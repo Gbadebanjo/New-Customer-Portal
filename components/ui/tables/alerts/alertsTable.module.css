@@ -1,0 +1,422 @@
+/* ── Container ─────────────────────────────────────── */
+.container {
+    padding: 24px 28px;
+    font-family: 'Kanit', sans-serif;
+    color: #E1E7ED;
+}
+
+/* ── Controls row ──────────────────────────────────── */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.controlGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 200px;
+}
+
+.label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #9aafc4;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.select,
+.dateInput {
+    height: 42px;
+    background: #123751;
+    border: 1px solid #1d4d6e;
+    border-radius: 6px;
+    color: #E1E7ED;
+    font-size: 0.9rem;
+    font-family: 'Kanit', sans-serif;
+    padding: 0 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 220px;
+}
+
+.select:focus,
+.dateInput:focus {
+    border-color: #3498DB;
+}
+
+.select option {
+    background: #123751;
+}
+
+/* Webkit datetime-local icon color */
+.dateInput::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    cursor: pointer;
+}
+
+/* ── Load button ───────────────────────────────────── */
+.loadBtn {
+    height: 42px;
+    padding: 0 24px;
+    background: #3498DB;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Kanit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    min-width: 130px;
+}
+
+.loadBtn:hover:not(:disabled) {
+    background: #2980b9;
+}
+
+.loadBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinnerRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Status message ────────────────────────────────── */
+.statusMsg {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+}
+
+.error {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.success {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27ae60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+/* ── Asset meta line ───────────────────────────────── */
+.assetMeta {
+    font-size: 0.85rem;
+    color: #9aafc4;
+    margin-bottom: 14px;
+}
+
+/* ── Summary cards ─────────────────────────────────── */
+.summaryCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 80px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    gap: 2px;
+}
+
+.cardCount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.cardLabel {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.85;
+}
+
+.cardError {
+    background: rgba(231, 76, 60, 0.15);
+    border-color: rgba(231, 76, 60, 0.35);
+    color: #e74c3c;
+}
+
+.cardWarn {
+    background: rgba(230, 126, 34, 0.15);
+    border-color: rgba(230, 126, 34, 0.35);
+    color: #e67e22;
+}
+
+.cardOk {
+    background: rgba(39, 174, 96, 0.15);
+    border-color: rgba(39, 174, 96, 0.35);
+    color: #27ae60;
+}
+
+.cardTotal {
+    background: rgba(52, 152, 219, 0.15);
+    border-color: rgba(52, 152, 219, 0.35);
+    color: #3498db;
+}
+
+/* ── Filter tabs ───────────────────────────────────── */
+.filterTabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filterTab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #1d4d6e;
+    background: transparent;
+    color: #9aafc4;
+    font-family: 'Kanit', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.filterTab:hover {
+    border-color: #3498db;
+    color: #E1E7ED;
+}
+
+.filterTabActive {
+    background: #1d4d6e;
+    color: #E1E7ED;
+    border-color: #3498db;
+}
+
+.tabError.filterTabActive {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.tabWarn.filterTabActive {
+    background: rgba(230, 126, 34, 0.2);
+    border-color: #e67e22;
+    color: #e67e22;
+}
+
+.tabOk.filterTabActive {
+    background: rgba(39, 174, 96, 0.2);
+    border-color: #27ae60;
+    color: #27ae60;
+}
+
+.tabBadge {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 0.75rem;
+}
+
+/* ── Table ─────────────────────────────────────────── */
+.tableWrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #1d4d6e;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.th {
+    background: #1A5276;
+    color: #b8d4ea;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 11px 14px;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid #1d4d6e;
+}
+
+.tr {
+    transition: background 0.15s;
+    border-bottom: 1px solid rgba(173, 216, 230, 0.1);
+}
+
+.tr:last-child {
+    border-bottom: none;
+}
+
+.tr:hover {
+    background: rgba(52, 152, 219, 0.05);
+}
+
+/* Left border accent per row status */
+.rowError {
+    border-left: 3px solid rgba(231, 76, 60, 0.5);
+}
+
+.rowWarn {
+    border-left: 3px solid rgba(230, 126, 34, 0.5);
+}
+
+.rowOk {
+    border-left: 3px solid rgba(39, 174, 96, 0.3);
+}
+
+.td {
+    padding: 10px 14px;
+    vertical-align: middle;
+    color: #D0DCE8;
+}
+
+/* ── Cell content ──────────────────────────────────── */
+.timestamp {
+    font-size: 0.8rem;
+    color: #9aafc4;
+    white-space: nowrap;
+}
+
+.alertContent {
+    font-weight: 500;
+    color: #E1E7ED;
+}
+
+.deviceCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.deviceName {
+    font-size: 0.85rem;
+    color: #c4d6e6;
+}
+
+.serialNo {
+    font-size: 0.72rem;
+    color: #6b8ca8;
+}
+
+.provider {
+    font-size: 0.78rem;
+    color: #7a9bb5;
+    text-transform: capitalize;
+}
+
+/* ── Status badges ─────────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badgeError {
+    background: rgba(231, 76, 60, 0.18);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.badgeWarn {
+    background: rgba(230, 126, 34, 0.18);
+    color: #e67e22;
+    border: 1px solid rgba(230, 126, 34, 0.3);
+}
+
+.badgeOk {
+    background: rgba(39, 174, 96, 0.18);
+    color: #27ae60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e74c3c;
+    flex-shrink: 0;
+}
+
+.dotWarn {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e67e22;
+    flex-shrink: 0;
+}
+
+.dotOk {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #27ae60;
+    flex-shrink: 0;
+}
+
+/* ── Empty / initial state ─────────────────────────── */
+.noData {
+    padding: 40px;
+    text-align: center;
+    color: #6b8ca8;
+    font-size: 0.9rem;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 60px 20px;
+    color: #6b8ca8;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.emptyIcon {
+    width: 48px;
+    height: 48px;
+    color: #3498db;
+    opacity: 0.5;
+}

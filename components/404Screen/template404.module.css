@@ -1,0 +1,67 @@
+.container {
+  background: #0d202f;
+  height: 100vh;
+  color: #e1e7ed;
+}
+
+.header {
+  display: flex; /* Use flexbox */
+  align-items: center;
+  padding: 10px 20px; /* Add padding for spacing */
+  border-bottom: 1px solid var(--lpx-border-color);
+  background-color: #0d202f;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin: 0;
+}
+
+.header span:first-child {
+  margin-right: 10px;
+}
+
+.content {
+  background-color: #0d202f;
+  max-width: 80%; /* Set a max-width for the content */
+  margin: 0 auto; /* Center the content */
+}
+
+.centerContent {
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 75px;
+  margin-bottom: 75px;
+  height: 500px;
+  border-radius: 14px;
+  gap: 77px;
+  background-color: #0d2638; /* black color with 50% opacity */
+  z-index: 1; /* Ensure it's above the layer mask */
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /*height: 100%;*/
+}
+
+.leftContent {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.orangeText {
+  color: #ff7d70;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 40px;
+  font-weight: 500;
+}
+
+.blueButton {
+  font-size: 1.5rem;
+  color: dodgerblue;
+  margin-bottom: 0 !important;
+  box-sizing: border-box;
+}
+
+.backButton {
+  padding-bottom: 10px;
+}

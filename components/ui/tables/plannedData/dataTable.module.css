@@ -1,0 +1,64 @@
+.mainContent {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 20px;
+}
+
+.mainContent th,
+.mainContent td {
+  padding: 16px 12px;
+  text-align: left;
+  white-space: nowrap; /* Prevent text wrapping for better spacing */
+  font-size: 1.1rem;
+}
+
+.mainContent th {
+  font-size: 0.9rem;
+}
+
+.searchArea {
+  display: flex;
+  border-radius: 14px;
+  padding: 20px 20px;
+}
+
+.searchTextInput {
+  width: 100%;
+  height: 60px;
+}
+
+.searchButton {
+  width: 60px;
+  height: 60px;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.filterText {
+  display: flex;
+  color: #ff7d70;
+  padding: 0 20px;
+}
+
+.inputText {
+  width: 100%;
+  height: 60px;
+  background: #123751;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border: 1px #123751 solid;
+  opacity: 0.6;
+  color: #e1e7ed;
+  font-size: 1.2rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+  padding-left: 10px;
+}
+
+.table {
+  overflow-x: auto;
+  width: 100%;
+  min-width: 900px; /* Ensures table is wide enough to scroll */
+}

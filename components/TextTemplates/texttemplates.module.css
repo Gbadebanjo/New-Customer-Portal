@@ -1,0 +1,177 @@
+/* ── Page shell ─────────────────────────────────────── */
+.content {
+    padding: 0;
+    margin: 0;
+    background-color: #0d202f;
+    color: #e1e7ed;
+    font-family: 'Kanit', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+}
+
+/* ── Breadcrumb header ──────────────────────────────── */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    gap: 6px;
+    color: #b0b7bd;
+    font-size: 0.85rem;
+}
+
+.header span:first-child {
+    display: flex;
+    align-items: center;
+}
+
+/* ── Title row ──────────────────────────────────────── */
+.topCenter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px 16px;
+    margin-left: 6px;
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* ── Outer panel ────────────────────────────────────── */
+.centerContent {
+    margin: 0 20px 80px;
+    border-radius: 14px;
+    background-color: #0d2638;
+    padding: 24px 24px 60px;
+    position: relative;
+    min-height: 420px;
+}
+
+/* ── Search bar ─────────────────────────────────────── */
+.searchArea {
+    margin-bottom: 24px;
+}
+
+.inputText {
+    width: 100%;
+    max-width: 480px;
+    height: 46px;
+    background: #123751;
+    border-radius: 8px;
+    border: 1px solid #1d3344;
+    color: #e1e7ed;
+    font-size: 15px;
+    font-family: sans-serif;
+    font-weight: 400;
+    padding: 0 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.inputText::placeholder {
+    color: #b0b7bd;
+    opacity: 1;
+}
+
+.inputText:focus {
+    border-color: #ff7d70;
+}
+
+/* ── Card grid ──────────────────────────────────────── */
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+/* ── Individual card ────────────────────────────────── */
+.card {
+    background: #1d3344;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    border-color: rgba(255, 125, 112, 0.35);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.cardIcon {
+    display: flex;
+    align-items: center;
+}
+
+.cardBody {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cardTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.cardSubtitle {
+    font-size: 12px;
+    color: #b0b7bd;
+    margin: 0;
+    font-family: monospace;
+}
+
+.pill {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 10px;
+    background: rgba(255, 125, 112, 0.15);
+    color: #ff7d70;
+    border: 1px solid rgba(255, 125, 112, 0.4);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.cardFooter {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ── Empty state ────────────────────────────────────── */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 280px;
+    color: #b0b7bd;
+    font-size: 15px;
+}
+
+/* ── Copyright ──────────────────────────────────────── */
+.copyright {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 0.72rem;
+    color: #b0b7bd;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+}

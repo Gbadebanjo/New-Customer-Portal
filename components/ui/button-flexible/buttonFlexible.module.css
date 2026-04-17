@@ -1,0 +1,20 @@
+.btn {
+    padding: 15px;
+    font-family: 'Inter', sans-serif;
+    background: #FF7D70;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 5px;
+    border: 1px #FF7D70 solid;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    gap: 5px;
+}
+
+.btn:hover {
+    background-color: #f26a6d;
+    border: 1px #f26a6d solid;
+}
+

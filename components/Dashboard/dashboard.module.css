@@ -1,0 +1,121 @@
+.container {
+  /* display: flex; */
+  height: auto; /* Full viewport height */
+  background-color: #0d202f; /* Dark background color */
+}
+
+.header {
+  display: flex; /* Use flexbox */
+  align-items: center;
+  font-size: 14px;
+  padding: 5px 20px; /* Add padding for spacing */
+  border-bottom: 1px solid var(--lpx-border-color);
+  background-color: #0d202f;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin: 0; /* Add horizontal margin */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.content {
+  margin: 0;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.header span:first-child {
+  margin-right: 10px;
+}
+
+.mainContent {
+  overflow-y: auto; /* Added overflow-y for vertical scrolling */
+  min-height: 380px; /* Automatically adjusts height to 380px */
+  height: fit-content; /* Allows the container to expand vertically */
+}
+
+.centerContent {
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 75px;
+  margin-bottom: 75px;
+  height: 80vh;
+  border-radius: 14px;
+  gap: 77px;
+  background: rgba(59, 68, 75, 0.85); /* Apply background color here */
+  z-index: 1; /* Ensure it's above the layer mask */
+}
+
+/* Sidebar styling */
+.sidebar {
+  /*height: calc(100vh - 40px); !* Adjusted height to fit within the container *!*/
+  min-height: fit-content; /* Automatically adjusts height to contain content */
+  height: auto; /* Allows the container to expand vertically */
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.sidebarHeader {
+  color: white;
+  fontsize: 24px;
+  fontfamily: "Kanit";
+  fontweight: 500;
+  margin-bottom: 50px; /* Added margin-bottom for spacing */
+}
+
+.noSitesIconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-top: 40px;
+}
+
+.copyright {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 1px solid var(--lpx-border-color);
+  font-size: 0.725rem;
+  color: gray;
+  width: 100%;
+  text-align: center;
+  padding-left: 0; /* Adjust padding as needed */
+  padding-right: 0; /* Adjust padding as needed */
+}
+
+.filterText {
+  display: flex;
+  color: #ff7d70;
+  padding: 0 20px;
+}
+
+.mainContent td {
+  border-top: 0.5px solid rgba(173, 216, 230, 0.3); /* Use a thinner and dimmer color */
+  border-bottom: 0.5px solid rgba(173, 216, 230, 0.3); /* Use a thinner and dimmer color */
+  padding: 8px; /* Add padding for better spacing */
+}
+
+.largeText {
+  color: #fff;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 30px;
+  font-family: "Kanit";
+  font-weight: 500;
+}
+.link {
+  color: #ff7d70;
+}

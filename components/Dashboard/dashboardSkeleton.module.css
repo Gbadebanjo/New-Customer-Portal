@@ -1,0 +1,135 @@
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(59, 68, 75, 0.6) 25%,
+    rgba(90, 103, 115, 0.7) 50%,
+    rgba(59, 68, 75, 0.6) 75%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 6px;
+}
+
+.grid {
+  min-height: 100vh;
+  display: grid;
+  margin: 20px;
+  padding: 20px;
+  grid-template-areas:
+    "topLeft    topCenter  topCenter  topRight"
+    "solar      co2        trees      rightSide"
+    "powerGen   lastUpdated lastUpdated rightSide"
+    "donut      donut      donut      rightSide";
+  grid-template-columns: 1fr 1fr 1fr 2fr;
+  grid-template-rows: auto auto auto auto;
+  gap: 20px;
+}
+
+.card {
+  background: rgba(59, 68, 75, 0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 160px;
+}
+
+.topLeft   { grid-area: topLeft;  margin-top: 25px; }
+.topCenter { grid-area: topCenter; margin-top: 25px; display: flex; justify-content: flex-end; }
+.topRight  { grid-area: topRight;  margin-top: 25px; }
+.solar     { grid-area: solar; }
+.co2       { grid-area: co2; }
+.trees     { grid-area: trees; }
+.rightSide { grid-area: rightSide; background: rgba(59, 68, 75, 0.85); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 16px; align-self: stretch; }
+.powerGen  { grid-area: powerGen; }
+.lastUpdated { grid-area: lastUpdated; display: flex; justify-content: flex-end; align-items: flex-end; }
+.donut     { grid-area: donut; background: rgba(59, 68, 75, 0.85); border-radius: 10px; padding: 20px; min-height: 200px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+
+/* Placeholder shapes */
+.title  { height: 24px; width: 140px; }
+.meta   { height: 16px; width: 200px; }
+.line   { height: 14px; }
+.wide   { width: 80%; }
+.narrow { width: 55%; }
+.circle { width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0; }
+.btn    { width: 64px; height: 34px; border-radius: 5px; flex-shrink: 0; }
+
+.siteRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(86, 87, 83, 0.4);
+  gap: 12px;
+}
+
+.siteInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.donutRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.donutCircle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.powerSources {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.powerSource {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "topLeft    topCenter"
+      "solar      co2"
+      "trees      trees"
+      "powerGen   lastUpdated"
+      "donut      donut"
+      "topRight   topRight"
+      "rightSide  rightSide";
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "topLeft" "topCenter" "solar" "co2" "trees"
+      "powerGen" "lastUpdated" "donut" "topRight" "rightSide";
+  }
+}

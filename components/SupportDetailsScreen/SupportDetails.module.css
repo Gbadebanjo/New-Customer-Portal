@@ -1,0 +1,23 @@
+.container {
+  background: #0d202f;
+  height: 100%;
+  color: #e1e7ed;
+}
+
+.header {
+  grid-area: header;
+  display: flex; /* Use flexbox */
+  align-items: center; /* Align items vertically */
+  padding: 0 20px; /* Add padding for spacing */
+}
+
+.header span:first-child {
+  margin: 10px; /* Adjust margin for spacing */
+}
+
+.content {
+  margin: 0; /* Reset margin */
+  background-color: #0d202f;
+}
+
+

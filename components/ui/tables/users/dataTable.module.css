@@ -1,0 +1,76 @@
+.searchArea {
+    display: flex;
+    justify-content: space-between; /* Space between elements */
+    align-items: center; /* Align items vertically */
+    padding: 20px; /* Add padding for spacing */
+}
+
+.searchTextInput {
+    width: 100%;
+    height: 60px;
+    /* justify-content: center;
+    align-items: center;
+    display: inline-flex; */
+}
+
+.searchButton {
+    width: 60px;
+    height: 60px;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+}
+
+.filterText {
+    display: flex;
+    color: #FF7D70;
+    padding: 0 20px;
+    font-size: 1.18rem;
+    justify-items: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.inputText {
+    width: 100%;
+    height: 60px;
+    background: #123751;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border: 1px #123751 solid;
+    opacity: 0.60;
+    color: #E1E7ED;
+    font-size: 1.2rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    word-wrap: break-word;
+    padding-left: 10px;
+}
+
+.mainContent {
+    overflow-x: auto;
+    overflow-y: auto;
+    min-height: auto;
+    height: fit-content;
+    padding: 20px;
+}
+
+.mainContent table {
+    min-width: 900px;
+}
+
+.mainContent td {
+    border-top: 0.5px solid rgba(173, 216, 230, 0.1);
+    border-bottom: 0.5px solid rgba(173, 216, 230, 0.1);
+    padding: 10px 15px;
+    white-space: nowrap;
+    font-size: 1.1rem;
+}
+
+.mainContent th {
+    font-size: 0.89rem;
+    white-space: nowrap;
+}
+

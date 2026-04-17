@@ -1,0 +1,80 @@
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modalLayout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  scrollbar-width: thin;
+  overflow-y: auto;
+  height: auto;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.modalContainer {
+  background-color: #0d202f;
+  max-width: 640px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  margin-block: 30px;
+  padding: 2.5rem 2rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.labelText {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.inputField {
+  background: transparent;
+  border: 1px solid #7c8796;
+  background-color: #123751;
+  border-color: #23262a;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  height: 60px;
+  width: 100%;
+  
+}
+
+.popUpHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn {
+    width: 80px;
+    height: 50px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background: #FF7D70;
+    border-radius: 5px;
+    border: 1px #FF7D70 solid;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    display: inline-flex;
+}
+
+.btn:hover {
+    background-color: #f26a6d;
+    border: 1px #f26a6d solid;
+}

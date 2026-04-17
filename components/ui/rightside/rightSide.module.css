@@ -1,0 +1,53 @@
+.rightSide {
+  grid-area: rightSide;
+  background: #0d2638;
+  min-height: 100vh; /* Automatically adjusts height to contain content */
+  height: auto;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 40px;
+}
+
+.profileIconDiv {
+  background-color: #ff7d70;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-radius 0.2s;
+}
+
+.profileIconDiv:hover {
+  border-radius: 30%;
+}
+
+.roleBadge {
+  margin-top: 8px;
+  background-color: #1d3344;
+  color: #ff7d70;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  max-width: 80%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileInitial {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}
+

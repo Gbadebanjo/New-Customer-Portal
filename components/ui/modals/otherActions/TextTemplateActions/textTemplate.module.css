@@ -1,0 +1,254 @@
+/* ── Modal backdrop layout ───────────────────────────── */
+.modalLayout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+/* ── Edit trigger button ─────────────────────────────── */
+.editBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255, 125, 112, 0.12);
+    color: #ff7d70;
+    border: 1px solid rgba(255, 125, 112, 0.35);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    font-family: inherit;
+}
+
+.editBtn:hover {
+    background: rgba(255, 125, 112, 0.22);
+    border-color: rgba(255, 125, 112, 0.6);
+}
+
+/* ── Modal box ───────────────────────────────────────── */
+.modalBox {
+    background: #0d202f;
+    border: 1px solid #1d3344;
+    border-radius: 14px;
+    padding: 28px 28px 24px;
+    width: 90vw;
+    max-width: 800px;
+    max-height: 88vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    color: #e1e7ed;
+    margin-block: 30px;
+    scrollbar-width: thin;
+}
+
+/* ── Modal header ────────────────────────────────────── */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.modalTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 4px;
+    line-height: 1.3;
+}
+
+.modalSubtitle {
+    font-size: 12px;
+    color: #b0b7bd;
+    margin: 0;
+    font-family: monospace;
+}
+
+.closeLink {
+    color: #b0b7bd;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.closeLink:hover {
+    color: #ff7d70;
+}
+
+/* ── Tabs ────────────────────────────────────────────── */
+.tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #1d3344;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 8px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #b0b7bd;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+    margin-bottom: -1px;
+}
+
+.tab:hover {
+    color: #e1e7ed;
+}
+
+.tabActive {
+    color: #ff7d70;
+    border-bottom-color: #ff7d70;
+}
+
+/* ── Tab content area ────────────────────────────────── */
+.tabContent {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+/* ── Edit panel ──────────────────────────────────────── */
+.editPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.fieldLabel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #b0b7bd;
+    letter-spacing: 0.02em;
+}
+
+.textInput {
+    width: 100%;
+    height: 44px;
+    background: #123751;
+    border: 1px solid #1d3344;
+    border-radius: 8px;
+    color: #e1e7ed;
+    font-size: 14px;
+    font-family: inherit;
+    padding: 0 12px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.textInput:focus {
+    border-color: #ff7d70;
+}
+
+.textInput::placeholder {
+    color: #b0b7bd;
+}
+
+.readOnlyField {
+    width: 100%;
+    min-height: 44px;
+    background: #0d2638;
+    border: 1px solid #1d3344;
+    border-radius: 8px;
+    color: #b0b7bd;
+    font-size: 13px;
+    font-family: monospace;
+    padding: 10px 12px;
+    line-height: 1.4;
+}
+
+.contentTextarea {
+    width: 100%;
+    min-height: 350px;
+    background: #123751;
+    border: 1px solid #1d3344;
+    border-radius: 8px;
+    color: #e1e7ed;
+    font-size: 13px;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 12px;
+    outline: none;
+    resize: vertical;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+}
+
+.contentTextarea:focus {
+    border-color: #ff7d70;
+}
+
+.contentTextarea::placeholder {
+    color: #b0b7bd;
+}
+
+.helperText {
+    font-size: 11px;
+    color: #b0b7bd;
+    font-style: italic;
+}
+
+/* ── Preview panel ───────────────────────────────────── */
+.previewPanel {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1d3344;
+    min-height: 350px;
+}
+
+.previewFrame {
+    width: 100%;
+    min-height: 420px;
+    border: none;
+    display: block;
+    background: #ffffff;
+}
+
+.previewEmpty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 350px;
+    background: #0d2638;
+    color: #b0b7bd;
+    font-size: 14px;
+}
+
+/* ── Modal action footer ─────────────────────────────── */
+.modalAction {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid #1d3344;
+}
+
+/* ── Alert modal ─────────────────────────────────────── */
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.popUpHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

@@ -1,0 +1,256 @@
+.sidebarMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+  height: 100vh;
+  width: 340px;
+  min-width: 340px;
+  background-color: #0d2638;
+  transition: width 0.5s;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+@media (max-width: 768px) {
+  .sidebarMenu {
+    width: 280px;
+    min-width: 280px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    gap: 32px;
+  }
+
+  .collapsed {
+    width: 280px !important;
+    min-width: 280px !important;
+  }
+}
+
+.sidebarHeaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 10px 20px 20px;
+}
+
+.sidebarHeader {
+  color: white;
+  font-size: 1.2rem;
+  font-family: "Kanit";
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hamburgerMenu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  color: white;
+}
+
+.menuItem {
+  color: #e1e7ed;
+  font-size: 17px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  line-height: 23px;
+  word-wrap: break-word;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 3px 40px;
+}
+
+.menuItemOrange {
+  color: #ff7d70;
+  font-size: 17px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  line-height: 23px;
+  word-wrap: break-word;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 3px 40px;
+}
+
+.chevronDownIcon {
+  transition: color 0.2s;
+  color: #828f98;
+}
+
+.chevronIcon {
+  color: #ff7d70;
+  transition: color 0.2s;
+}
+
+.menuItem:hover,
+.chevronDownIcon:hover {
+  color: #ff7d70 !important;
+}
+
+.innerMenu {
+  margin-left: 0;
+  list-style-type: none;
+  font-size: 17px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  line-height: 23px;
+  padding-left: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.innerMenu:hover {
+  color: #ff7d70;
+}
+
+.innerMenuItem {
+  color: #e1e7ed;
+}
+
+.subMenuOrange {
+  color: #ff7d70;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 20px 10px 40px;
+  margin-top: 0;
+}
+
+.subMenuItemIdentity {
+  color: #e1e7ed;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 20px 10px 40px;
+}
+
+.subMenuItemIdentity:hover {
+  color: #ff7d70;
+}
+
+.subMenuOrangeIdentity {
+  color: #ff7d70;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 20px 10px 40px;
+  margin-top: 0;
+}
+
+.subMenuItem {
+  color: #e1e7ed;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 20px 10px 40px;
+}
+
+.subMenuItem:hover {
+  color: #ff7d70;
+}
+
+.subSubMenuItem {
+  color: #e1e7ed;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px 10px 55px;
+}
+
+.subSubMenuItem:hover {
+  color: #ff7d70;
+}
+
+.subSubMenuItemOrange {
+  color: #ff7d70;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px 10px 55px;
+}
+
+.dayStarLogoForMenu {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  margin-bottom: 35px;
+  margin-top: 60px;
+  margin-left: 20px;
+}
+
+/* Assuming DashboardIcon is a SVG wrapped inside a span */
+.menuItem span:first-child {
+  margin-right: 10px; /* Adjust margin for spacing */
+}
+
+.menuItem span:nth-child(3) {
+  margin-left: 100px; /* Adjust margin for spacing */
+}
+
+.menuItemOrange span:nth-child(3) {
+  margin-left: 100px; /* Adjust margin for spacing */
+}
+
+.menuItemOrange span:first-child {
+  margin-right: 10px; /* Adjust margin for spacing */
+}
+
+.subMenuItem span:first-child,
+.subMenuOrange span:first-child,
+.subMenuOrangeIdentity span:first-child,
+.subMenuItemIdentity span:first-child {
+  margin-right: 10px;
+}
+
+.collapsed {
+  width: 90px !important;
+  min-width: 90px !important;
+  transition: width 0.5s;
+}
+
+.collapsed .hamburgerMenu {
+  width: 30px !important;
+  min-width: 30px !important;
+  transition: width 0.5s;
+}
+
+.collapsed .sidebarHeaderContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.expandedOnHover .sidebarHeaderContainer {
+  justify-content: space-between;
+}
+
+.collapsed .sidebarHeader,
+.collapsed .menuItem span:not(:first-child),
+.collapsed .menuItemOrange span:not(:first-child),
+.collapsed .subMenuItem span:not(:first-child),
+.collapsed .subMenuOrange span:not(:first-child),
+.collapsed .subMenuOrangeIdentity span:not(:first-child),
+.collapsed .dayStarLogoForMenu,
+.collapsed .subMenuItemIdentity span:not(:first-child) {
+  display: none;
+}
+
+.expandedOnHover {
+  width: 340px !important;
+  min-width: 340px !important;
+  transition: width 0.5s;
+}
+
+.expandedOnHover .sidebarHeader,
+.expandedOnHover .menuItem span:not(:first-child),
+.expandedOnHover .menuItemOrange span:not(:first-child),
+.expandedOnHover .subMenuItem span:not(:first-child),
+.expandedOnHover .subMenuOrange span:not(:first-child),
+.expandedOnHover .subMenuOrangeIdentity span:not(:first-child),
+.expandedOnHover .subMenuItemIdentity span:not(:first-child) {
+  display: inline;
+}

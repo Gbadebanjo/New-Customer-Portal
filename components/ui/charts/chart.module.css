@@ -1,0 +1,110 @@
+.chartCard {
+    background: #0d2638;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chartTitle {
+    color: #4b7a9c;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.chartControls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dateInput {
+    background: #1c384e;
+    border: 1px solid #2d4f66;
+    border-radius: 6px;
+    color: #e1e7ed;
+    padding: 4px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.intervalBtn {
+    padding: 4px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #1c384e;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.downloadBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #1c384e;
+    color: #e1e7ed;
+    transition: background 0.15s;
+}
+
+.downloadBtn:hover {
+    background: #2d5470;
+}
+
+.chartBody {
+    height: 320px;
+}
+
+.chartBodyTall {
+    height: 360px;
+}
+
+.chartPlaceholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b0b7bd;
+}
+
+@media screen and (max-width: 768px) {
+    .chartCard {
+        padding: 14px 10px;
+    }
+
+    .chartHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .chartControls {
+        width: 100%;
+    }
+
+    .chartBody {
+        height: 240px;
+    }
+
+    .chartBodyTall {
+        height: 280px;
+    }
+
+    .chartTitle {
+        font-size: 1rem;
+    }
+}

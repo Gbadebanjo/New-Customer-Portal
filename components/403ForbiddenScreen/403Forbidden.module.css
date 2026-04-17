@@ -1,0 +1,161 @@
+.container {
+    background: #0D202F;
+    height: 100vh;
+    color: #E1E7ED;
+    fontSize: 15px; /* Changed from fontSize to font-size */
+    fontFamily: 'Kanit';
+    fontWeight: 300; /* Changed from fontWeight to font-weight */
+    line-height: 23px;
+    wordWrap: break-word; /* Changed from wordWrap to word-wrap */
+    display: grid;
+    grid-template-areas:
+            'nav header rightSide'
+             'nav content rightSide'
+             'nav content rightSide';
+    grid-template-columns: 5fr 15fr 1fr;
+    grid-template-rows: 40px 100px 1fr;
+    overflow-y: auto; /* Added overflow-y for vertical scrolling */
+}
+
+/* Individual components styling */
+.nav {
+    padding: 20px;
+    grid-area: nav;
+    background: #0D2638;
+}
+
+.header {
+    grid-area: header;
+    display: flex; /* Use flexbox */
+    align-items: center; /* Align items vertically */
+    padding: 0 20px; /* Add padding for spacing */
+}
+
+/* Styles for HomeIcon */
+/* Assuming HomeIcon is a SVG wrapped inside a span */
+.header span:first-child {
+    margin-right: 10px; /* Adjust margin for spacing */
+}
+
+.content {
+    grid-area: content;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    background-size: cover;
+    background-position: center;
+    /*background-color: #121212;*/
+    /*background-color: rgba(59, 68, 75, 0.75); !* black color with 50% opacity *!*/
+    opacity: 0.95; /* Set opacity to 50% */
+}
+
+.rightSide {
+    grid-area: rightSide;
+    background: #0D2638;
+    min-height: fit-content; /* Automatically adjusts height to contain content */
+    height: auto; /* Allows the container to expand vertically */
+}
+
+.profileIconDiv {
+    margin: 40px 20px 10px;
+}
+
+.profileUserDiv {
+    margin: 10px 10px;
+}
+
+/* Sidebar styling */
+.sidebar {
+    /*height: calc(100vh - 40px); !* Adjusted height to fit within the container *!*/
+    min-height: fit-content; /* Automatically adjusts height to contain content */
+    height: auto; /* Allows the container to expand vertically */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.sidebarHeader {
+    color: white;
+    fontSize: 24px;
+    fontFamily: 'Kanit';
+    fontWeight: 500;
+    margin-bottom: 50px; /* Added margin-bottom for spacing */
+}
+
+
+.centerContent {
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 75px;
+    margin-bottom: 75px;
+    height: 500px;
+    border-radius: 14px;
+    gap: 77px;
+    background-color: #0D2638; /* black color with 50% opacity */
+    z-index: 1; /* Ensure it's above the layer mask */
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /*height: 100%;*/
+}
+
+.leftContent {
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.rightContent {
+
+}
+
+.orangeText {
+    color: #FF7D70;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 40px;
+    fontFamily: 'Kanit';
+    font-weight: 500;
+}
+
+.blueButton {
+    font-size: 1.5rem;
+    color: dodgerblue;
+    margin-bottom: 0 !important;
+    box-sizing: border-box;
+}
+
+.backButton {
+    padding-bottom: 10px;
+}
+
+.copyright {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--lpx-border-color);
+    font-size: .725rem;
+    color: gray;
+    width: 100%;
+    text-align: center;
+    padding-left: 0; /* Adjust padding as needed */
+    padding-right: 0; /* Adjust padding as needed */
+}
+
+.filterText {
+    display: flex;
+    color: #FF7D70;
+    padding: 0 20px;
+}
+
+.mainContent td {
+    border-top: 0.5px solid rgba(173, 216, 230, 0.3); /* Use a thinner and dimmer color */
+    border-bottom: 0.5px solid rgba(173, 216, 230, 0.3); /* Use a thinner and dimmer color */
+    padding: 8px; /* Add padding for better spacing */
+}

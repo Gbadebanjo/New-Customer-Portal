@@ -1,0 +1,439 @@
+.gridContainer {
+  min-height: 100vh;
+  color: #e1e7ed;
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: 300;
+  display: grid;
+  margin: 20px;
+  padding: 20px;
+  grid-template-areas:
+    "topLeft    topCenter1  topCenter1  topRight"
+    "solar      co2         trees       rightSide"
+    "powerGen   lastUpdated lastUpdated rightSide"
+    "donut      donut       donut       rightSide";
+  grid-template-columns: 1fr 1fr 1fr 2fr;
+  grid-template-rows: auto auto auto auto;
+  gap: 20px;
+  background-size: cover;
+}
+
+.card {
+  border-radius: 24px;
+  padding: 15px;
+  z-index: 1;
+  background: rgba(59, 68, 75, 0.65);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Ensure the card takes up the full height of its grid cell */
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.cardSubtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #b0b7bd;
+}
+
+.solar,
+.co2,
+.trees {
+  border-radius: 10px;
+  padding: 15px;
+  z-index: 1;
+  background: rgba(59, 68, 75, 0.65);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  gap: 10px;
+}
+
+.cardBody {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  justify-content: center;
+  background-color: #777c80;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+}
+
+.rightSide {
+  grid-area: rightSide;
+  background: rgba(59, 68, 75, 0.85);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  border-radius: 10px;
+  scrollbar-color: #ff7d70 #2c333a;
+  padding: 20px;
+  align-self: stretch;
+}
+
+/* For Chrome, Edge, Safari */
+.rightSide::-webkit-scrollbar {
+  width: 8px;
+  background: #2c333a;
+  border-radius: 8px;
+}
+
+.rightSide::-webkit-scrollbar-thumb {
+  background: #ff7d70;
+  border-radius: 8px;
+}
+
+.rightSide::-webkit-scrollbar-thumb:hover {
+  background: #ff9770;
+}
+
+.topLeft {
+  grid-area: topLeft;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  margin-top: 25px;
+}
+
+.topCenter1 {
+  grid-area: topCenter1;
+  grid-column: span 2;
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  margin-top: 25px;
+}
+
+.topRight {
+  grid-area: topRight;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  margin-top: 25px;
+}
+
+.rightContainer {
+  display: flex;
+  align-items: center; /* Vertically center the items */
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.rightSide hr {
+  border: none;
+  border-top: 1px solid #565753;
+  margin: 8px 0;
+}
+
+.rightSideName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  text-align: left;
+  width: 100%;
+}
+
+.rightSideDetails {
+  font-size: 1rem;
+  color: #b0b7bd;
+  font-weight: 500;
+}
+
+.rightBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff7d70;
+  cursor: pointer;
+  padding: 10px 15px;
+  border: 1px solid #ff7d70;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.rightBtn:hover {
+  background-color: #ff7d70;
+  border-color: #ff9770;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.powerGen {
+  grid-area: powerGen;
+  background: none;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.lastUpdated {
+  grid-area: lastUpdated;
+  display: flex;
+  background: none;
+  margin-bottom: 0;
+  margin-top: 0;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.donut {
+  grid-area: donut;
+  background: rgba(59, 68, 75, 0.85);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  height: auto;
+}
+
+.donutContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.donutHeader {
+  font-weight: bold;
+  text-align: left;
+  justify-self: left;
+  align-self: flex-start;
+  font-size: 0.93rem;
+  color: #b0b7bd;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.donutHeaderTwo {
+  font-weight: bold;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
+  font-size: 0.93rem;
+  color: #b0b7bd;
+  font-weight: 500;
+  margin-bottom: 5%;
+}
+
+.donutFigure {
+  flex: 1;
+  align-self: center;
+  justify-self: center;
+}
+
+.donutFooter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 16px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.powerSource {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9em;
+  min-width: 120px;
+  flex: 1 1 120px;
+}
+
+.powerSourceTop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 6px;
+}
+
+.powerSource span {
+  margin-top: 5px;
+}
+
+.copyright {
+  bottom: 0;
+  /* left: 50%; */
+  border-bottom: 1px solid #fff;
+  font-size: 0.725rem;
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.figure {
+  margin-top: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  align-self: center;
+  justify-self: center;
+}
+
+.whiteTitle {
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+/* Tablet: stack into 2 columns, donut + active sites side by side */
+@media (max-width: 1200px) {
+  .gridContainer {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "topLeft    topCenter1"
+      "solar      co2"
+      "trees      trees"
+      "powerGen   lastUpdated"
+      "donut      donut"
+      "topRight   topRight"
+      "rightSide  rightSide";
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .donut,
+  .rightSide {
+    min-width: 0;
+  }
+}
+
+/* Large mobile: keep donut + active sites side by side */
+@media (max-width: 768px) {
+  .gridContainer {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "topLeft    topLeft"
+      "topCenter1 topCenter1"
+      "solar      co2"
+      "trees      trees"
+      "powerGen   lastUpdated"
+      "donut      donut"
+      "topRight   topRight"
+      "rightSide  rightSide";
+    margin: 8px;
+    padding: 8px;
+    gap: 12px;
+  }
+
+  .topCenter1 {
+    justify-content: flex-start;
+  }
+
+  .topRight {
+    justify-content: flex-start;
+  }
+
+  .donutHeader,
+  .donutHeaderTwo {
+    text-align: center;
+    align-self: center;
+  }
+
+  .donutFooter {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .powerSource {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 280px;
+    min-width: unset;
+  }
+
+  .powerSourceTop {
+    justify-content: flex-start;
+    flex: 1;
+  }
+}
+
+/* Small mobile: single column */
+@media (max-width: 480px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "topLeft"
+      "topCenter1"
+      "solar"
+      "co2"
+      "trees"
+      "powerGen"
+      "lastUpdated"
+      "donut"
+      "topRight"
+      "rightSide";
+    margin: 6px;
+    padding: 6px;
+    gap: 10px;
+  }
+
+  .solar,
+  .co2,
+  .trees {
+    min-height: 120px;
+  }
+
+  .cardTitle {
+    font-size: 1rem;
+  }
+
+  .whiteTitle {
+    font-size: 1rem;
+  }
+
+  .rightSideName {
+    font-size: 1rem;
+  }
+}

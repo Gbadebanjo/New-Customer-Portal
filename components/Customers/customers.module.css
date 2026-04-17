@@ -1,0 +1,147 @@
+.content {
+  height: 100%;
+  background-color: #0d202f;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex; /* Use flexbox */
+  align-items: center;
+  font-size: 14px;
+  padding: 5px 20px; /* Add padding for spacing */
+  border-bottom: 1px solid var(--lpx-border-color);
+  background-color: #0d202f;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin: 0; /* Add horizontal margin */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header span:first-child {
+  margin-right: 10px;
+}
+
+.topCenter {
+  display: flex; /* Use flexbox */
+  align-items: flex-end; /* Align items vertically */
+  justify-items: end;
+  justify-content: end; /* Center the content horizontally */
+  margin: 20px 30px;
+}
+
+.centerContent {
+  margin: 10px 20px;
+  border-radius: 14px;
+  min-height: fit-content; /* Automatically adjusts height to contain content */
+  height: auto; /* Allows the container to expand vertically */
+  background-color: #0d2638;
+}
+
+.searchArea {
+  display: flex;
+  border-radius: 14px;
+  justify-content: space-between; /* Space between elements */
+  align-items: center; /* Align items vertically */
+  padding: 20px 20px; /* Add padding for spacing */
+}
+
+.searchTextInput {
+  width: min(700px, 100%);
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.searchButton {
+  width: 48px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.mainContent {
+  overflow-x: auto;
+  overflow-y: auto;
+  min-height: 380px;
+  height: fit-content;
+}
+
+.inputText {
+  width: min(700px, 100%);
+  height: 50px;
+  background: #123751;
+  border-radius: 5px;
+  border: 1px #123751 solid;
+  opacity: 0.6;
+  color: #e1e7ed;
+  font-size: 18px;
+  font-family: sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+  padding-left: 10px;
+}
+
+.rightSide {
+  grid-area: rightSide;
+  background: #0d2638;
+  min-height: fit-content; /* Automatically adjusts height to contain content */
+  height: auto; /* Allows the container to expand vertically */
+}
+
+.profileIconDiv {
+  margin: 40px 20px 10px;
+}
+
+.profileUserDiv {
+  margin: 10px 10px;
+}
+
+/* Sidebar styling */
+.sidebar {
+  /*height: calc(100vh - 40px); !* Adjusted height to fit within the container *!*/
+  min-height: fit-content; /* Automatically adjusts height to contain content */
+  height: auto; /* Allows the container to expand vertically */
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.sidebarHeader {
+  color: white;
+  fontsize: 24px;
+  fontfamily: "Kanit";
+  fontweight: 500;
+  margin-bottom: 50px; /* Added margin-bottom for spacing */
+}
+
+.copyright {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 1px solid var(--lpx-border-color);
+  font-size: 0.725rem;
+  color: gray;
+  width: 100%;
+  text-align: center;
+  padding-left: 0; /* Adjust padding as needed */
+  padding-right: 0; /* Adjust padding as needed */
+}
+
+.filterText {
+  display: flex;
+  color: #ff7d70;
+  padding: 0 20px;
+}
+
+.mainContent td {
+  border-top: 0.5px solid rgba(173, 216, 230, 0.3); /* Use a thinner and dimmer color */
+  border-bottom: 0.5px solid rgba(173, 216, 230, 0.3); /* Use a thinner and dimmer color */
+  padding: 8px; /* Add padding for better spacing */
+}

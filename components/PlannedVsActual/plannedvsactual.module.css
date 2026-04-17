@@ -1,0 +1,125 @@
+
+.header {
+    grid-area: header;
+    display: flex; /* Use flexbox */
+    align-items: center; /* Align items vertically */
+    padding: 0 20px; /* Add padding for spacing */
+}
+
+.header span:first-child {
+    margin-right: 10px; /* Adjust margin for spacing */
+}
+
+.topCenter {
+    grid-area: header;
+    display: flex; /* Use flexbox */
+    justify-content: space-between; /* Space between elements */
+    align-items: center; /* Align items vertically */
+    padding: 0 20px; /* Add padding for spacing */
+    margin-top: 15px; /* Reduce top margin */
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.title {
+    margin-right: auto; /* Push the button to the right */
+    margin-bottom: 0; /* Remove default margin */
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    /* font-Family: 'Kanit'; */
+    font-weight: 500;
+    font-weight: 'bold';
+    color: white;
+    font-size: 27px !important;
+    line-height: 1.2;
+}
+
+.content {
+    grid-area: content;
+    padding: 0;
+    margin: 0;
+    background-size: cover;
+    background-position: center;
+    background-color: #0D202F;
+    opacity: 0.95; /* Set opacity to 50% */
+}
+
+.topMiddle {
+    display: flex; /* Use flexbox */
+    justify-content: space-between; /* Space between elements */
+    align-items: center; /* Align items vertically */
+    padding: 0 20px; /* Add padding for spacing */
+    margin: 15px 30px 0 30px; /* Reduce top margin */
+}
+
+.eachField {
+    width: 48%; 
+}
+
+.inputField {
+  background: transparent;
+  border: 1px solid #7c8796;
+  background-color: #123751;
+  border-color: #23262a;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  height: 60px;
+  width: 100%;
+}
+
+.lastUpdate {
+    font-weight: 600;
+    padding-left: 50px;
+    padding-top: 30px;
+}
+
+.centerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.chartDetails {
+    display: flex;
+    gap: 10px;
+}
+
+.details {
+    font-size: 14px;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    color: #666666;
+}
+
+.noDataText {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.chartArea {
+    width: 90%;
+    height: 400px; /* Set a fixed height for the chart area */
+    margin-top: 20px;
+}
+
+@media screen and (max-width: 1024px) {
+    .eachField {
+        width: 100%;
+    }
+
+    .topMiddle {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

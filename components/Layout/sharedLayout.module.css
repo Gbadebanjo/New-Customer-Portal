@@ -1,0 +1,155 @@
+.container {
+  display: grid;
+  background: #0d2638;
+  grid-template-columns: 340px 1fr 80px;
+  grid-template-areas: "nav content right";
+  min-height: 100vh;
+  height: auto;
+  width: 100vw;
+  color: #e1e7ed;
+  font-family: "Inter", sans-serif;
+  transition: grid-template-columns 0.5s ease-in-out;
+}
+
+.collapsed {
+  grid-template-columns: 90px 1fr 80px;
+}
+
+.expandedOnHover {
+  grid-template-columns: 340px 1fr 80px !important;
+}
+
+.content {
+  grid-area: content;
+  height: 100vh;
+  background-color: #0d202f;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.content::-webkit-scrollbar {
+  display: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--lpx-border-color);
+  background-color: #0d202f;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin: 0;
+}
+
+.navbarComponent {
+  grid-area: nav;
+  height: auto;
+  left: 0;
+  top: 0;
+}
+
+.rightSideComponent {
+  grid-area: right;
+  height: 100vh;
+  position: sticky;
+  right: 0;
+  top: 0;
+}
+
+/* Elements hidden on desktop, shown on mobile */
+.overlay {
+  display: none;
+}
+
+.mobileMenuTrigger {
+  display: none;
+}
+
+/* ── Tablet (≤1024px) ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .container,
+  .uncollapsed {
+    grid-template-columns: 90px 1fr;
+    grid-template-areas: "nav content";
+  }
+
+  .collapsed {
+    grid-template-columns: 90px 1fr;
+  }
+
+  .expandedOnHover {
+    grid-template-columns: 340px 1fr !important;
+  }
+
+  .rightSideComponent {
+    display: none;
+  }
+}
+
+/* ── Mobile (≤768px) ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container,
+  .uncollapsed,
+  .collapsed,
+  .expandedOnHover {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "content" !important;
+  }
+
+  /* Sidebar becomes a fixed slide-in drawer */
+  .navbarComponent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  /* Slide in when mobile sidebar is open */
+  .mobileOpen .navbarComponent {
+    transform: translateX(0);
+  }
+
+  .rightSideComponent {
+    display: none;
+  }
+
+  /* Dim overlay behind the sidebar */
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 999;
+    cursor: pointer;
+  }
+
+  /* Floating hamburger button to open the sidebar */
+  .mobileMenuTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 998;
+    background: #0d2638;
+    color: #e1e7ed;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Push content down so it doesn't sit under the trigger */
+  .content {
+    padding-top: 64px;
+    height: calc(100vh - 0px);
+  }
+}

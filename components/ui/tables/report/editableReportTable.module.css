@@ -1,0 +1,293 @@
+.container {
+  padding: 20px;
+}
+
+.reportSection {
+  margin-top: 20px;
+  background-color: #fff;
+  margin-block: 30px;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  gap: 20%;
+  margin-top: 20px;
+  padding-left: 5%;
+}
+
+.header h2 {
+  color: #1a5276;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header h3 {
+  color: #1a5276;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.header p {
+  color: #1a5276;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.controls {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.controlGroup label {
+  color: #ccc;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.controlGroup select,
+.controlGroup input {
+  background: #123751;
+  border: 1px solid #1a5276;
+  border-radius: 5px;
+  color: #e1e7ed;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  min-width: 160px;
+}
+
+.controlGroup select:focus,
+.controlGroup input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.loadBtn,
+.saveBtn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loadBtn {
+  background: #3498db;
+  color: #fff;
+}
+
+.loadBtn:hover {
+  background: #2980b9;
+}
+
+.loadBtn:disabled,
+.saveBtn:disabled,
+.uploadBtn:disabled,
+.templateBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.saveBtn {
+  background: #27ae60;
+  color: #fff;
+  padding: 10px 32px;
+  font-size: 1rem;
+}
+
+.saveBtn:hover {
+  background: #219a52;
+}
+
+.uploadBtn,
+.templateBtn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #fff;
+}
+
+.uploadBtn {
+  background: #e67e22;
+}
+
+.uploadBtn:hover {
+  background: #d35400;
+}
+
+.templateBtn {
+  background: #8e44ad;
+}
+
+.templateBtn:hover {
+  background: #732d91;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.reportTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  min-width: 1600px;
+}
+
+.reportTable thead {
+  background: #1a5276;
+  color: #fff;
+}
+
+.reportTable thead th {
+  padding: 6px 4px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.7rem;
+  border: 1px solid #fff;
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+.reportTable tbody tr {
+  background: #fff;
+}
+
+.reportTable tbody tr:nth-child(even) {
+  background: #eaf2f8;
+}
+
+.reportTable tbody tr:hover {
+  background: #d4e6f1;
+}
+
+.reportTable tbody td {
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  text-align: right;
+  color: #222;
+  vertical-align: middle;
+}
+
+.reportTable tbody td:first-child {
+  text-align: center;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reportTable tbody td input {
+  width: 100%;
+  min-width: 60px;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  text-align: right;
+  font-size: 0.75rem;
+  color: #222;
+  box-sizing: border-box;
+}
+
+.reportTable tbody td input:focus {
+  border-color: #3498db;
+  outline: none;
+  background: #fff;
+}
+
+.reportTable tbody td input.textInput {
+  text-align: left;
+  min-width: 120px;
+}
+
+.totalRow {
+  background: #d5e8d4 !important;
+  font-weight: 700;
+}
+
+.totalRow td {
+  font-weight: 700;
+  color: #1a5276 !important;
+}
+
+.percentCell {
+  color: #c0392b !important;
+  font-weight: 700;
+  text-align: center !important;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+.noData {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-size: 1rem;
+}
+
+.statusMsg {
+  font-size: 0.9rem;
+}
+
+.success {
+  color: #27ae60;
+}
+
+.error {
+  color: #e74c3c;
+}
+
+.plannedKwhGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plannedKwhGroup label {
+  color: #ccc;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.plannedKwhGroup input {
+  background: #123751;
+  border: 1px solid #1a5276;
+  border-radius: 5px;
+  color: #e1e7ed;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  width: 160px;
+}

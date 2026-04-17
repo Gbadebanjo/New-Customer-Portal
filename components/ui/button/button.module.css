@@ -1,0 +1,22 @@
+.btn {
+  height: 50px;
+  background: #ff7d70;
+  border-radius: 5px;
+  border: 1px #ff7d70 solid;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+  width: 100%;
+  color: #fff;
+  font-size: 20px;
+  font-family: sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  word-wrap: break-word;
+}
+
+.btn:hover {
+  background-color: #fd5041;
+  border: 1px #f26a6d solid;
+}
