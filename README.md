@@ -1,4 +1,4 @@
-# daystar-customer-portal-new-code
+# daystar-customer-portal-new
 
 Description: Daystar Customer Portal Web Application.
 
