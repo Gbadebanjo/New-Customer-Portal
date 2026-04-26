@@ -1,0 +1,254 @@
+name: Deploy DEV
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'dev'
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+env:
+  ROLE: arn:aws:iam::273081097050:role/deployer
+  REGION: eu-west-1
+  CLUSTER: daystar-dev
+  NAMESPACE: customerportal
+  VALUES: values.dev.yaml # make sure to name it according to the naming convention of your helm values that corresponds to the dev deployment values 
+  REGISTRY: 273081097050.dkr.ecr.eu-west-1.amazonaws.com/customer-portal-web 
+  MIGRATOR_REGISTRY: 273081097050.dkr.ecr.eu-west-1.amazonaws.com/customer-portal-db-migrator
+  IMAGE_NAME: ${{ github.repository }}
+  SCAN_REGISTRY: ghcr.io
+  DOCKERFILE_PATH: Dockerfile
+  # DOCKERFILEMIGRATOR_PATH: src/Steer73.Daystar.DbMigrator/Dockerfile
+
+jobs:
+  # ECCN-Scan:
+  #   uses: sede-x/github-cicd-workflows/.github/workflows/eccn-scan.yaml@main
+
+  SonarQube-Scan:
+    uses: sede-x/github-cicd-workflows/.github/workflows/sonarqube-scan.yaml@main
+    secrets: inherit
+
+  # Build-Migrator:
+  #   name: Build-Migrator
+  #   runs-on: ubuntu-latest
+  #   # if: ${{ always() && contains(join(needs.*.result, ','), 'success') }} 
+  #   # needs: [ECCN-Scan, SonarQube-Scan]
+  #   timeout-minutes: 20
+  #   steps:
+  #     - name: Setup - Checkout
+  #       uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: recursive
+
+  #     - name: Container - Setup QEMU
+  #       uses: docker/setup-qemu-action@v3
+
+  #     - name: Container - Setup Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Container - Meta
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: |
+  #           ${{ env.SCAN_REGISTRY }}/${{ env.IMAGE_NAME }}-dev-customer-portal-db-migrator
+  #           ${{ env.MIGRATOR_REGISTRY }}
+  #         tags: |
+  #           type=sha,format=long
+
+  #     - name: Setup - GHCR login
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Setup - AWS login
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         role-to-assume: ${{ env.ROLE }}
+  #         aws-region: ${{ env.REGION }}
+
+  #     - name: Setup - ECR login
+  #       id: login
+  #       uses: aws-actions/amazon-ecr-login@v1
+
+  #     - name: Container - Build & Push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         push: true
+  #         context: .
+  #         file: ${{ env.DOCKERFILEMIGRATOR_PATH }}
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
+  #         platforms: linux/amd64
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    # if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    # if: ${{ always() }}
+    # needs: [ECCN-Scan, SonarQube-Scan]
+    # needs: [Build-Migrator]
+    needs: [SonarQube-Scan]
+    timeout-minutes: 20
+    steps:
+      - name: Setup - Checkout
+        # uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Container - Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Container - Setup Buildx
+        # uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v5
+
+
+      - name: Container - Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.SCAN_REGISTRY }}/${{ env.IMAGE_NAME }}-dev-customer-portal-web
+            ${{ env.REGISTRY }}
+          tags: |
+            type=sha,format=long
+
+      - name: Setup - GHCR login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup - AWS login
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.ROLE }}
+          aws-region: ${{ env.REGION }}
+
+      - name: Setup - ECR login
+        id: login
+        # uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Container - Build & Push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha, mode=max
+          build-args: |
+            NEXT_PUBLIC_ENV=development
+
+  WhiteSource-Image-Scan:
+    needs: [Build]
+    uses: sede-x/github-cicd-workflows/.github/workflows/whitesource-image-scan.yaml@main
+    with:
+      registry: ghcr.io
+      image_name: ${{ github.repository }}-dev-customer-portal-web
+      image_tag: sha-${{ github.sha }}
+    secrets:
+      ws_api_key: ${{ secrets.WS_API_KEY }}
+      ws_user_key: ${{ secrets.WS_USER_KEY }}
+      
+  Deploy-Dev:
+    name: Deploy-Dev
+    # needs: [Build]
+    needs: [Build, WhiteSource-Image-Scan]
+    runs-on: ubuntu-latest
+    concurrency: deploy-dev
+    timeout-minutes: 15
+    steps:
+      - name: Setup - Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup - Kubectl
+        uses: azure/setup-kubectl@v3.0
+
+      - name: Setup - Helm
+        uses: azure/setup-helm@v3
+        with: 
+          version: 3.13.0
+
+      - name: Setup - AWS login
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE }}
+          aws-region: ${{ env.REGION }}
+
+      - name: Setup - EKS login
+        run: |
+          # aws eks update-kubeconfig --region ${{ env.REGION }} --name ${{ env.CLUSTER }}
+          # idtoken=$(curl -sH "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=github.com" | jq -r .value)
+          # kubectl config set-credentials $(kubectl config current-context) --token="${idtoken}"
+          # kubectl get deploy --all-namespaces 
+          aws eks update-kubeconfig \
+          --region ${{ env.REGION }} \
+          --name ${{ env.CLUSTER }}
+
+      - name: Deploy
+        env:
+          VALUES: ${{ env.VALUES }}
+          IMAGE_TAG: sha-${{ github.sha }}
+          IMAGE_REPO: ${{ env.REGISTRY }}
+          # IMAGE_MIGRATOR_REPO: ${{ env.MIGRATOR_REGISTRY }}
+          
+        # run: >
+        #   helm upgrade --install --force --wait --atomic --timeout 36000s --debug
+        #   --namespace ${{ env.NAMESPACE }}
+        #   --values chart/$VALUES
+        #   --set image.tag=$IMAGE_TAG
+        #   --set image.repository=$IMAGE_REPO
+        #   --set job.name=database-migration-job-$IMAGE_TAG
+        #   --set job.image_tag=$IMAGE_TAG
+        #   --set job.image_repository=$IMAGE_MIGRATOR_REPO
+        #   --kubeconfig /home/runner/.kube/config
+        #   app
+        #   chart/
+
+        run: >
+          helm upgrade --install --force --wait --atomic --timeout 360s --debug
+          --namespace ${{ env.NAMESPACE }}
+          --values chart/$VALUES
+          --set image.tag=$IMAGE_TAG
+          --set image.repository=$IMAGE_REPO
+          --kubeconfig /home/runner/.kube/config
+          
+          app
+          chart/
+
+  # WhiteSource-Image-Scan-For-Web-Image:
+  #   needs: [Build]
+  #   uses: sede-x/github-cicd-workflows/.github/workflows/whitesource-image-scan.yaml@main
+  #   with:
+  #     registry: ghcr.io
+  #     image_name: ${{ github.repository }}-dev-customer-portal-web
+  #     image_tag: sha-${{ github.sha }}
+  #   secrets:
+  #     ws_api_key: ${{ secrets.WS_API_KEY }}
+  #     ws_user_key: ${{ secrets.WS_USER_KEY }}
+      
+  # WhiteSource-Image-Scan-For-Migrator-Image:
+  #   needs: [Build-Migrator]
+  #   uses: sede-x/github-cicd-workflows/.github/workflows/whitesource-image-scan.yaml@main
+  #   with:
+  #     registry: ghcr.io
+  #     image_name: ${{ github.repository }}-dev-customer-portal-db-migrator
+  #     image_tag: sha-${{ github.sha }}
+  #   secrets:
+  #     ws_api_key: ${{ secrets.WS_API_KEY }}
+  #     ws_user_key: ${{ secrets.WS_USER_KEY }}
