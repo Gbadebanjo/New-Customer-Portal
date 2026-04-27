@@ -4,13 +4,13 @@ import Link from "next/link";
 import getAllPowerProductionPlans from "@/lib/controllers/powerProductionPlan/getAllPowerProductionPlans";
 import CreatePlannedDataUploadModal
     from "@/components/ui/modals/creates/createPlannedDataUpload/CreatePlannedDataUploadModal";
-import PlannedMainDataTable from "@/components/ui/tables/plannedData/PlannedMainDataTable"; // Import the image
+import PlannedMainDataTable from "@/components/ui/tables/plannedData/PlannedMainDataTable";
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function PlannedUploadsScreen() {
     const date = new Date();
     const thisYear = date.getFullYear();
     const {powerProductionPlans} = await getAllPowerProductionPlans();
-    console.log('Power Production Plans:', powerProductionPlans);
     const NO_OF_COLUMNS = 5;
     
     return (<div className={classes.content}>
@@ -22,6 +22,7 @@ export default async function PlannedUploadsScreen() {
                    </Link>
                  </span>
             <span><small> | &nbsp; Planned Data Upload</small></span>
+                <BackButton />
         </div>
         {/* Content */}
         <div className={classes.content}>

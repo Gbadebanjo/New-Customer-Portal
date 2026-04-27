@@ -5,7 +5,7 @@ import classes from './sharedLayout.module.css';
 import { Bars3BottomLeftIcon } from "@heroicons/react/20/solid";
 
 export default function MainAppLayout({ children, impersonationBanner }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [hovered, setHovered] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 

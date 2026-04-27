@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import FullScreenLoader from '@/components/LoadingSkeleton/LoadingSkeleton';
 import Image from 'next/image';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import classes from './editableReportTable.module.css';
 import getReportData from '@/lib/controllers/reportData/getReportData';
@@ -166,32 +165,27 @@ export default function EditableReportTable({ isCustomerOnly = false, customers 
   }, [selectedSite, selectedMonth, selectedYear, activeCustomerId]);
 
   // Download Excel template
-  const handleDownloadTemplate = useCallback(() => {
+  const handleDownloadTemplate = useCallback(async () => {
     const daysCount = getDaysInMonth(selectedMonth, selectedYear);
-    const wsData = [TEMPLATE_HEADERS];
+    const ExcelJS = (await import('exceljs')).default;
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Report Template');
 
+    ws.addRow(TEMPLATE_HEADERS);
     for (let d = 1; d <= daysCount; d++) {
-      const row = [d];
-      // Fill numeric columns with 0, text columns with empty
-      NUMERIC_FIELDS.forEach(() => row.push(0));
-      TEXT_FIELDS.forEach(() => row.push(''));
-      wsData.push(row);
+      ws.addRow([d, ...NUMERIC_FIELDS.map(() => 0), ...TEXT_FIELDS.map(() => '')]);
     }
+    TEMPLATE_HEADERS.forEach((h, i) => {
+      ws.getColumn(i + 1).width = i === 0 ? 6 : Math.max(h.length, 15);
+    });
 
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-    // Set column widths
-    ws['!cols'] = TEMPLATE_HEADERS.map((h, i) => ({ wch: i === 0 ? 6 : Math.max(h.length, 15) }));
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Report Template');
-    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const buf = await wb.xlsx.writeBuffer();
     const blob = new Blob([buf], { type: 'application/octet-stream' });
     saveAs(blob, `Report_Template_${MONTHS[selectedMonth - 1]}_${selectedYear}.xlsx`);
   }, [selectedMonth, selectedYear]);
 
   // Export loaded report as XLSX
-  const handleExportReport = useCallback(() => {
+  const handleExportReport = useCallback(async () => {
     const wsData = [
       ['Date', ...Object.values(EXCEL_COLUMN_MAP)],
       ...rows.map(row => [
@@ -199,11 +193,14 @@ export default function EditableReportTable({ isCustomerOnly = false, customers 
         ...Object.keys(EXCEL_COLUMN_MAP).map(k => EXCEL_COLUMN_MAP[k]).map(f => row[f] ?? ''),
       ]),
     ];
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = wsData[0].map((h) => ({ wch: Math.max(String(h).length, 12) }));
-    XLSX.utils.book_append_sheet(wb, ws, 'Report');
-    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const ExcelJS = (await import('exceljs')).default;
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Report');
+    wsData.forEach(row => ws.addRow(row));
+    wsData[0].forEach((h, i) => {
+      ws.getColumn(i + 1).width = Math.max(String(h).length, 12);
+    });
+    const buf = await wb.xlsx.writeBuffer();
     const blob = new Blob([buf], { type: 'application/octet-stream' });
     const site = showNewSiteInput ? newSite.trim() : selectedSite;
     saveAs(blob, `Report_${site}_${MONTHS[selectedMonth - 1]}_${selectedYear}.xlsx`);
@@ -215,18 +212,33 @@ export default function EditableReportTable({ isCustomerOnly = false, customers 
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
-        const wb = XLSX.read(evt.target.result, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(ws);
+        const ExcelJS = (await import('exceljs')).default;
+        const wb = new ExcelJS.Workbook();
+        await wb.xlsx.load(evt.target.result);
+        const ws = wb.worksheets[0];
+
+        const headers = {};
+        ws.getRow(1).eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.text || String(cell.value ?? '');
+        });
+
+        const jsonData = [];
+        ws.eachRow((row, rowNumber) => {
+          if (rowNumber === 1) return;
+          const rowData = {};
+          Object.entries(headers).forEach(([colNumber, header]) => {
+            rowData[header] = row.getCell(Number(colNumber)).value ?? undefined;
+          });
+          jsonData.push(rowData);
+        });
 
         if (jsonData.length === 0) {
           setStatusMsg({ text: 'Uploaded file is empty', type: 'error' });
           return;
         }
 
-        // Validate headers
         const fileHeaders = Object.keys(jsonData[0]);
         const expectedFields = Object.keys(EXCEL_COLUMN_MAP);
         const missingHeaders = expectedFields.filter(h => !fileHeaders.includes(h));
@@ -246,9 +258,9 @@ export default function EditableReportTable({ isCustomerOnly = false, customers 
             Object.entries(EXCEL_COLUMN_MAP).forEach(([header, field]) => {
               const val = excelRow[header];
               if (NUMERIC_FIELDS.includes(field)) {
-                newRow[field] = val === '' || val === undefined ? 0 : parseFloat(val) || 0;
+                newRow[field] = val === '' || val === undefined || val === null ? 0 : parseFloat(val) || 0;
               } else {
-                newRow[field] = val !== undefined ? String(val) : '';
+                newRow[field] = val !== undefined && val !== null ? String(val) : '';
               }
             });
             uploadedRows.push(newRow);
@@ -460,7 +472,7 @@ export default function EditableReportTable({ isCustomerOnly = false, customers 
         <div className={classes.reportSection}>
         <div className={classes.formHeader}>
         <div>
-          <Image src="/img/daystar/shell-daystar.png" alt="Daystar Logo" width={150} height={40} className={classes.logo} />
+          <Image src="/img/daystar/shell-daystar.png" alt="Daystar Logo" width={150} height={40} className={classes.logo} style={{ height: 'auto' }} />
         </div>
           <div className={classes.header}>
             <h2>DAYBREAK SOLAR POWER SYSTEM - {activeSite.toUpperCase()}</h2>

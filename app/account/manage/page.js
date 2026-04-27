@@ -1,15 +1,9 @@
-import {verifyAuth} from "@/lib/auth/auth";
-import {redirect} from "next/navigation";
-import nookies from "nookies";
+import { verifyAuth } from "@/lib/auth/auth";
+import { redirect } from "next/navigation";
 import ProfileScreen from "@/components/Profile/ProfileScreen";
-import verify2FA from "@/lib/controllers/users/verify2FA";
 
-
-export default async function Profile(req) {
-    //authentication
-    const cookies = nookies.get({ req });
-    const result = await verifyAuth(cookies);
-    
+export default async function Profile() {
+    const result = await verifyAuth();
 
     if (!result.user) {
         return redirect('/');
@@ -20,4 +14,3 @@ export default async function Profile(req) {
         </div>
     );
 }
-

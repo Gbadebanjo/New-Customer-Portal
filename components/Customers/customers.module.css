@@ -10,7 +10,7 @@
   display: flex; /* Use flexbox */
   align-items: center;
   font-size: 14px;
-  padding: 5px 20px; /* Add padding for spacing */
+  padding: 10px 20px; /* Add padding for spacing */
   border-bottom: 1px solid var(--lpx-border-color);
   background-color: #0d202f;
   border-top-left-radius: 10px;

@@ -5,8 +5,7 @@ import getAllCustomers from "@/lib/controllers/customers/getAllCustomers";
 
 
 export default async function Profile({ params }) {
-
-    const customerId = params.id;
+    const { id: customerId } = await params;
     const { users } = await getAllUsers();
     const customers = await getAllCustomers();
 

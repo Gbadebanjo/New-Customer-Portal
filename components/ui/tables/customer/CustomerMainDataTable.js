@@ -6,7 +6,7 @@ import ButtonFlexible from "@/components/ui/button-flexible/ButtonFlexible";
 import { FaSearch } from "react-icons/fa";
 import PaginationComponent from "@/components/ui/pagination/PaginationComponent";
 
-export default function CustomerMainDataTable({ allCustomers }) {
+export default function CustomerMainDataTable({ allCustomers, allUsers = [] }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -91,7 +91,7 @@ export default function CustomerMainDataTable({ allCustomers }) {
                                     />
                                 </td>
                                 <td>{myCustomer.company_name}</td>
-                                <td>{myCustomer.users.length}</td>
+                                <td>{allUsers.filter(u => u.customer === myCustomer.id).length}</td>
                                 <td>{new Date(myCustomer.created_at).toLocaleString('en-US', {
                                     year: 'numeric',
                                     month: '2-digit',

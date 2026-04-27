@@ -3,6 +3,7 @@ import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
 import getAllTextTemplates from "@/lib/controllers/textTemplates/getAllTextTemplates";
 import TextTemplatesClient from "./TextTemplatesClient";
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function TextTemplatesScreen() {
     const date = new Date();
@@ -19,6 +20,7 @@ export default async function TextTemplatesScreen() {
                     </Link>
                 </span>
                 <span><small> | &nbsp; Admin &nbsp; | &nbsp; Text Templates</small></span>
+                <BackButton />
             </div>
 
             {/* Page Title */}

@@ -15,7 +15,7 @@ import SupportQueryMod from "./SupportQuery.js";
 import SupportQueryCategoryMod from "./SupportQueryCategory.js";
 import SupportQueryMessageMod from "./SupportQueryMessage.js";
 import SupportQueryStatusMod from "./SupportQueryStatus.js";
-import TextTemplateMod from "./Texttemplate.js";
+import TextTemplateMod from "./TextTemplate.js";
 import UserRoleMod from "./UserRole.js";
 import UserSessionMod from "./UserSession.js";
 import VerificationCodeMod from "./VerificationCode.js";

@@ -99,7 +99,7 @@ const CreateReportModal = () => {
                         </button>
                     </div>
                     <div className="py-4">
-                        <form encType="multipart/form-data" method="dialog" action={AddReport}>
+                        <form action={AddReport}>
                             <div>
                                 <label className={classes.formField}>
                                     <div className="label">

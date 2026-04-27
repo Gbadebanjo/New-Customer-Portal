@@ -2,13 +2,17 @@ import classes from './customers.module.css';
 import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
 import getAllCustomers from "@/lib/controllers/customers/getAllCustomers";
+import getAllUsers from "@/lib/controllers/users/getAllUsers";
 import CreateCustomerModal from "@/components/ui/modals/creates/createCustomer/CreateCustomerModal";
 import CustomerMainDataTable from "@/components/ui/tables/customer/CustomerMainDataTable";
 import CopyRight from '../ui/CopyRight/copyright';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function CustomersScreen() {
-    const allCustomers = await getAllCustomers();
-    // console.log('allCustomers', allCustomers);
+    const [allCustomers, { users: allUsers }] = await Promise.all([
+        getAllCustomers(),
+        getAllUsers(),
+    ]);
 
     return (
         <div className={classes.content}>
@@ -19,12 +23,13 @@ export default async function CustomersScreen() {
                     </Link>
                 </span>
                 <span> | &nbsp; Customers</span>
+                <BackButton />
             </div>
             <div className={classes.topCenter}>
                 <CreateCustomerModal />
             </div>
             <div className={classes.centerContent}>
-                <CustomerMainDataTable allCustomers={allCustomers} />
+                <CustomerMainDataTable allCustomers={allCustomers} allUsers={allUsers} />
             </div>
             <CopyRight />
         </div>

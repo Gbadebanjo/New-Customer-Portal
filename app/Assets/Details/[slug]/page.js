@@ -13,7 +13,7 @@ export default async function AssetDetailsPage({ params }) {
         return redirect('/')
     }
 
-    const { slug } = params;
+    const { slug } = await params;
 // console.log('slug is >> ', slug);
     // Fetch asset data from your API or database using the slug
     const { access_token } = await getAmmpToken(result.user.id);

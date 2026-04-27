@@ -10,6 +10,7 @@ import { getHistoricAsset } from '@/lib/controllers/historicalAssets/getHistoric
 import getPlannedVsActualData from '@/lib/controllers/powerProductionPlanItem/getPlannedVsActualData';
 import PlannedVsActualChart from '../ui/charts/PlannedVsActualChart';
 import FullScreenLoader from '@/components/LoadingSkeleton/LoadingSkeleton';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default function 
 PlannedVsActualScreen({ assets, token }) {
@@ -39,7 +40,7 @@ PlannedVsActualScreen({ assets, token }) {
         const fromISO = dateFrom.toISOString();
         const toISO = dateTo.toISOString();
 
-        const historic = await getHistoricAsset(token, selectedAssetId, fromISO, toISO);
+        const historic = await getHistoricAsset({ token }, selectedAssetId, fromISO, toISO);
         const pv = historic?.pv_energy?.data ?? [];
         setHistoricPv(Array.isArray(pv) ? pv : []);
 
@@ -67,6 +68,7 @@ PlannedVsActualScreen({ assets, token }) {
           </Link>
         </span>
         <span> <small>| &nbsp; Planned Vs. Actual</small></span>
+        <BackButton />
       </div>
 
       {/* Title */}

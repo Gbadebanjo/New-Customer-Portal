@@ -2,7 +2,7 @@
     grid-area: header;
     display: flex; /* Use flexbox */
     align-items: center; /* Align items vertically */
-    padding: 0 20px; /* Add padding for spacing */
+    padding: 10px 20px; /* Add padding for spacing */
 }
 
 

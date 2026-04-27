@@ -9,6 +9,11 @@ import { useUser } from "@/components/Context/userContext";
 import { changePassword } from "@/lib/controllers/users/changePassword";
 import { updateProfile } from "@/lib/controllers/users/updateProfile";
 import { AllTimezones } from "@/utils/constants";
+import PasswordStrengthIndicator from "@/components/ui/PasswordStrength/PasswordStrengthIndicator";
+import { validatePassword } from "@/utils/passwordValidation";
+import EyeIcon from "@/components/ui/icons/EyeIcon";
+import EyeSlashIcon from "@/components/ui/icons/EyeSlashIcon";
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 
 export default function ProfileScreen() {
@@ -22,6 +27,9 @@ export default function ProfileScreen() {
     const [passwordMessage, setPasswordMessage] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [passwordLoading, setPasswordLoading] = useState(false);
+    const [showCurrentPwd, setShowCurrentPwd] = useState(false);
+    const [showNewPwd, setShowNewPwd] = useState(false);
+    const [showConfirmPwd, setShowConfirmPwd] = useState(false);
 
     // Personal Info state
     const [username, setUsername] = useState('');
@@ -54,8 +62,9 @@ export default function ProfileScreen() {
             return;
         }
 
-        if (newPassword.length < 6) {
-            setPasswordError('New password must be at least 6 characters.');
+        const strengthError = validatePassword(newPassword);
+        if (strengthError) {
+            setPasswordError(strengthError);
             return;
         }
 
@@ -66,7 +75,7 @@ export default function ProfileScreen() {
 
         setPasswordLoading(true);
         try {
-            const result = await changePassword(user.id, currentPassword, newPassword);
+            const result = await changePassword(user.id, { currentPassword, newPassword });
             if (result.success) {
                 setPasswordMessage(result.message);
                 setCurrentPassword('');
@@ -124,6 +133,7 @@ export default function ProfileScreen() {
                     </Link>
                 </span>
                 <span> | &nbsp;My Profile</span>
+                <BackButton />
             </div>
             {/* Content */}
             <div className={classes.content}>
@@ -170,32 +180,66 @@ export default function ProfileScreen() {
 
                                 <div className={classes.inputGroup}>
                                     <label>Current password *</label>
-                                    <input
-                                        type="text"
-                                        className={classes.input}
-                                        value={currentPassword}
-                                        onChange={(e) => setCurrentPassword(e.target.value)}
-                                    />
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <input
+                                            type={showCurrentPwd ? 'text' : 'password'}
+                                            className={classes.input}
+                                            style={{ width: '100%', boxSizing: 'border-box', paddingRight: '44px' }}
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCurrentPwd((v) => !v)}
+                                            aria-label={showCurrentPwd ? 'Hide password' : 'Show password'}
+                                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#8fa0b3', display: 'flex', alignItems: 'center' }}
+                                        >
+                                            {showCurrentPwd ? <EyeSlashIcon /> : <EyeIcon />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className={classes.inputGroup}>
                                     <label>New password *</label>
-                                    <input
-                                        type="text"
-                                        className={classes.input}
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                    />
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <input
+                                            type={showNewPwd ? 'text' : 'password'}
+                                            className={classes.input}
+                                            style={{ width: '100%', boxSizing: 'border-box', paddingRight: '44px' }}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPwd((v) => !v)}
+                                            aria-label={showNewPwd ? 'Hide password' : 'Show password'}
+                                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#8fa0b3', display: 'flex', alignItems: 'center' }}
+                                        >
+                                            {showNewPwd ? <EyeSlashIcon /> : <EyeIcon />}
+                                        </button>
+                                    </div>
+                                    <PasswordStrengthIndicator password={newPassword} />
                                 </div>
 
                                 <div className={classes.inputGroup}>
                                     <label>Confirm new password *</label>
-                                    <input
-                                        type="text"
-                                        className={classes.input}
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                    />
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <input
+                                            type={showConfirmPwd ? 'text' : 'password'}
+                                            className={classes.input}
+                                            style={{ width: '100%', boxSizing: 'border-box', paddingRight: '44px' }}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPwd((v) => !v)}
+                                            aria-label={showConfirmPwd ? 'Hide password' : 'Show password'}
+                                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#8fa0b3', display: 'flex', alignItems: 'center' }}
+                                        >
+                                            {showConfirmPwd ? <EyeSlashIcon /> : <EyeIcon />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <button

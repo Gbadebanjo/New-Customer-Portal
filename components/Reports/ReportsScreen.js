@@ -9,6 +9,7 @@ import CreateReportModal from "@/components/ui/modals/creates/createReport/Creat
 import ReportMainDataTable from "@/components/ui/tables/report/ReportMainDataTable";
 import EditableReportTable from "@/components/ui/tables/report/EditableReportTable";
 import db from '@/database/models';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function ReportsScreen({ userId }) {
     const date = new Date();
@@ -30,25 +31,15 @@ export default async function ReportsScreen({ userId }) {
                    </Link>
                  </span>
             <span><small> | &nbsp; Reports</small></span>
+                <BackButton />
         </div>
 
             {/* Top Center - Upload only visible to non-customer roles */}
             <div className={classes.topCenter}>
                 <p className={classes.title}>Reports</p>
-                {!isCustomerOnly && <CreateReportModal />}
+                {/* {!isCustomerOnly && <CreateReportModal />} */}
             </div>
-            {/* {!isCustomerOnly && (
-                <div className={classes.centerContent}>
-                    <ReportMainDataTable
-                        allReports={report}
-                    />
-                </div>
-            )} */}
-
-            {/* Editable Report Table Section */}
-            {/* <div className={classes.topCenter} style={{ marginTop: '10px' }}>
-                <p className={classes.title}>{isCustomerOnly ? 'Report Data' : 'Edit Report Data'}</p>
-            </div> */}
+          
             <div className={classes.centerContent}>
                 <EditableReportTable
                     isCustomerOnly={isCustomerOnly}

@@ -2,6 +2,7 @@ import classes from './securitylogs.module.css';
 import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
 import SecurityLogMainDataTable from "@/components/ui/tables/securityLogs/SecurityLogMainDataTable";
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default function SecurityLogsScreen() {
     const thisYear = new Date().getFullYear();
@@ -14,6 +15,7 @@ export default function SecurityLogsScreen() {
                     </Link>
                 </span>
                 <span><small>| &nbsp; Admin &nbsp; | &nbsp; Security Logs</small></span>
+                <BackButton />
             </div>
             <div className={classes.topCenter}>
                 <p className={classes.title}>Security Logs</p>

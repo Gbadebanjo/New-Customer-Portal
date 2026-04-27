@@ -3,6 +3,7 @@ import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
 import { getSettings } from '@/lib/services/settings/settingsStore';
 import SettingsClient from './SettingsClient';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function SettingsScreen() {
     const thisYear = new Date().getFullYear();
@@ -17,6 +18,7 @@ export default async function SettingsScreen() {
                     </Link>
                 </span>
                 <span><small>| &nbsp; Admin &nbsp; | &nbsp; Settings</small></span>
+                <BackButton />
             </div>
             <div className={classes.topCenter}>
                 <p className={classes.title}>Settings</p>

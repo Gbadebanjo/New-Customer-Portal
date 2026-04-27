@@ -469,9 +469,9 @@ const UserActions = ({ menuItems, customers }) => {
                 ref={customAlertPopupRef}
                 onCancel={(e) => { e.preventDefault(); closeCustomAlertModal(); }}
             >
-                <div className={modalClasses.modalContainer} style={{ maxWidth: '400px', textAlign: 'center' }}>
+                <div className={modalClasses.modalContainer} style={{ maxWidth: '480px', textAlign: 'center' }}>
                     <WarnCircleBigIcon />
-                    <h2 className="font-bold text-xl" style={{ marginTop: '1rem' }}>{alertMessage}</h2>
+                    <p className="font-bold text-base" style={{ marginTop: '1rem', wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}>{alertMessage}</p>
                     <div className="modal-action">
                         <div className={modalClasses.buttonContainer}>
                             <ButtonSaveSubmit buttonText={'Ok'} onClick={closeCustomAlertModal} />

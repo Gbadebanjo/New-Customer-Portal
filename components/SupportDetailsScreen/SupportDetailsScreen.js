@@ -7,6 +7,7 @@ import getAllSupportQueryCategories from "@/lib/controllers/supportQueryCategory
 import { getSupportQueryById } from '@/lib/controllers/supportQuery/getSupportQueryById';
 
 import CopyRight from '../ui/CopyRight/copyright';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 
 export default async function SupportDetailsScreen({ support_id }) {
@@ -29,6 +30,7 @@ export default async function SupportDetailsScreen({ support_id }) {
                 </span>
                 <span>
                     <small> Support </small></span>
+                <BackButton />
             </div>
             <div className={classes.content}>
                 <SupportDetailsClient

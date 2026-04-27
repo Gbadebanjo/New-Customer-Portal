@@ -5,6 +5,7 @@ import AmmpServices from '@/lib/services/ammp/AmmpServices';
 import AlertsTable from '@/components/ui/tables/alerts/AlertsTable';
 import db from '@/database/models';
 import { getAmmpToken } from '@/lib/services/ammp/getAmmpToken';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function AlertsScreen({ userId }) {
     const date = new Date();
@@ -28,6 +29,7 @@ export default async function AlertsScreen({ userId }) {
                     </Link>
                 </span>
                 <span><small> | &nbsp; Alerts</small></span>
+                <BackButton />
             </div>
 
             {/* Title Row */}

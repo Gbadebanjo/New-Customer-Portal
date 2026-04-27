@@ -7,6 +7,8 @@ import CustomTextField from '@/components/ui/CustomTextField/CustomTextInput';
 import CopyRight from '@/components/ui/CopyRight/copyright';
 import { resetPassword } from "@/lib/auth/authActions";
 import CustomAlertModal from "@/components/ui/modals/customAlertModal/customAlertModal";
+import PasswordStrengthIndicator from "@/components/ui/PasswordStrength/PasswordStrengthIndicator";
+import { validatePassword } from "@/utils/passwordValidation";
 
 function ResetPasswordComponent() {
     const [password, setPassword] = useState("");
@@ -24,6 +26,14 @@ function ResetPasswordComponent() {
         setLoading(true);
 
         try {
+            const strengthError = validatePassword(password);
+            if (strengthError) {
+                setAlertMessage(strengthError);
+                setIsModalOpen(true);
+                setLoading(false);
+                return;
+            }
+
             if (password !== confirmPassword) {
                 setAlertMessage("Passwords do not match!");
                 setIsModalOpen(true);
@@ -51,7 +61,6 @@ function ResetPasswordComponent() {
             setIsModalOpen(true);
         }
         setLoading(false);
-
     };
 
     return (
@@ -71,13 +80,16 @@ function ResetPasswordComponent() {
                                 </div>
                             </div>
                             <form onSubmit={handleSubmit} className={classes.loginForm}>
-                                <CustomTextField
-                                    label="Password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    isPassword={true}
-                                    name="password"
-                                />
+                                <div>
+                                    <CustomTextField
+                                        label="Password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        isPassword={true}
+                                        name="password"
+                                    />
+                                    <PasswordStrengthIndicator password={password} />
+                                </div>
                                 <CustomTextField
                                     label="Confirm Password"
                                     value={confirmPassword}
@@ -106,8 +118,7 @@ function ResetPasswordComponent() {
                 }}
             />
         </div>
-    )
-        ;
+    );
 }
 
 export default ResetPasswordComponent;

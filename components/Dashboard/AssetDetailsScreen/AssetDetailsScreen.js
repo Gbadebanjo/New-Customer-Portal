@@ -50,14 +50,15 @@ export default async function AssetDetailsScreen({ assetData }) {
 
     // Date ranges for chart data
     const now = new Date();
-    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    // Use last 24h for power (today-only is often empty early in the day)
+    const last24hStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const weekAgo = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 7));
 
     // Fetch all data in parallel
     const [totals, devicesRaw, powerData, kpiData] = await Promise.all([
         AmmpServices().getTodaysEnergy(token, asset_id),
         AmmpServices().getAssetDevices(token, asset_id),
-        AmmpServices().getHistoricAssetPowerData(token, asset_id, todayStart, now, '15m'),
+        AmmpServices().getHistoricAssetPowerData(token, asset_id, last24hStart, now, '15m'),
         AmmpServices().getHistoricKpiData(token, asset_id, weekAgo, now, '1h'),
     ]);
 

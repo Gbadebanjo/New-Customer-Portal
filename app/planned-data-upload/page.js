@@ -1,13 +1,9 @@
 import PlannedUploadsScreen from "@/components/PlannedUploads/PlannedUploadsScreen";
-import {verifyAuth} from "@/lib/auth/auth";
-import {redirect} from "next/navigation";
-import nookies from "nookies";
+import { verifyAuth } from "@/lib/auth/auth";
+import { redirect } from "next/navigation";
 
-
-async function Page(req) {
-    //authentication
-    const cookies = nookies.get({ req });
-    const result = await verifyAuth(cookies);
+async function Page() {
+    const result = await verifyAuth();
 
     if (!result.user) {
         return redirect('/');
@@ -19,4 +15,4 @@ async function Page(req) {
     );
 }
 
-export default Page
+export default Page;

@@ -25,7 +25,11 @@ function formatTimeLabel(dateStr) {
 export default function GensetChart({ initialData, assetId }) {
     const [chartData, setChartData] = useState(initialData);
     const [selectedInterval, setSelectedInterval] = useState('15m');
-    const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d.toISOString().slice(0, 10);
+    });
     const [loading, setLoading] = useState(false);
     const chartRef = useRef(null);
 

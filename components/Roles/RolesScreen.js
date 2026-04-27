@@ -3,6 +3,7 @@ import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
 import getAllUserRoles from "@/lib/controllers/userRoles/getAllUserRoles";
 import RolesClient from './RolesClient';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function RolesScreen() {
     const thisYear = new Date().getFullYear();
@@ -17,6 +18,7 @@ export default async function RolesScreen() {
                     </Link>
                 </span>
                 <span><small>| &nbsp; Identity management &nbsp; | &nbsp; Roles</small></span>
+                <BackButton />
             </div>
             <div className={classes.topCenter}>
                 <h1 className={classes.title}>User Roles</h1>

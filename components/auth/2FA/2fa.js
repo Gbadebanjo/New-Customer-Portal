@@ -57,7 +57,7 @@ function TwoFactorVerification() {
         try {
             const res = await verify2FA(userId, code.trim());
             if (!res || !res.valid) {
-                openCustomAlertPopup("Invalid authenticator code.");
+                openCustomAlertPopup(res?.message || "Invalid authenticator code.");
                 setIsSubmitting(false);
                 return;
             }

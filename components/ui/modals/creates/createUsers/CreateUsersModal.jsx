@@ -137,7 +137,6 @@ const CreateUsersModal = ({ customers, users }) => {
         openCustomAlertPopup(response.error);
         return;
       }
-      // On success AddUser redirects server-side; reset state for safety
       closeNewUserModal();
       setUserName("");
       setSurname("");

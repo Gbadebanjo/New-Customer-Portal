@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 
-// Routes to skip logging (noise / internal / static)
 const SKIP_PATTERNS = [
     /^\/api\/internal\//,
     /^\/api\/auth\//,
@@ -9,10 +8,9 @@ const SKIP_PATTERNS = [
     /\.(png|jpg|jpeg|svg|ico|css|js|woff2?)$/i,
 ];
 
-// Only log mutating API calls (skip GET — too noisy, log on the server action level instead)
 const LOG_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-export async function middleware(request) {
+export async function proxy(request) {
     const { pathname } = request.nextUrl;
     const method = request.method;
 
@@ -29,7 +27,6 @@ export async function middleware(request) {
 
         const secret = process.env.INTERNAL_LOG_SECRET;
         if (secret) {
-            // Fire-and-forget — don't await so middleware doesn't add latency
             const baseUrl = request.nextUrl.origin;
             fetch(`${baseUrl}/api/internal/audit`, {
                 method: 'POST',

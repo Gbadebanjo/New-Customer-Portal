@@ -7,6 +7,7 @@ import CreateUsersComponent from "@/components/ui/modals/creates/createUsers/Cre
 // import getCustomerById from "@/lib/controllers/customers/getCustomerById";
 import UsersMainDataTable from "@/components/ui/tables/users/UsersMainDataTable";
 import CopyRight from '../ui/CopyRight/copyright';
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default async function UsersScreen({ users, customers}) {
     // const { users } = await getAllUsers();
@@ -22,7 +23,7 @@ export default async function UsersScreen({ users, customers}) {
                     </Link>
                 </span>
                 <span> | &nbsp; Identity management </span>
-
+                <BackButton />
             </div>
         
             <div className={classes.topCenter}>

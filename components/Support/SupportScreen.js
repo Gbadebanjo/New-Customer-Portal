@@ -8,6 +8,7 @@ import getAllSupportQueryCategories from "@/lib/controllers/supportQueryCategory
 import SupportMainDataTable from "@/components/ui/tables/support/SupportMainDataTable";
 import getAllSupportQueryStatuses from "@/lib/controllers/supportQueryStatus/getAllSupportQueryStatuses";
 import getAllCustomers from "@/lib/controllers/customers/getAllCustomers";
+import BackButton from '@/components/ui/BackButton/BackButton';
 
 
   export default async function SupportScreen({ userId }) {
@@ -29,6 +30,7 @@ import getAllCustomers from "@/lib/controllers/customers/getAllCustomers";
                    </Link>
                  </span>
                 <span> <small>| &nbsp; Support</small></span>
+                <BackButton />
             </div>
             {/* Content */}
             <div className={classes.content}>

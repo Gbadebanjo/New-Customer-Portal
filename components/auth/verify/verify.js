@@ -46,7 +46,11 @@ function VerifyComponent() {
 
     const resendCode = async () => {
         try {
-            await generateCode(userId, email);
+            const result = await generateCode(userId, email);
+            if (!result?.success) {
+                openCustomAlertPopup(result?.message || "Failed to resend verification code. Please try again.");
+                return;
+            }
             openCustomAlertPopup("Verification code resent to your email.");
         }
         catch (error) {
