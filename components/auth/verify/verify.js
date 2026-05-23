@@ -76,7 +76,7 @@ function VerifyComponent() {
             }
             else {
                 setVerificationSuccess(true);
-                // console.log(userInfo.user);
+                console.log(userInfo.user);
                 localStorage.setItem('user', JSON.stringify(userInfo.user));
                 setUser(userInfo.user);
                 window.location.href = '/dashboard';

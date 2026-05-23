@@ -15,42 +15,48 @@ export default async function ReportsScreen({ userId }) {
     const date = new Date();
     const thisYear = date.getFullYear();
     // Look up user to determine role
-    const user = await db.User.findByPk(userId, { raw: true });
+    const userRecord = await db.User.findByPk(userId);
+    const user = userRecord ? userRecord.toJSON() : null;
     const roles = user?.roles || [];
     const isCustomerOnly = roles.length > 0 && roles.every(role => role.name === 'Customer');
 
-    const {report} = await getAllReport();
+    const editorName = user?.name
+        ? `${user.name}${user.surname ? ' ' + user.surname : ''}`.trim()
+        : (user?.username || 'Admin');
+
+    const { report } = await getAllReport();
     const allCustomers = isCustomerOnly ? [] : await getAllCustomers();
 
     return (<div className={classes.content}>
         {/* Header */}
         <div className={classes.header}>
-                 <span>
-                   <Link href='/dashboard'>
-                       <HomeIcon/>
-                   </Link>
-                 </span>
+            <span>
+                <Link href='/dashboard'>
+                    <HomeIcon />
+                </Link>
+            </span>
             <span><small> | &nbsp; Reports</small></span>
-                <BackButton />
+            <BackButton />
         </div>
 
-            {/* Top Center - Upload only visible to non-customer roles */}
-            <div className={classes.topCenter}>
-                <p className={classes.title}>Reports</p>
-                {/* {!isCustomerOnly && <CreateReportModal />} */}
-            </div>
-          
-            <div className={classes.centerContent}>
-                <EditableReportTable
-                    isCustomerOnly={isCustomerOnly}
-                    customers={allCustomers}
-                    userCustomerId={user?.customer || ''}
-                />
+        {/* Top Center - Upload only visible to non-customer roles */}
+        <div className={classes.topCenter}>
+            <p className={classes.title}>Reports</p>
+            {/* {!isCustomerOnly && <CreateReportModal />} */}
+        </div>
 
-                {/*footer area*/}
-                <div className={classes.copyright}>
-                    {thisYear} © Daystar Power Energy Solutions
-                </div>
+        <div className={classes.centerContent}>
+            <EditableReportTable
+                isCustomerOnly={isCustomerOnly}
+                customers={allCustomers}
+                userCustomerId={user?.customer || ''}
+                editorName={editorName}
+            />
+
+            {/*footer area*/}
+            <div className={classes.copyright}>
+                {thisYear} © Daystar Power Energy Solutions
             </div>
+        </div>
     </div>);
 }

@@ -16,8 +16,8 @@ module.exports = {
     // Define roles directly as array of objects
     const roles = [{ name: 'Admin', isAssigned: true }];
     const roles2 = [{ name: 'Customer', isAssigned: true }];
-    const password1 = 'password123@2024';
-    const password2 = 'daystarDev@2024';
+    const password1 = process.env.SEED_PASSWORD_ADMIN
+    const password2 = process.env.SEED_PASSWORD_DEV
     const hashedPassword1 = hashUserPassword(password1);
     const hashedPassword2 = hashUserPassword(password2);
 

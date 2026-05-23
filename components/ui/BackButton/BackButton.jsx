@@ -9,6 +9,7 @@ export default function BackButton() {
             onClick={() => router.back()}
             style={{
                 marginLeft: 'auto',
+                marginTop: '12px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '3px',

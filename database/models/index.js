@@ -16,6 +16,7 @@ import SupportQueryCategoryMod from "./SupportQueryCategory.js";
 import SupportQueryMessageMod from "./SupportQueryMessage.js";
 import SupportQueryStatusMod from "./SupportQueryStatus.js";
 import TextTemplateMod from "./TextTemplate.js";
+import ReportNoteMod from "./ReportNote.js";
 import UserRoleMod from "./UserRole.js";
 import UserSessionMod from "./UserSession.js";
 import VerificationCodeMod from "./VerificationCode.js";
@@ -43,6 +44,7 @@ if (!global._sequelizeModels) {
   const SupportQueryStatusClass = resolve(SupportQueryStatusMod);
   const TextTemplateClass = resolve(TextTemplateMod);
   const UserRoleClass = resolve(UserRoleMod);
+  const ReportNoteClass = resolve(ReportNoteMod);
   const UserSessionClass = resolve(UserSessionMod);
   const VerificationCodeClass = resolve(VerificationCodeMod);
 
@@ -63,6 +65,7 @@ if (!global._sequelizeModels) {
     SupportQueryStatus: SupportQueryStatusClass,
     TextTemplate: TextTemplateClass,
     UserRole: UserRoleClass,
+    ReportNote: ReportNoteClass,
     UserSession: UserSessionClass,
     VerificationCode: VerificationCodeClass,
   };

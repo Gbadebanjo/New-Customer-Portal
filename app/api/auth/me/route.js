@@ -13,8 +13,8 @@ export async function GET() {
             return NextResponse.json(null, { status: 404 });
         }
         // Only send what the client needs — never expose password hash
-        const { id, username, email, name, surname, roles, customer, timezone } = user;
-        return NextResponse.json({ id, username, email, name, surname, roles, customer, timezone });
+        const { id, username, email, name, surname, roles, customer, timezone, totp_enabled } = user;
+        return NextResponse.json({ id, username, email, name, surname, roles, customer, timezone, totp_enabled });
     } catch {
         return NextResponse.json(null, { status: 500 });
     }
