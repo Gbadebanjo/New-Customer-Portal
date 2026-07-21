@@ -1,0 +1,37 @@
+replicaCount: 1
+
+image:
+  repository: 273081097050.dkr.ecr.eu-west-1.amazonaws.com/customer-portal-web
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 3000
+
+ingress:
+  enabled: false
+  host: ""
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Name of a pre-existing Secret (create separately - do not put real secret
+# values in this file or in values.dev.yaml) holding: DB_PASS, SENDGRID_API_KEY,
+# BUCKET_ACCESS_KEY, BUCKET_SECRET_KEY, ENCRYPTION_KEY, INTERNAL_LOG_SECRET,
+# SEED_PASSWORD_ADMIN, SEED_PASSWORD_DEV, AMMP_API_KEY
+secretName: customer-portal-nextjs-secrets
+
+# Non-secret config, passed to the container as plain env vars
+env:
+  NODE_ENV: production
+  APP_NAME: "Daystar Customer Portal"
+  NEXT_PUBLIC_BASE_URL: ""
+  DB_HOST: ""
+  DB_PORT: "5432"
+  DB_NAME: "daystar"
+  FROM_EMAIL: ""

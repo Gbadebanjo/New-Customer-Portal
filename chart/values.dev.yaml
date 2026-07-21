@@ -1,0 +1,15 @@
+# Dev/test-environment overrides. image.tag/image.repository are set via
+# --set at deploy time (see .github/workflows/deploy-dev.yml).
+ingress:
+  enabled: false
+
+env:
+  NODE_ENV: production
+  APP_NAME: "Daystar Customer Portal (test)"
+  NEXT_PUBLIC_BASE_URL: ""
+  DB_HOST: ""
+  DB_PORT: "5432"
+  DB_NAME: "daystar"
+  FROM_EMAIL: ""
+
+secretName: customer-portal-nextjs-secrets

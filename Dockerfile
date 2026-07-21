@@ -22,9 +22,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Run migration and seeding commands during build
-RUN npm run migrate
-RUN npm run seed
+# Migrations/seeding disabled here: baking them into the image build requires
+# live DB credentials at build time and can't reach a private RDS from most
+# CI runners. Run them as a separate deploy-time step instead.
+# RUN npm run migrate
+# RUN npm run seed
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
