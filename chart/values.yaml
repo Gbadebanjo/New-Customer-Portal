@@ -26,6 +26,10 @@ resources:
 # SEED_PASSWORD_ADMIN, SEED_PASSWORD_DEV, AMMP_API_KEY
 secretName: customer-portal-nextjs-secrets
 
+# ConfigMap holding the RDS CA bundle (global-bundle.pem), mounted and
+# referenced via NODE_EXTRA_CA_CERTS so TLS to RDS validates correctly.
+caBundleConfigMap: rds-ca-bundle
+
 # Non-secret config, passed to the container as plain env vars
 env:
   NODE_ENV: production

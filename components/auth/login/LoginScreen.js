@@ -8,7 +8,6 @@ import { generateCode } from "@/lib/auth/verificationActions";
 import verify2FA from "@/lib/controllers/users/verify2FA";
 import startEnable2FA from "@/lib/controllers/users/startEnable2FA";
 import enable2FAAndLogin from "@/lib/controllers/users/enable2FAAndLogin";
-import getUserById from "@/lib/controllers/users/getUserById";
 import { useRouter } from 'next/navigation';
 import { CustomerConstants } from "@/utils/constants";
 import WarnCircleBigIcon from "@/components/ui/icons/WarnCircleBigIcon";

@@ -14,6 +14,10 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      volumes:
+        - name: rds-ca-bundle
+          configMap:
+            name: {{ .Values.caBundleConfigMap }}
       containers:
         - name: web
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -24,10 +28,16 @@ spec:
             - secretRef:
                 name: {{ .Values.secretName }}
           env:
+            - name: NODE_EXTRA_CA_CERTS
+              value: /etc/ssl/rds/global-bundle.pem
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+          volumeMounts:
+            - name: rds-ca-bundle
+              mountPath: /etc/ssl/rds
+              readOnly: true
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           readinessProbe:

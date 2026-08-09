@@ -23,7 +23,6 @@ const labelData = [
 const BAR_HEIGHT = 10; // px
 
 const ProgressBarChartComponent = ({ progressData }) => {
-    console.log("ProgressBarChartComponent loaded", progressData);
     const values = [
         progressData?.energyFromSolar || 0,
         progressData?.energyFromGrid || 0,

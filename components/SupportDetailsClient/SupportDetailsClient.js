@@ -64,7 +64,7 @@ export default function SupportDetailsClient({ allSupportQueryStatuses, allSuppo
             });
             setResponse("");
         } catch (error) {
-            console.log('Failed to send query message', error);
+            console.error('Failed to send query message', error);
         }
 
     };
@@ -76,7 +76,7 @@ export default function SupportDetailsClient({ allSupportQueryStatuses, allSuppo
             setLoading(true);
             await ResolveSupportQueryById(supportQueryById?.supportQuery.id);
         } catch (error) {
-            console.log('Failed to resolve support query', error);
+            console.error('Failed to resolve support query', error);
         } finally {
             setLoading(false);
         }

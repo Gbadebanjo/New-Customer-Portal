@@ -14,8 +14,6 @@ const ProfilePopUp = () => {
     const [mounted, setMounted] = useState(false);
     const { user, setUser } = useUser();
     const router = useRouter();
-    console.log('user:', user);
-
 
     useEffect(() => {
         setMounted(true);

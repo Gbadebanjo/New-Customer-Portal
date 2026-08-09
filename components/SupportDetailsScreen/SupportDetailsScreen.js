@@ -15,10 +15,6 @@ export default async function SupportDetailsScreen({ support_id }) {
     const { supportQueryCategories } = await getAllSupportQueryCategories();
     const supportQueryById = await getSupportQueryById(support_id);
 
-    // console.log('supportQueryById', supportQueryById)
-    // console.log('supportQueryStatus', supportQueryStatuses)
-
-
     return (
         <div className={classes.container}>
             {/* Header */}

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { validateCode, generateCode } from "@/lib/auth/verificationActions";
 import verify2FA from "@/lib/controllers/users/verify2FA";
-import getUserById from '@/lib/controllers/users/getUserById';
 import classes from '../login/login.module.css';
 import { ButtonDefault } from "@/components/ui/ButtonDefault/ButtonDefault";
 import CustomTextField from '@/components/ui/CustomTextField/CustomTextInput';

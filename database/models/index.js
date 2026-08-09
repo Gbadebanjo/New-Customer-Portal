@@ -13,7 +13,7 @@ import SupportQueryMod from "./SupportQuery.js";
 import SupportQueryCategoryMod from "./SupportQueryCategory.js";
 import SupportQueryMessageMod from "./SupportQueryMessage.js";
 import SupportQueryStatusMod from "./SupportQueryStatus.js";
-import TextTemplateMod from "./Texttemplate.js";
+import TextTemplateMod from "./TextTemplate.js";
 import ReportNoteMod from "./ReportNote.js";
 import UserRoleMod from "./UserRole.js";
 import UserSessionMod from "./UserSession.js";
@@ -43,13 +43,12 @@ if (global._sequelizeModels) {
   const cached = global._sequelizeModels;
   const missing = REQUIRED_MODELS.filter((n) => !cached[n]);
   if (missing.length > 0) {
-    console.log('⚠️  Sequelize model cache is missing:', missing.join(', '), '— rebuilding.');
+    console.warn('Sequelize model cache is missing:', missing.join(', '), '— rebuilding.');
     global._sequelizeModels = null;
   }
 }
 
 if (!global._sequelizeModels) {
-  console.log("🔄 Initializing Sequelize models (minimal associations)...");
 
   // resolve module classes (this causes the files to run Model.init)
   const UserClass = resolve(UserMod);
@@ -128,15 +127,8 @@ if (!global._sequelizeModels) {
     }
   });
 
-  // export the registryModels as your app-wide models object
   global._sequelizeModels = registryModels;
   models = registryModels;
-
-  // DEBUG: list exported model names and key associations for verification
-  console.log("🔎 exported model keys:", Object.keys(models));
-  console.log("🔎 Enabled associations:", Array.from(enabledAssociations));
-  if (models.SupportQuery) console.log("🔎 SupportQuery associations:", Object.keys(models.SupportQuery.associations || {}));
-  if (models.User) console.log("🔎 User associations:", Object.keys(models.User.associations || {}));
 } else {
   models = global._sequelizeModels;
 }

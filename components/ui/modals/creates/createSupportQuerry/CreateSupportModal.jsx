@@ -24,8 +24,6 @@ const CreateSupportModal = ({ supportQueryCategories }) => {
   const createSupportModalRef = useRef(null);
   const { user } = useUser();
 
-  // console.log("User in supportmodel:", user);
-
   useEffect(() => {
     if (isCreateSupportModalOpen) {
       createSupportModalRef.current.showModal();

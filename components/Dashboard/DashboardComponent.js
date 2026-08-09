@@ -6,7 +6,6 @@ import { TooManyAssetsComponent } from "@/components/Dashboard/TooManyAssetsComp
 import { ServiceConstants } from "@/utils/constants";
 
 export function DashboardComponent({ assets, totals }) {
-    console.log('inside DashboardComponent');
     const [lastUpdateDate, setLastUpdateDate] = useState('');
     const [noAssets, setNoAssets] = useState(true);
     const [assetCount, setAssetCount] = useState(0);
@@ -14,15 +13,12 @@ export function DashboardComponent({ assets, totals }) {
 
     useEffect(() => {
         const fetchData = async () => {
-
             if (assets?.detail === 'Could not validate credentials') {
-                // console.log('detail: ' + assets.detail);
                 setAssetCount(0);
                 setNoAssets(true);
             } else if (!assets || assets.length === 0) {
                 setAssetCount(0);
                 setNoAssets(true);
-                // console.log("NO assets");
             } else if (assets.length > 0) {
                 setAssetCount(assets.length);
                 setNoAssets(false);
@@ -32,17 +28,10 @@ export function DashboardComponent({ assets, totals }) {
             setLastUpdateDate(timeZoneInfo);
 
             setTooManyAssets(Array.isArray(assets) && assets.length > ServiceConstants.MaxAssets);
-            if (Array.isArray(assets) && assets.length > ServiceConstants.MaxAssets) {
-                console.log("TOO MANY assets");
-            }
-
-            if (totals) {
-                console.log('Totals > ', totals)
-            }
         };
 
         fetchData();
-    }, [assets]);
+    }, [assets, totals]);
 
     return (
         <div>
