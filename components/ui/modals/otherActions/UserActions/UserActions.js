@@ -39,10 +39,11 @@ const UserActions = ({ menuItems, customers }) => {
     const [activeTab, setActiveTab] = useState('userInfo');
     const [selectedTimezone, setSelectedTimezone] = useState(AllTimezones[0]);
     const [selectedCustomer, setSelectedCustomer] = useState('');
-    const [adminRoleChecked, setAdminRoleChecked] = useState(false);
-    const [daystarPortalAdminRoleChecked, setDaystarPortalAdminRoleChecked] = useState(false);
-    const [daystarCustomerAdminRoleChecked, setDaystarCustomerAdminRoleChecked] = useState(false);
-    const [customerRoleChecked, setCustomerRoleChecked] = useState(true);
+    // A user has exactly one role. Kept as a single string to match the
+    // create-user modal's radio-group pattern. Multi-checkbox was the
+    // old shape but let admins assign contradictory roles (e.g. Admin
+    // + Customer User) that the rest of the auth code doesn't handle.
+    const [selectedRole, setSelectedRole] = useState('Customer');
     const [userName, setUserName] = useState('');
     const [surname, setSurname] = useState('');
     const [name, setName] = useState('');
@@ -156,11 +157,14 @@ const UserActions = ({ menuItems, customers }) => {
             setIsExternal(is_external ?? false);
             setExistingUserObject(user);
 
+            // Legacy rows may have multiple roles assigned. Prefer the
+            // most-privileged one so a user who was previously an Admin
+            // doesn't get demoted to Customer just by opening + saving
+            // their profile.
             const roleNames = Array.isArray(roles) ? roles.map(r => r.name) : [];
-            setAdminRoleChecked(roleNames.includes('Admin'));
-            setDaystarPortalAdminRoleChecked(roleNames.includes('Daystar Portal Admin'));
-            setDaystarCustomerAdminRoleChecked(roleNames.includes('Daystar Customer Admin'));
-            setCustomerRoleChecked(roleNames.includes('Customer'));
+            const priority = ['Admin', 'Daystar Portal Admin', 'Daystar Customer Admin', 'Customer'];
+            const picked = priority.find((r) => roleNames.includes(r)) || roleNames[0] || 'Customer';
+            setSelectedRole(picked);
         } else {
             openCustomAlertPopup("User not found.");
         }
@@ -206,11 +210,10 @@ const UserActions = ({ menuItems, customers }) => {
     const updateUser = async () => {
         setIsUpdating(true);
         try {
-            const newRoles = [];
-            if (adminRoleChecked) newRoles.push({ name: 'Admin', isAssigned: true });
-            if (customerRoleChecked) newRoles.push({ name: 'Customer', isAssigned: true });
-            if (daystarCustomerAdminRoleChecked) newRoles.push({ name: 'Daystar Customer Admin', isAssigned: true });
-            if (daystarPortalAdminRoleChecked) newRoles.push({ name: 'Daystar Portal Admin', isAssigned: true });
+            // Single role per user — the radio group guarantees at most one.
+            const newRoles = selectedRole
+                ? [{ name: selectedRole, isAssigned: true }]
+                : [];
 
             const userData = {
                 username: userName,
@@ -397,30 +400,30 @@ const UserActions = ({ menuItems, customers }) => {
                         )}
                         {activeTab === 'roles' && (
                             <div>
-                                <div className="mb-4 align-items-center gap-3 flex">
-                                    <input type="checkbox" id="admin_role_checkbox" name="adminRoleCheckbox"
-                                        checked={adminRoleChecked} onChange={() => setAdminRoleChecked(!adminRoleChecked)}
-                                        value="true" className={modalClasses.inputCheckbox} />
-                                    <label className={modalClasses.labelText} htmlFor="admin_role_checkbox">Admin</label>
-                                </div>
-                                <div className="mb-4 align-items-center gap-3 flex">
-                                    <input type="checkbox" id="customer_role_checkbox" name="customerRoleCheckbox"
-                                        checked={customerRoleChecked} onChange={() => setCustomerRoleChecked(!customerRoleChecked)}
-                                        value="true" className={modalClasses.inputCheckbox} />
-                                    <label className={modalClasses.labelText} htmlFor="customer_role_checkbox">Customer User</label>
-                                </div>
-                                <div className="mb-4 align-items-center gap-3 flex">
-                                    <input type="checkbox" id="daystar_customer_admin_role_checkbox" name="daystarCustomerAdminRoleCheckbox"
-                                        checked={daystarCustomerAdminRoleChecked} onChange={() => setDaystarCustomerAdminRoleChecked(!daystarCustomerAdminRoleChecked)}
-                                        value="true" className={modalClasses.inputCheckbox} />
-                                    <label className={modalClasses.labelText} htmlFor="daystar_customer_admin_role_checkbox">Daystar Customer Admin</label>
-                                </div>
-                                <div className="mb-4 align-items-center gap-3 flex">
-                                    <input type="checkbox" id="daystar_portal_admin_role_checkbox" name="daystarPortalAdminRoleCheckbox"
-                                        checked={daystarPortalAdminRoleChecked} onChange={() => setDaystarPortalAdminRoleChecked(!daystarPortalAdminRoleChecked)}
-                                        value="true" className={modalClasses.inputCheckbox} />
-                                    <label className={modalClasses.labelText} htmlFor="daystar_portal_admin_role_checkbox">Daystar Portal Admin</label>
-                                </div>
+                                {[
+                                    { value: 'Admin', label: 'Admin' },
+                                    { value: 'Customer', label: 'Customer User' },
+                                    { value: 'Daystar Customer Admin', label: 'Daystar Customer Admin' },
+                                    { value: 'Daystar Portal Admin', label: 'Daystar Portal Admin' },
+                                ].map((r) => {
+                                    const inputId = `edit_role_radio_${r.value.replace(/\s+/g, '_').toLowerCase()}`;
+                                    return (
+                                        <div key={r.value} className="mb-4 align-items-center gap-3 flex">
+                                            <input
+                                                id={inputId}
+                                                name="editUserRole"
+                                                type="radio"
+                                                value={r.value}
+                                                checked={selectedRole === r.value}
+                                                onChange={() => setSelectedRole(r.value)}
+                                                className={modalClasses.inputCheckbox}
+                                            />
+                                            <label className={modalClasses.labelText} htmlFor={inputId}>
+                                                {r.label}
+                                            </label>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

@@ -264,16 +264,16 @@ function LoginScreen() {
                                     {setupQr ? (
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', margin: '1rem 0' }}>
                                             <Image src={setupQr} alt="2FA QR code" width={180} height={180} />
-                                            <div style={{ textAlign: 'center', fontSize: '0.85rem', opacity: 0.85 }}>
+                                            <div style={{ textAlign: 'center', fontSize: '0.85rem', color: '#e1e7ed' }}>
                                                 Can&apos;t scan? Enter this secret manually:
                                                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.35rem' }}>
-                                                    <code style={{ background: '#123751', padding: '6px 10px', borderRadius: '4px', fontSize: '0.9rem', lineHeight: 1 }}>
+                                                    <code style={{ background: '#123751', color: '#e1e7ed', padding: '6px 10px', borderRadius: '4px', fontSize: '0.9rem', lineHeight: 1 }}>
                                                         {setupSecret}
                                                     </code>
                                                     <button
                                                         type="button"
                                                         onClick={handleCopySetupSecret}
-                                                        style={{ background: 'transparent', border: '1px solid #23262a', color: 'inherit', padding: '4px 10px', borderRadius: '4px', fontSize: '0.85rem', lineHeight: 1, cursor: 'pointer' }}
+                                                        style={{ background: 'transparent', border: '1px solid #23262a', color: '#e1e7ed', padding: '4px 10px', borderRadius: '4px', fontSize: '0.85rem', lineHeight: 1, cursor: 'pointer' }}
                                                     >
                                                         {setupCopied ? 'Copied' : 'Copy'}
                                                     </button>

@@ -44,31 +44,12 @@
   --ds-space-4: 16px;
   --ds-space-5: 24px;
   --ds-space-6: 32px;
-
-  /* Legacy vars retained for existing rules */
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: var(--ds-text);
   font-family: "Kanit", sans-serif;
   overflow: hidden;
-  /*background: linear-gradient(*/
-  /*    to bottom,*/
-  /*    transparent,*/
-  /*    rgb(var(--background-end-rgb))*/
-  /*  )*/
-  /*  rgb(var(--background-start-rgb));*/
 }
 
 @layer utilities {
@@ -95,6 +76,20 @@ body {
   font-family: 'Kanit', sans-serif;
   padding: 10px 20px;
   border-bottom: 1px solid var(--ds-border-subtle, rgba(173, 216, 230, 0.1));
+}
+
+/* --- Hide the browser-native password-reveal / clear icons ---
+   Edge (and IE) renders its own "eye" and "X" pseudo-elements inside
+   every <input type="password"> and text input. Where the app also
+   renders a custom show/hide toggle (CustomTextField, PasswordField),
+   the user sees two eye icons at slightly different positions. Where
+   it doesn't, the native icon is inconsistent with the rest of the
+   design. Suppress both so every password input renders exactly the
+   toggle our components draw — or none, if the component didn't
+   include one. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
 }
 
 [class$="__header"] small,

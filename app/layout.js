@@ -46,7 +46,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   const initialUser = await getInitialUser();
   return (
-    <html lang="en" data-theme="night">
+    <html lang="en">
       <body className={kanit.className}>
         <UserProvider initialUser={initialUser}>
           <ClientLayoutWrapper impersonationBanner={<ImpersonationBanner />}>
@@ -57,8 +57,3 @@ export default async function RootLayout({ children }) {
     </html>
   );
 }
-//     <html lang="en" data-theme="night">
-//       <body className={inter.className}>{children}</body>
-//     </html>
-//   );
-// }
