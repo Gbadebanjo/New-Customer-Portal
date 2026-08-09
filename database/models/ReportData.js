@@ -1,10 +1,20 @@
 'use strict';
 import { DataTypes, Model } from "sequelize";
+import { v4 as uuidv4 } from 'uuid';
 import sequelizeConnection from '@/db_connection';
 
 class ReportData extends Model {}
 
 ReportData.init({
+  // DB column is uuid NOT NULL with no server default. Function form for
+  // the default — the class literal `DataTypes.UUIDV4` serialises to the
+  // string 'UUIDV4' at insert time on this Sequelize version.
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: () => uuidv4(),
+    primaryKey: true,
+    allowNull: false,
+  },
   customer_id: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -93,6 +103,27 @@ ReportData.init({
     type: DataTypes.DOUBLE,
     allowNull: true,
     defaultValue: 0,
+  },
+  // Data-assurance columns. These MUST be declared on the model or
+  // Sequelize silently drops them from every `.update()` / `.create()` —
+  // which is why admin saves were leaving rows stuck at status='raw'
+  // and customers (who only see 'verified') were seeing nothing.
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'raw',
+  },
+  verified_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  verified_by_user_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+  raw_source_data: {
+    type: DataTypes.JSONB,
+    allowNull: true,
   },
 }, {
   sequelize: sequelizeConnection,

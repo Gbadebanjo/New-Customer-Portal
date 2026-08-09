@@ -1,0 +1,53 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  font-size: 14px;
+  padding: 8px var(--ds-space-5);
+  border-bottom: 1px solid var(--ds-border-subtle);
+  background-color: var(--ds-bg);
+  border-top-left-radius: var(--ds-radius-md);
+  border-top-right-radius: var(--ds-radius-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: var(--ds-text);
+}
+
+/* On mobile, leave space for the floating sidebar hamburger (fixed at
+   top:14 left:14, size 40 — so 14+40+8 = 62 gives a comfortable gap). */
+@media (max-width: 768px) {
+  .header {
+    padding-left: 68px;
+    padding-right: var(--ds-space-3);
+  }
+}
+
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ds-text);
+  transition: color 0.15s;
+}
+
+.homeLink:hover {
+  color: var(--ds-accent);
+}
+
+.separator {
+  color: var(--ds-text-hint);
+  margin: 0 var(--ds-space-1);
+}
+
+.crumb {
+  color: var(--ds-text);
+}
+
+.crumbLast {
+  color: var(--ds-text);
+  font-weight: 500;
+}
+
+.backSlot {
+  margin-left: auto;
+}

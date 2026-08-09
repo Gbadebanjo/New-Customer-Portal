@@ -2,7 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Daystar design tokens.
+   Every hex used across the app should reference one of these. Screens still
+   using raw hex will be migrated screen-by-screen; both work side-by-side. */
 :root {
+  /* Surfaces */
+  --ds-bg: #0d202f;
+  --ds-surface: #0d2638;
+  --ds-surface-raised: #123751;
+  --ds-surface-elevated: #0a1c2a;
+
+  /* Text */
+  --ds-text: #e1e7ed;
+  --ds-text-muted: #b0b7bd;
+  --ds-text-hint: #7c8796;
+  --ds-text-footer: #757f90;
+
+  /* Accent (brand orange) */
+  --ds-accent: #ff7d70;
+  --ds-accent-hover: #ff9770;
+
+  /* Feedback */
+  --ds-success: #4caf50;
+  --ds-success-bg: #0e2e1e;
+  --ds-info: #60a5fa;
+  --ds-danger: #ef4444;
+
+  /* Borders */
+  --ds-border: #1c384e;
+  --ds-border-subtle: rgba(173, 216, 230, 0.1);
+
+  /* Radii */
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+
+  /* Spacing scale */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 24px;
+  --ds-space-6: 32px;
+
+  /* Legacy vars retained for existing rules */
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -32,6 +75,33 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* --- Consistent breadcrumb-header appearance across every screen ---
+   Every screen uses the module-scoped class `.header`, which Turbopack
+   compiles to `<file>-module__<hash>__header`. Two visual variants had
+   grown up in parallel — most screens had a plain padding-only header,
+   a handful (Customers, Dashboard, 404) had a bordered/background one.
+   Pull them all onto the same look: same font size, colour, padding,
+   subtle underline, family — with any nested <small> inheriting the
+   container size so the tag no longer changes visual weight.
+   `__headerTitle`, `__headerRight`, etc. are not matched because they
+   have suffix characters after "__header". */
+[class$="__header"],
+[class*="__header "] {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ds-text-muted, #b0b7bd);
+  font-family: 'Kanit', sans-serif;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--ds-border-subtle, rgba(173, 216, 230, 0.1));
+}
+
+[class$="__header"] small,
+[class*="__header "] small {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
 }
 
 

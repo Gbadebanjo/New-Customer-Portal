@@ -8,11 +8,11 @@
   margin: 20px;
   padding: 20px;
   grid-template-areas:
-    "topLeft    topCenter1  topCenter1  topRight"
-    "solar      co2         trees       rightSide"
-    "powerGen   lastUpdated lastUpdated rightSide"
-    "donut      donut       donut       rightSide";
-  grid-template-columns: 1fr 1fr 1fr 2fr;
+    "topLeft    topCenter1  topCenter1  topCenter1  topRight"
+    "solar      co2         trees       diesel      rightSide"
+    "trend      trend       trend       trend       rightSide"
+    "donut      donut       donut       donut       rightSide";
+  grid-template-columns: 1fr 1fr 1fr 1fr 2fr;
   grid-template-rows: auto auto auto auto;
   gap: 20px;
   background-size: cover;
@@ -47,9 +47,10 @@
 
 .solar,
 .co2,
-.trees {
+.trees,
+.diesel {
   border-radius: 10px;
-  padding: 15px;
+  padding: 12px 14px 14px;
   z-index: 1;
   background: rgba(59, 68, 75, 0.65);
   backdrop-filter: blur(10px);
@@ -59,9 +60,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
-  gap: 10px;
+  gap: 4px;
+  align-self: start;
+  min-height: 200px;
 }
+
+.solar   { grid-area: solar; }
+.co2     { grid-area: co2; }
+.trees   { grid-area: trees; }
+.diesel  { grid-area: diesel; }
+.trend   { grid-area: trend; }
 
 .cardBody {
   text-align: center;
@@ -330,8 +338,8 @@
     grid-template-areas:
       "topLeft    topCenter1"
       "solar      co2"
-      "trees      trees"
-      "powerGen   lastUpdated"
+      "trees      diesel"
+      "trend      trend"
       "donut      donut"
       "topRight   topRight"
       "rightSide  rightSide";
@@ -354,8 +362,8 @@
       "topLeft    topLeft"
       "topCenter1 topCenter1"
       "solar      co2"
-      "trees      trees"
-      "powerGen   lastUpdated"
+      "trees      diesel"
+      "trend      trend"
       "donut      donut"
       "topRight   topRight"
       "rightSide  rightSide";
@@ -409,8 +417,8 @@
       "solar"
       "co2"
       "trees"
-      "powerGen"
-      "lastUpdated"
+      "diesel"
+      "trend"
       "donut"
       "topRight"
       "rightSide";
@@ -421,7 +429,8 @@
 
   .solar,
   .co2,
-  .trees {
+  .trees,
+  .diesel {
     min-height: 120px;
   }
 

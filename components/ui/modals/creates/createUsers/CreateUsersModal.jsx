@@ -17,17 +17,15 @@ const CreateUsersModal = ({ customers, users }) => {
     AllTimezones[0].value
   );
   const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [adminRoleChecked, setAdminRoleChecked] = useState(false);
-  const [daystarPortalAdminRoleChecked, setDaystarPortalAdminRoleChecked] =
-    useState(false);
-  const [daystarCustomerAdminRoleChecked, setDaystarCustomerAdminRoleChecked] =
-    useState(false);
-  const [customerRoleChecked, setCustomerRoleChecked] = useState(true);
+  // Single role per user. Options are the four canonical role names as
+  // stored in the DB (`Admin`, `Customer`, `Daystar Customer Admin`,
+  // `Daystar Portal Admin`). Defaults to `Customer` since that's the
+  // most common creation case.
+  const [selectedRole, setSelectedRole] = useState("Customer");
   const [userName, setUserName] = useState("");
   const [surname, setSurname] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [ammpApiKeyy, setAmmpApiKeyy] = useState("");
   const [phone, setPhone] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [lockoutEnabled, setLockoutEnabled] = useState(true);
@@ -79,28 +77,20 @@ const CreateUsersModal = ({ customers, users }) => {
     formData.append("Name", name);
     formData.append("Email", email);
     formData.append("Timezone", selectedTimezone);
-    formData.append("AMMP_API_key", ammpApiKeyy);
     formData.append("SelectedCustomer", selectedCustomer);
     formData.append("Phone", phone);
     if (isActive) formData.append("UserInfo.IsActive", "true");
     if (lockoutEnabled) formData.append("UserInfo.LockoutEnabled", "true");
     if (sendConfirmationEmail) formData.append("UserInfo.SendConfirmationEmail", "true");
 
-    const roles = [];
-    if (adminRoleChecked) {
-      roles.push({ name: "Admin", isAssigned: true });
+    if (!selectedRole) {
+      openCustomAlertPopup("Please select a role.");
+      return;
     }
-    if (customerRoleChecked) {
-      roles.push({ name: "Customer", isAssigned: true });
-    }
-    if (daystarCustomerAdminRoleChecked) {
-      roles.push({ name: "Daystar Customer Admin", isAssigned: true });
-    }
-    if (daystarPortalAdminRoleChecked) {
-      roles.push({ name: "Daystar Portal Admin", isAssigned: true });
-    }
-
-    formData.append("roles", JSON.stringify(roles));
+    formData.append(
+      "roles",
+      JSON.stringify([{ name: selectedRole, isAssigned: true }])
+    );
 
     // Client-side validation
     if (isUsernameTaken(formData.get("UserName"))) {
@@ -142,14 +132,10 @@ const CreateUsersModal = ({ customers, users }) => {
       setSurname("");
       setName("");
       setEmail("");
-      setAmmpApiKeyy("");
       setSelectedCustomer("");
       setSelectedTimezone(AllTimezones[0].value);
       setPhone("");
-      setAdminRoleChecked(false);
-      setDaystarPortalAdminRoleChecked(false);
-      setDaystarCustomerAdminRoleChecked(false);
-      setCustomerRoleChecked(true);
+      setSelectedRole("Customer");
       setIsActive(false);
       setLockoutEnabled(true);
       setSendConfirmationEmail(true);
@@ -391,27 +377,6 @@ const CreateUsersModal = ({ customers, users }) => {
                       }}
                     >
                       <div className="label">
-                        <span className={classes.labelText}>AMMP API key</span>
-                      </div>
-                      <input
-                        type="text"
-                        id="AMMP_API_key"
-                        max="255"
-                        min="2"
-                        name="AMMP_API_key"
-                        className={classes.inputField}
-                        value={ammpApiKeyy}
-                        onChange={(e) => setAmmpApiKeyy(e.target.value)}
-                      />
-                    </label>
-                    <label
-                      className="form-control w-full"
-                      style={{
-                        marginBottom: "20px",
-                        maxWidth: "133%",
-                      }}
-                    >
-                      <div className="label">
                         <span className={classes.labelText}>
                           Select Customer
                         </span>
@@ -514,93 +479,32 @@ const CreateUsersModal = ({ customers, users }) => {
               </form>
             )}
             {activeTab === "roles" && (
-              // Roles Tab Content
-
               <div id="create-user-modal-tabs_1-tab">
-                {/* Your form components for the "Roles" tab */}
-                <div className="mb-4 align-items-center gap-2 flex">
-                  <input
-                    id="admin_role_checkbox"
-                    name="adminRoleCheckbox"
-                    type="checkbox"
-                    checked={adminRoleChecked}
-                    onChange={() => setAdminRoleChecked(!adminRoleChecked)}
-                    data-val="true"
-                    data-val-required="The IsAssigned field is required."
-                    value="true"
-                    className={classes.inputCheckbox}
-                  />
-                  &nbsp;
-                  <label
-                    className={classes.labelText}
-                    htmlFor="Roles_0__IsAssigned"
-                  >
-                    Admin
-                  </label>
-                </div>
-                <div className="mb-4 align-items-center gap-2 flex">
-                  <input
-                    // checked="checked"
-                    checked={customerRoleChecked}
-                    onChange={() => setCustomerRoleChecked(!customerRoleChecked)}
-                    id="customer_role_checkbox"
-                    name="customerRoleCheckbox"
-                    type="checkbox"
-                    value="true"
-                    className={classes.inputCheckbox}
-                  />
-                  &nbsp;
-                  <label
-                    className={classes.labelText}
-                    htmlFor="Roles_1__IsAssigned"
-                  >
-                    Customer User
-                  </label>
-                </div>
-                <div className="mb-4 align-items-center gap-2 flex">
-                  <input
-                    id="daystar_customer_admin_role_checkbox"
-                    name="daystarCustomerAdminRoleCheckbox"
-                    checked={daystarCustomerAdminRoleChecked}
-                    onChange={() =>
-                      setDaystarCustomerAdminRoleChecked(
-                        !daystarCustomerAdminRoleChecked
-                      )
-                    }
-                    type="checkbox"
-                    value="true"
-                    className={classes.inputCheckbox}
-                  />
-                  &nbsp;
-                  <label
-                    className={classes.labelText}
-                    htmlFor="Roles_2__IsAssigned"
-                  >
-                    Daystar Customer Admin
-                  </label>
-                </div>
-                <div className="mb-4 align-items-center gap-2 flex">
-                  <input
-                    id="daystar_portal_admin_role_checkbox"
-                    name="daystarPortalAdminRoleCheckbox"
-                    checked={daystarPortalAdminRoleChecked}
-                    onChange={() =>
-                      setDaystarPortalAdminRoleChecked(
-                        !daystarPortalAdminRoleChecked
-                      )
-                    }
-                    type="checkbox"
-                    value="true"
-                    className={classes.inputCheckbox}
-                  />
-                  &nbsp;
-                  <label
-                    className={classes.labelText}
-                    htmlFor="Roles_3__IsAssigned"
-                  >
-                    Daystar Portal Admin
-                  </label>
-                </div>
+                {[
+                  { value: "Admin", label: "Admin" },
+                  { value: "Customer", label: "Customer User" },
+                  { value: "Daystar Customer Admin", label: "Daystar Customer Admin" },
+                  { value: "Daystar Portal Admin", label: "Daystar Portal Admin" },
+                ].map((r) => (
+                  <div key={r.value} className="mb-4 align-items-center gap-2 flex">
+                    <input
+                      id={`role_radio_${r.value.replace(/\s+/g, "_").toLowerCase()}`}
+                      name="userRole"
+                      type="radio"
+                      value={r.value}
+                      checked={selectedRole === r.value}
+                      onChange={() => setSelectedRole(r.value)}
+                      className={classes.inputCheckbox}
+                    />
+                    &nbsp;
+                    <label
+                      className={classes.labelText}
+                      htmlFor={`role_radio_${r.value.replace(/\s+/g, "_").toLowerCase()}`}
+                    >
+                      {r.label}
+                    </label>
+                  </div>
+                ))}
               </div>
             )}
           </div>

@@ -47,7 +47,6 @@ const UserActions = ({ menuItems, customers }) => {
     const [surname, setSurname] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [ammpApiKey, setAmmpApiKey] = useState('');
     const [phone, setPhone] = useState('');
     const [customer, setCustomer] = useState('');
     const [roles, setRoles] = useState('');
@@ -135,7 +134,6 @@ const UserActions = ({ menuItems, customers }) => {
                 phone_number,
                 name,
                 surname,
-                ammp_api_key,
                 customer,
                 timezone,
                 roles,
@@ -149,7 +147,6 @@ const UserActions = ({ menuItems, customers }) => {
             setPhone(phone_number);
             setName(name);
             setSurname(surname);
-            setAmmpApiKey(ammp_api_key);
             setSelectedCustomer(customer);
             setSelectedTimezone(timezone);
             setRoles(roles);
@@ -221,7 +218,6 @@ const UserActions = ({ menuItems, customers }) => {
                 phone_number: phone,
                 name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(),
                 surname: surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase(),
-                ammp_api_key: ammpApiKey,
                 customer: selectedCustomer,
                 roles: newRoles,
                 timezone: selectedTimezone,
@@ -245,7 +241,6 @@ const UserActions = ({ menuItems, customers }) => {
             setPhone('');
             setName('');
             setSurname('');
-            setAmmpApiKey('');
             setSelectedCustomer('');
             setSelectedTimezone(AllTimezones[0]);
             setRoles('');
@@ -364,12 +359,6 @@ const UserActions = ({ menuItems, customers }) => {
                                             <option key={tz.id} value={tz.id}>{tz.name}</option>
                                         ))}
                                     </select>
-                                </label>
-                                <label className={modalClasses.fieldRow}>
-                                    <span className={modalClasses.labelText}>AMMP API key</span>
-                                    <input type="text" className={modalClasses.inputField}
-                                        id="ammpApiKey" name="ammpApiKey"
-                                        value={ammpApiKey} onChange={(e) => setAmmpApiKey(e.target.value)} />
                                 </label>
                                 <label className={modalClasses.fieldRow}>
                                     <span className={modalClasses.labelText}>Select Customer</span>

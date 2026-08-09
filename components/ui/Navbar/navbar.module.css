@@ -1,16 +1,26 @@
+/* ─── Sidebar shell ─────────────────────────────────────────── */
 .sidebarMenu {
   display: flex;
   flex-direction: column;
-  gap: 45px;
   height: 100vh;
   width: 340px;
   min-width: 340px;
   background-color: #0d2638;
-  transition: width 0.5s;
-  scroll-behavior: smooth;
+  transition: width 0.3s;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  padding: 12px 8px 24px;
+  gap: 2px;
+}
+
+.sidebarMenu::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebarMenu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
 }
 
 @media (max-width: 768px) {
@@ -18,9 +28,7 @@
     width: 280px;
     min-width: 280px;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
-    gap: 32px;
   }
-
   .collapsed {
     width: 280px !important;
     min-width: 280px !important;
@@ -31,226 +39,285 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30px 10px 20px 20px;
+  padding: 8px 12px 20px;
 }
 
 .sidebarHeader {
-  color: white;
-  font-size: 1.2rem;
-  font-family: "Kanit";
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: "Kanit", sans-serif;
   font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .hamburgerMenu {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
-  color: white;
+  color: #cfd8e0;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  transition: background 0.15s, color 0.15s;
 }
 
+.hamburgerMenu:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+/* ─── Menu item (top level) ─────────────────────────────────── */
+/* Reset the anchor/button appearance uniformly. */
 .menuItem {
-  color: #e1e7ed;
-  font-size: 17px;
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  line-height: 23px;
-  word-wrap: break-word;
+  all: unset;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
+  gap: 12px;
   width: 100%;
-  padding: 0 0 3px 40px;
-}
-
-.menuItemOrange {
-  color: #ff7d70;
-  font-size: 17px;
+  padding: 11px 12px;
+  margin: 3px 0;
+  border-radius: 8px;
+  color: rgba(225, 231, 237, 0.85);
+  font-size: 0.9rem;
   font-family: "Inter", sans-serif;
-  font-weight: 600;
-  line-height: 23px;
-  word-wrap: break-word;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 0 0 3px 40px;
-}
-
-.chevronDownIcon {
-  transition: color 0.2s;
-  color: #828f98;
-}
-
-.chevronIcon {
-  color: #ff7d70;
-  transition: color 0.2s;
+  font-weight: 500;
+  line-height: 1.25;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, color 0.15s;
+  overflow: hidden;
 }
 
 .menuItem:hover,
-.chevronDownIcon:hover {
-  color: #ff7d70 !important;
+.menuItem:focus-visible {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  outline: none;
 }
 
-.innerMenu {
-  margin-left: 0;
-  list-style-type: none;
-  font-size: 17px;
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  line-height: 23px;
-  padding-left: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.innerMenu:hover {
+.menuItemActive {
+  background: rgba(255, 125, 112, 0.10);
   color: #ff7d70;
+}
+
+/* Left rail on the active item — subtle, sharp identity cue. */
+.menuItemActive::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #ff7d70;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chevron {
+  color: rgba(255, 255, 255, 0.45);
+  transition: transform 0.2s ease, color 0.15s;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.menuItem:hover .chevron {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.menuItemActive .chevron {
+  color: #ff7d70;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ─── Submenu (Administration children) ────────────────────── */
+.innerMenu {
+  list-style: none;
+  padding: 2px 0 4px 0;
+  margin: 0 0 4px 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .innerMenuItem {
-  color: #e1e7ed;
-}
-
-.subMenuOrange {
-  color: #ff7d70;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 10px 20px 10px 40px;
-  margin-top: 0;
-}
-
-.subMenuItemIdentity {
-  color: #e1e7ed;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 10px 20px 10px 40px;
-}
-
-.subMenuItemIdentity:hover {
-  color: #ff7d70;
-}
-
-.subMenuOrangeIdentity {
-  color: #ff7d70;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 10px 20px 10px 40px;
-  margin-top: 0;
+  margin: 0;
+  padding: 0 0 0 8px;
 }
 
 .subMenuItem {
-  color: #e1e7ed;
+  all: unset;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
+  gap: 10px;
   width: 100%;
-  padding: 10px 20px 10px 40px;
+  padding: 9px 10px;
+  margin: 2px 0;
+  border-radius: 6px;
+  color: rgba(225, 231, 237, 0.75);
+  font-size: 0.85rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, color 0.15s;
 }
 
-.subMenuItem:hover {
+.subMenuItem:hover,
+.subMenuItem:focus-visible {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  outline: none;
+}
+
+.subMenuActive {
+  background: rgba(255, 125, 112, 0.10);
   color: #ff7d70;
+}
+
+.subMenuActive .chevron,
+.subMenuItem:hover .chevron {
+  color: inherit;
+}
+
+/* ─── Deepest level (Roles / Users / Security Logs) ─────────── */
+.subSubMenu {
+  list-style: none;
+  padding: 2px 0 4px 0;
+  margin: 0 0 4px 14px;
+  border-left: 1px dashed rgba(255, 255, 255, 0.07);
 }
 
 .subSubMenuItem {
-  color: #e1e7ed;
-  display: flex;
-  align-items: center;
-  padding: 10px 20px 10px 55px;
+  display: block;
+  padding: 8px 12px;
+  margin: 2px 8px;
+  border-radius: 6px;
+  color: rgba(225, 231, 237, 0.65);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
 }
 
 .subSubMenuItem:hover {
-  color: #ff7d70;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
 }
 
-.subSubMenuItemOrange {
+.subSubMenuActive {
+  background: rgba(255, 125, 112, 0.10);
   color: #ff7d70;
-  display: flex;
-  align-items: center;
-  padding: 10px 20px 10px 55px;
+  font-weight: 600;
 }
 
+/* ─── Footer logo ───────────────────────────────────────────── */
 .dayStarLogoForMenu {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  height: 100%;
-  margin-bottom: 35px;
-  margin-top: 60px;
-  margin-left: 20px;
+  margin-top: auto;
+  padding: 24px 12px 8px;
 }
 
-/* Assuming DashboardIcon is a SVG wrapped inside a span */
-.menuItem span:first-child {
-  margin-right: 10px; /* Adjust margin for spacing */
+.dayStarLogoForMenu img {
+  max-width: 140px;
+  height: auto;
+  opacity: 0.7;
 }
 
-.menuItem span:nth-child(3) {
-  margin-left: 100px; /* Adjust margin for spacing */
-}
-
-.menuItemOrange span:nth-child(3) {
-  margin-left: 100px; /* Adjust margin for spacing */
-}
-
-.menuItemOrange span:first-child {
-  margin-right: 10px; /* Adjust margin for spacing */
-}
-
-.subMenuItem span:first-child,
-.subMenuOrange span:first-child,
-.subMenuOrangeIdentity span:first-child,
-.subMenuItemIdentity span:first-child {
-  margin-right: 10px;
-}
-
+/* ─── Collapsed state (icon-only) ───────────────────────────── */
 .collapsed {
   width: 90px !important;
   min-width: 90px !important;
-  transition: width 0.5s;
-}
-
-.collapsed .hamburgerMenu {
-  width: 30px !important;
-  min-width: 30px !important;
-  transition: width 0.5s;
+  transition: width 0.3s;
+  padding: 12px 8px 24px;
 }
 
 .collapsed .sidebarHeaderContainer {
-  display: flex;
   justify-content: center;
+  padding: 8px 0 20px;
+}
+
+.collapsed .menuItem {
+  justify-content: center;
+  padding: 10px;
+  gap: 0;
+}
+
+.collapsed .menuItem .label,
+.collapsed .menuItem .chevron,
+.collapsed .sidebarHeader,
+.collapsed .innerMenu,
+.collapsed .dayStarLogoForMenu {
+  display: none;
+}
+
+/* Active rail moves to sit flush with the trimmed padding. */
+.collapsed .menuItemActive::before {
+  left: -8px;
+}
+
+/* ─── Expanded-on-hover (temporary widen) ───────────────────── */
+.expandedOnHover {
+  width: 340px !important;
+  min-width: 340px !important;
+  transition: width 0.3s;
 }
 
 .expandedOnHover .sidebarHeaderContainer {
   justify-content: space-between;
+  padding: 8px 12px 20px;
 }
 
-.collapsed .sidebarHeader,
-.collapsed .menuItem span:not(:first-child),
-.collapsed .menuItemOrange span:not(:first-child),
-.collapsed .subMenuItem span:not(:first-child),
-.collapsed .subMenuOrange span:not(:first-child),
-.collapsed .subMenuOrangeIdentity span:not(:first-child),
-.collapsed .dayStarLogoForMenu,
-.collapsed .subMenuItemIdentity span:not(:first-child) {
-  display: none;
+.expandedOnHover .menuItem {
+  justify-content: flex-start;
+  padding: 9px 12px;
+  gap: 12px;
 }
 
-.expandedOnHover {
-  width: 340px !important;
-  min-width: 340px !important;
-  transition: width 0.5s;
-}
-
+.expandedOnHover .menuItem .label,
+.expandedOnHover .menuItem .chevron,
 .expandedOnHover .sidebarHeader,
-.expandedOnHover .menuItem span:not(:first-child),
-.expandedOnHover .menuItemOrange span:not(:first-child),
-.expandedOnHover .subMenuItem span:not(:first-child),
-.expandedOnHover .subMenuOrange span:not(:first-child),
-.expandedOnHover .subMenuOrangeIdentity span:not(:first-child),
-.expandedOnHover .subMenuItemIdentity span:not(:first-child) {
-  display: inline;
+.expandedOnHover .dayStarLogoForMenu {
+  display: flex;
+  /* Container widens over 0.3s. Labels wait 0.1s, then fade + slide in over
+     0.25s — finishing ~0.05s AFTER the container so text trails the widening
+     edge instead of appearing on a still-narrow rail. */
+  animation: ds-sidebar-label-in 0.25s ease 0.1s both;
+}
+
+.expandedOnHover .innerMenu {
+  display: block;
+  animation: ds-sidebar-label-in 0.25s ease 0.15s both;
+}
+
+@keyframes ds-sidebar-label-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
 }

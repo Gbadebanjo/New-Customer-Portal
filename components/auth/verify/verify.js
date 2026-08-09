@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { validateCode, generateCode } from "@/lib/auth/verificationActions";
-import getUserById from '@/lib/controllers/users/getUserById';
 import classes from '../login/login.module.css';
 import { ButtonDefault } from "@/components/ui/ButtonDefault/ButtonDefault";
 import CustomTextField from '@/components/ui/CustomTextField/CustomTextInput';
@@ -60,7 +59,6 @@ function VerifyComponent() {
 
     const handleVerify = async (e) => {
         e.preventDefault();
-        const userInfo = await getUserById(userId);
 
         if (!code || code.length !== 6) {
             openCustomAlertPopup("Please enter a valid code.");
@@ -73,14 +71,14 @@ function VerifyComponent() {
                 openCustomAlertPopup(result?.message || "Verification failed.");
                 setVerificationSuccess(false);
                 setIsSubmitting(false);
+                return;
             }
-            else {
-                setVerificationSuccess(true);
-                console.log(userInfo.user);
-                localStorage.setItem('user', JSON.stringify(userInfo.user));
-                setUser(userInfo.user);
-                window.location.href = '/dashboard';
+            setVerificationSuccess(true);
+            if (result.user) {
+                localStorage.setItem('user', JSON.stringify(result.user));
+                setUser(result.user);
             }
+            router.push(result.redirectTo || '/dashboard');
         } catch (err) {
             openCustomAlertPopup("Something went wrong. Please try again.");
             setIsSubmitting(false);

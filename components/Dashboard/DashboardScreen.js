@@ -1,34 +1,40 @@
 import { Suspense } from 'react';
-import classes from './dashboard.module.css';
-import { DashboardComponent } from "@/components/Dashboard/DashboardComponent";
-import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
-import AmmpServices from "@/lib/services/ammp/AmmpServices";
-import { ServiceConstants } from "@/utils/constants";
+import classes from './dashboard.module.css';
 import Image from "next/image";
 import bgImage from "@/public/img/daystar/bg.png";
-import { getAmmpToken } from "@/lib/services/ammp/getAmmpToken";
-import DashboardSkeleton from "@/components/Dashboard/DashboardSkeleton";
+import HomeIcon from "@/components/ui/icons/HomeIcon";
+import { ServiceConstants } from "@/utils/constants";
+import { getAuthorizedAssets } from "@/lib/services/ammp/getAuthorizedAssets";
+import { NoAssetsComponent } from "@/components/Dashboard/NoAssetsComponent";
+import { TooManyAssetsComponent } from "@/components/Dashboard/TooManyAssetsComponent";
+import StreamingDashboard from "@/components/Dashboard/streaming/StreamingDashboard";
 
-async function DashboardData({ userId }) {
-    let assets = [];
-    let myTotals;
+/**
+ * Fetches only the site list up front — the cheapest AMMP call, needed to
+ * decide the layout (no-assets / too-many / streaming grid). Everything
+ * downstream (historic totals, live power, freshness) is fetched inside
+ * per-section Suspense boundaries so each cell streams in as its own
+ * call returns.
+ */
+async function AssetsGate({ userId }) {
+    const { token, assets } = await getAuthorizedAssets(userId);
 
-    try {
-        const { access_token } = await getAmmpToken(userId);
-        const token = access_token;
-        if (token) {
-            const result = await AmmpServices().getAssets(token);
-            assets = Array.isArray(result) ? result : [];
-            if (assets.length > 0 && assets.length < ServiceConstants.MaxAssets) {
-                myTotals = await AmmpServices().fetchAndCalculateHistoricEnergyData(assets, token);
-            }
-        }
-    } catch (err) {
-        console.error('DashboardScreen data fetch error:', err);
+    if (!assets || assets.length === 0) {
+        return <NoAssetsComponent />;
+    }
+    if (assets.length > ServiceConstants.MaxAssets) {
+        return <TooManyAssetsComponent />;
     }
 
-    return <DashboardComponent assets={assets} totals={myTotals} />;
+    return (
+        <StreamingDashboard
+            assets={assets}
+            token={token}
+            autoRefreshMs={0}
+            userId={userId}
+        />
+    );
 }
 
 export default function DashboardScreen({ userId }) {
@@ -53,8 +59,11 @@ export default function DashboardScreen({ userId }) {
                 />
                 <div className={classes.overlay} />
                 <div style={{ position: "relative", zIndex: 1 }}>
-                    <Suspense fallback={<DashboardSkeleton />}>
-                        <DashboardData userId={userId} />
+                    {/* Outer Suspense catches the assets fetch — a small
+                        window (typically <500ms with the cache warm) before
+                        the grid shell + inner Suspense skeletons appear. */}
+                    <Suspense fallback={<div style={{ minHeight: '60vh' }} />}>
+                        <AssetsGate userId={userId} />
                     </Suspense>
                 </div>
             </div>

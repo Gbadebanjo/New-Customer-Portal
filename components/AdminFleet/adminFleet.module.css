@@ -1,0 +1,170 @@
+.content {
+    padding: 0;
+    margin: 0;
+    background-color: #0D202F;
+    min-height: 100vh;
+}
+
+.topCenter {
+    padding: 0 20px;
+    margin: 15px 30px 0;
+}
+
+.title {
+    color: white;
+    font-size: 27px !important;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0;
+    font-family: 'Kanit', sans-serif;
+}
+
+.subtitle {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.85rem;
+    margin: 4px 0 0;
+    max-width: 720px;
+}
+
+.centerContent {
+    margin: 16px 20px 75px;
+    background: #0D2638;
+    border-radius: 12px;
+    padding: 18px 20px 24px;
+    color: #cbd5e1;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.searchGroup {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+    max-width: 380px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.4);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    height: 34px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 0 32px 0 32px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.clearBtn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 2px 6px;
+}
+
+.select {
+    height: 34px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 0 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.resultCount {
+    margin-left: auto;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.8rem;
+}
+
+/* Virtualised scroll container — fixed height to give scrollbar its range. */
+.scroll {
+    height: 640px;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-top: 4px;
+}
+
+/* Sticky header stays visible while scrolling the list. */
+.headerRow {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(240px, 2fr) 80px 1fr 120px 1fr 1fr 1fr 100px;
+    background: #0D2638;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.row {
+    display: grid;
+    grid-template-columns: minmax(240px, 2fr) 80px 1fr 120px 1fr 1fr 1fr 100px;
+    align-items: center;
+    height: 44px;
+    padding: 0 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: background 0.1s;
+}
+
+.row:hover {
+    background: rgba(255,125,112,0.06);
+    color: #fff;
+}
+
+.cell {
+    padding-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cellName {
+    color: #fff;
+    font-weight: 500;
+}
+
+.cellRight {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    padding-right: 0;
+}
+
+.empty {
+    padding: 40px 0;
+    text-align: center;
+    color: rgba(255,255,255,0.45);
+    font-style: italic;
+    font-size: 0.9rem;
+}

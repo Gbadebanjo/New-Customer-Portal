@@ -3,6 +3,9 @@ import NavbarComponent from "@/components/ui/Navbar/NavbarContainer";
 import RightSideComponent from "@/components/ui/rightside/RightSideComponent";
 import classes from './sharedLayout.module.css';
 import { Bars3BottomLeftIcon } from "@heroicons/react/20/solid";
+import ShortcutsProvider from "@/components/ui/ShortcutsProvider/ShortcutsProvider";
+import CommandPalette from "@/components/ui/CommandPalette/CommandPalette";
+import HooksErrorBoundary from "@/components/ui/ErrorBoundary/HooksErrorBoundary";
 
 export default function MainAppLayout({ children, impersonationBanner }) {
   const [collapsed, setCollapsed] = useState(true);
@@ -37,23 +40,36 @@ export default function MainAppLayout({ children, impersonationBanner }) {
       </div>
 
       <div className={classes.navbarComponent}>
-        <NavbarComponent
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-          hovered={hovered}
-          setHovered={setHovered}
-          mobileOpen={mobileOpen}
-          setMobileOpen={setMobileOpen}
-        />
+        <HooksErrorBoundary label="Navbar">
+          <NavbarComponent
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            hovered={hovered}
+            setHovered={setHovered}
+            mobileOpen={mobileOpen}
+            setMobileOpen={setMobileOpen}
+          />
+        </HooksErrorBoundary>
       </div>
 
       <div className={classes.content}>
-        {children}
+        <HooksErrorBoundary label="Page">
+          {children}
+        </HooksErrorBoundary>
       </div>
 
       <div className={classes.rightSideComponent}>
-        <RightSideComponent impersonationBanner={impersonationBanner} />
+        <HooksErrorBoundary label="RightSide">
+          <RightSideComponent impersonationBanner={impersonationBanner} />
+        </HooksErrorBoundary>
       </div>
+
+      <HooksErrorBoundary label="ShortcutsProvider">
+        <ShortcutsProvider />
+      </HooksErrorBoundary>
+      <HooksErrorBoundary label="CommandPalette">
+        <CommandPalette />
+      </HooksErrorBoundary>
     </div>
   );
 }

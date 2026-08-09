@@ -1,17 +1,16 @@
 'use strict';
 import { DataTypes, Model } from "sequelize";
+import { v4 as uuidv4 } from 'uuid';
 import sequelizeConnection from '@/db_connection';
 
-class PowerProductionPlan extends Model {
-  // static associate(models) {
-  //   // define association here
-  // }
-}
+class PowerProductionPlan extends Model {}
 
 PowerProductionPlan.init({
   id: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    // Function form — `DataTypes.UUIDV4` literal serialises to the string
+    // 'UUIDV4' on insert under this Sequelize version.
+    defaultValue: () => uuidv4(),
     primaryKey: true,
   },
   file_name: {

@@ -46,7 +46,13 @@ export const UserConstants = {
 
 export const ServiceConstants = {
     AmmpServerBaseUrl: "https://data-api.ammp.io",
-    AmmpApiKiey: process.env.AMMP_API_KEY,
+    // Fleet-wide master key — the ONLY credential the app uses to talk to
+    // the data provider. Per-user keys have been removed; every request is
+    // authenticated as master, then scoped in code based on the caller's
+    // customer id.
+    AmmpMasterKey: process.env.AMMP_MASTER_KEY,
+    // Legacy env fallback for local dev where no master key is provisioned.
+    AmmpApiKey: process.env.AMMP_API_KEY,
     MaxAssets: 1000,
 }
 

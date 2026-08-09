@@ -62,10 +62,8 @@ function TwoFactorVerification() {
                 return;
             }
 
-            // fetch fresh user and set context then redirect
-            const userInfo = await getUserById(userId);
-            if (userInfo?.user) setUser(userInfo.user);
-            router.push('/dashboard');
+            if (res.user) setUser(res.user);
+            router.push(res.redirectTo || '/dashboard');
         } catch (err) {
             console.error('2FA verify error:', err);
             openCustomAlertPopup("Something went wrong. Please try again.");

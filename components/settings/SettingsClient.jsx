@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { updateSettings } from '@/lib/services/settings/settingsActions';
+import { triggerWeeklyDigestForAll } from '@/lib/controllers/admin/digestActions';
 
 const TIMEZONES = [
     'Africa/Lagos', 'Africa/Abidjan', 'Africa/Accra', 'Africa/Nairobi', 'Africa/Cairo',
@@ -102,6 +103,53 @@ function SavedBanner() {
             display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: '0.5rem',
         }}>
             ✓ Settings saved
+        </div>
+    );
+}
+
+function WeeklyDigestTrigger() {
+    const [busy, setBusy] = useState(false);
+    const [result, setResult] = useState(null);
+    const onClick = async () => {
+        if (busy) return;
+        setBusy(true); setResult(null);
+        try {
+            const res = await triggerWeeklyDigestForAll();
+            setResult(res);
+        } catch (err) {
+            setResult({ ok: false, error: err?.message || 'Failed' });
+        } finally {
+            setBusy(false);
+        }
+    };
+    return (
+        <div>
+            <button
+                type="button"
+                onClick={onClick}
+                disabled={busy}
+                style={{
+                    padding: '9px 18px', borderRadius: 8,
+                    border: '1px solid rgba(255,125,112,0.4)',
+                    background: busy ? 'rgba(255,125,112,0.08)' : 'rgba(255,125,112,0.14)',
+                    color: '#ff9770', fontWeight: 600, fontSize: '0.9rem',
+                    cursor: busy ? 'wait' : 'pointer',
+                }}
+            >
+                {busy ? 'Sending…' : 'Send weekly digest now'}
+            </button>
+            {result && (
+                <div style={{
+                    marginTop: 12, fontSize: '0.85rem',
+                    color: result.ok ? '#4caf50' : '#f87171',
+                }}>
+                    {result.ok
+                        ? (result.reason === 'no-recipients'
+                            ? 'No users have opted in to the weekly digest yet.'
+                            : `Sent to ${result.sent} · Skipped ${result.skipped} · Failed ${result.failed}`)
+                        : (result.error || 'Send failed.')}
+                </div>
+            )}
         </div>
     );
 }
@@ -212,6 +260,11 @@ export default function SettingsClient({ initialSettings }) {
                             <input style={inputStyle} type="number" min={5} max={1440} value={s.lockoutDurationMinutes} onChange={(e) => update('security', 'lockoutDurationMinutes', parseInt(e.target.value))} />
                         </FieldRow>
                     </SectionCard>
+                    <SectionCard title="Invitations" description="How long an invitation link stays valid before an admin must re-issue it">
+                        <FieldRow label="Invitation Link Expiry (days)" hint="Applies to new invites; existing invites keep the expiry they were issued with">
+                            <input style={inputStyle} type="number" min={1} max={365} value={s.inviteExpiryDays ?? 30} onChange={(e) => update('security', 'inviteExpiryDays', parseInt(e.target.value))} />
+                        </FieldRow>
+                    </SectionCard>
                     <SectionCard title="Two-Factor Authentication">
                         <ToggleRow label="Require 2FA for Admin users" hint="Admins and Portal Admins must enable 2FA"
                             checked={s.force2FAForAdmins} onChange={(v) => update('security', 'force2FAForAdmins', v)} />
@@ -265,6 +318,9 @@ export default function SettingsClient({ initialSettings }) {
                     <SectionCard title="Reports" description="Scheduled report delivery">
                         <ToggleRow label="Daily Performance Report" hint="Send a daily summary email to subscribed users"
                             checked={n.dailyReportEnabled} onChange={(v) => update('notifications', 'dailyReportEnabled', v)} />
+                    </SectionCard>
+                    <SectionCard title="Weekly Digest" description="Manually trigger the Monday-morning solar summary for all opted-in users">
+                        <WeeklyDigestTrigger />
                     </SectionCard>
                     {saved === 'notifications' ? <SavedBanner /> : <SaveButton onClick={() => save('notifications')} saving={saving} />}
                 </>

@@ -7,23 +7,46 @@ import AuditLogMod from "./AuditLog.js";
 import CustomerMod from "./Customer.js";
 import PowerProductionPlanMod from "./PowerProductionPlan.js";
 import PowerProductionPlanItemMod from "./PowerProductionPlanitem.js";
-import ReportMod from "./Report.js";
 import ReportDataMod from "./ReportData.js";
 import SecurityLogMod from "./SecurityLog.js";
-import SiteDetailMod from "./SiteDetail.js";
 import SupportQueryMod from "./SupportQuery.js";
 import SupportQueryCategoryMod from "./SupportQueryCategory.js";
 import SupportQueryMessageMod from "./SupportQueryMessage.js";
 import SupportQueryStatusMod from "./SupportQueryStatus.js";
-import TextTemplateMod from "./TextTemplate.js";
+import TextTemplateMod from "./Texttemplate.js";
 import ReportNoteMod from "./ReportNote.js";
 import UserRoleMod from "./UserRole.js";
 import UserSessionMod from "./UserSession.js";
 import VerificationCodeMod from "./VerificationCode.js";
+import ApiKeyMod from "./ApiKey.js";
+import NotificationMod from "./Notification.js";
+import CronRunMod from "./CronRun.js";
+import CustomerSiteMappingMod from "./CustomerSiteMapping.js";
 
 const resolve = (m) => (m && m.default ? m.default : m);
 
 let models;
+
+// Model classes we consider mandatory. If any of these is missing from
+// the cached registry (typically because a new model was added since
+// the dev process started), rebuild — otherwise the caller sees a very
+// unhelpful "Cannot read properties of undefined (reading 'findAll')".
+const REQUIRED_MODELS = [
+  'User', 'AuditLog', 'Customer', 'PowerProductionPlan', 'PowerProductionPlanItem',
+  'ReportData', 'SecurityLog', 'SupportQuery',
+  'SupportQueryCategory', 'SupportQueryMessage', 'SupportQueryStatus',
+  'TextTemplate', 'UserRole', 'ReportNote', 'UserSession', 'VerificationCode',
+  'ApiKey', 'Notification', 'CronRun', 'CustomerSiteMapping',
+];
+
+if (global._sequelizeModels) {
+  const cached = global._sequelizeModels;
+  const missing = REQUIRED_MODELS.filter((n) => !cached[n]);
+  if (missing.length > 0) {
+    console.log('⚠️  Sequelize model cache is missing:', missing.join(', '), '— rebuilding.');
+    global._sequelizeModels = null;
+  }
+}
 
 if (!global._sequelizeModels) {
   console.log("🔄 Initializing Sequelize models (minimal associations)...");
@@ -34,10 +57,8 @@ if (!global._sequelizeModels) {
   const CustomerClass = resolve(CustomerMod);
   const PowerProductionPlanClass = resolve(PowerProductionPlanMod);
   const PowerProductionPlanItemClass = resolve(PowerProductionPlanItemMod);
-  const ReportClass = resolve(ReportMod);
   const ReportDataClass = resolve(ReportDataMod);
   const SecurityLogClass = resolve(SecurityLogMod);
-  const SiteDetailClass = resolve(SiteDetailMod);
   const SupportQueryClass = resolve(SupportQueryMod);
   const SupportQueryCategoryClass = resolve(SupportQueryCategoryMod);
   const SupportQueryMessageClass = resolve(SupportQueryMessageMod);
@@ -47,6 +68,10 @@ if (!global._sequelizeModels) {
   const ReportNoteClass = resolve(ReportNoteMod);
   const UserSessionClass = resolve(UserSessionMod);
   const VerificationCodeClass = resolve(VerificationCodeMod);
+  const ApiKeyClass = resolve(ApiKeyMod);
+  const NotificationClass = resolve(NotificationMod);
+  const CronRunClass = resolve(CronRunMod);
+  const CustomerSiteMappingClass = resolve(CustomerSiteMappingMod);
 
   // map of module classes for reference
   const moduleClasses = {
@@ -55,10 +80,8 @@ if (!global._sequelizeModels) {
     Customer: CustomerClass,
     PowerProductionPlan: PowerProductionPlanClass,
     PowerProductionPlanItem: PowerProductionPlanItemClass,
-    Report: ReportClass,
     ReportData: ReportDataClass,
     SecurityLog: SecurityLogClass,
-    SiteDetail: SiteDetailClass,
     SupportQuery: SupportQueryClass,
     SupportQueryCategory: SupportQueryCategoryClass,
     SupportQueryMessage: SupportQueryMessageClass,
@@ -68,6 +91,10 @@ if (!global._sequelizeModels) {
     ReportNote: ReportNoteClass,
     UserSession: UserSessionClass,
     VerificationCode: VerificationCodeClass,
+    ApiKey: ApiKeyClass,
+    Notification: NotificationClass,
+    CronRun: CronRunClass,
+    CustomerSiteMapping: CustomerSiteMappingClass,
   };
 
   // Build base models object from sequelize registry (these are the real model classes with static methods)

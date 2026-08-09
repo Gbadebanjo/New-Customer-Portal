@@ -8,7 +8,7 @@ import CustomerMainDataTable from "@/components/ui/tables/customer/CustomerMainD
 import CopyRight from '../ui/CopyRight/copyright';
 import BackButton from '@/components/ui/BackButton/BackButton';
 
-export default async function CustomersScreen() {
+export default async function CustomersScreen({ canWrite = true }) {
     const [allCustomers, { users: allUsers }] = await Promise.all([
         getAllCustomers(),
         getAllUsers(),
@@ -25,11 +25,13 @@ export default async function CustomersScreen() {
                 <span> | &nbsp; Customers</span>
                 <BackButton />
             </div>
-            <div className={classes.topCenter}>
-                <CreateCustomerModal />
-            </div>
+            {canWrite && (
+                <div className={classes.topCenter}>
+                    <CreateCustomerModal />
+                </div>
+            )}
             <div className={classes.centerContent}>
-                <CustomerMainDataTable allCustomers={allCustomers} allUsers={allUsers} />
+                <CustomerMainDataTable allCustomers={allCustomers} allUsers={allUsers} canWrite={canWrite} />
             </div>
             <CopyRight />
         </div>

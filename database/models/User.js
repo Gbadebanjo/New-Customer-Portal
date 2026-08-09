@@ -103,6 +103,15 @@ User.init({
     allowNull: true,
     defaultValue: null,
   },
+  // When the current lockout began. Combined with the admin's current
+  // maxLockoutDurationMinutes at check time, this is what determines
+  // whether the user is still locked — so admin changes take effect
+  // immediately for existing locks.
+  lockout_started_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null,
+  },
 }, {
   sequelize: sequelizeConnection,
   createdAt: "created_at",

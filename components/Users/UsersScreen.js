@@ -9,10 +9,7 @@ import UsersMainDataTable from "@/components/ui/tables/users/UsersMainDataTable"
 import CopyRight from '../ui/CopyRight/copyright';
 import BackButton from '@/components/ui/BackButton/BackButton';
 
-export default async function UsersScreen({ users, customers}) {
-    // const { users } = await getAllUsers();
-    // const customers = await getAllCustomers();
-
+export default async function UsersScreen({ users, customers, canWrite = true }) {
     return (
         <div className={classes.content}>
             {/* Header */}
@@ -25,17 +22,21 @@ export default async function UsersScreen({ users, customers}) {
                 <span> | &nbsp; Identity management </span>
                 <BackButton />
             </div>
-        
-            <div className={classes.topCenter}>
-                <CreateUsersComponent
-                    customers={customers}
-                    users={users}
-                />
-            </div>
+
+            {/* Create-user button is hidden for read-only roles (DCA). */}
+            {canWrite && (
+                <div className={classes.topCenter}>
+                    <CreateUsersComponent
+                        customers={customers}
+                        users={users}
+                    />
+                </div>
+            )}
             <div className={classes.centerContent}>
                 <UsersMainDataTable
                     AllUsers={users}
                     AllCustomers={customers}
+                    canWrite={canWrite}
                 />
             </div>
             <CopyRight />

@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useRef, useState, useTransition } from 'react';
+import Image from 'next/image';
 import classes from './login.module.css';
 import Link from "next/link";
 import { login } from "@/lib/auth/authActions";
 import { generateCode } from "@/lib/auth/verificationActions";
 import verify2FA from "@/lib/controllers/users/verify2FA";
+import startEnable2FA from "@/lib/controllers/users/startEnable2FA";
+import enable2FAAndLogin from "@/lib/controllers/users/enable2FAAndLogin";
 import getUserById from "@/lib/controllers/users/getUserById";
 import { useRouter } from 'next/navigation';
 import { CustomerConstants } from "@/utils/constants";
@@ -25,12 +28,20 @@ function LoginScreen() {
     const router = useRouter();
     const { setUser } = useUser();
 
-    // 2FA step state
+    // 2FA step state — 'credentials' | '2fa' | 'setup2FA'
     const [step, setStep] = useState('credentials');
     const [pendingUserId, setPendingUserId] = useState('');
     const [pendingEmail, setPendingEmail] = useState('');
     const [totpCode, setTotpCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
+
+    // First-time setup state
+    const [setupQr, setSetupQr] = useState('');
+    const [setupSecret, setSetupSecret] = useState('');
+    const [setupCode, setSetupCode] = useState('');
+    const [setupLoading, setSetupLoading] = useState(false);
+    const [setupError, setSetupError] = useState('');
+    const [setupCopied, setSetupCopied] = useState(false);
 
     useEffect(() => {
         if (isCustomAlertModalOpen) {
@@ -72,17 +83,59 @@ function LoginScreen() {
                 const errorMessage = result.errors.email || result.errors.password || "Login failed.";
                 openCustomAlertPopup(errorMessage);
             } else if (result.require2FA) {
-                // Show 2FA step inline
                 setPendingUserId(result.user.id);
                 setPendingEmail(result.user.email);
                 setStep('2fa');
-            } else if (result.success) {
-                // No 2FA — send email verification code
-                localStorage.setItem('email', result.user.email);
-                localStorage.setItem('userId', result.user.id);
-                router.push('/verify');
+            } else if (result.requireSetup2FA) {
+                setPendingUserId(result.user.id);
+                setPendingEmail(result.user.email);
+                setStep('setup2FA');
+                setSetupError('');
+                setSetupLoading(true);
+                try {
+                    const data = await startEnable2FA(result.user.id);
+                    setSetupQr(data.qrDataUrl);
+                    setSetupSecret(data.secret || '');
+                } catch {
+                    setSetupError('Could not start 2FA setup. Please try again.');
+                } finally {
+                    setSetupLoading(false);
+                }
             }
         });
+    };
+
+    const handleConfirmSetup2FA = async (e) => {
+        e.preventDefault();
+        if (setupCode.length !== 6) {
+            setSetupError('Enter the 6-digit code from your authenticator app.');
+            return;
+        }
+        setSetupLoading(true);
+        setSetupError('');
+        try {
+            const res = await enable2FAAndLogin(pendingUserId, setupCode.trim());
+            if (!res?.success) {
+                setSetupError(res?.message || 'Verification failed.');
+                setSetupLoading(false);
+                return;
+            }
+            if (res.user) setUser(res.user);
+            router.push(res.redirectTo || '/dashboard');
+        } catch {
+            setSetupError('Something went wrong. Please try again.');
+            setSetupLoading(false);
+        }
+    };
+
+    const handleCopySetupSecret = async () => {
+        try {
+            await navigator.clipboard.writeText(setupSecret.replace(/\s/g, ''));
+            setSetupCopied(true);
+            setTimeout(() => setSetupCopied(false), 2000);
+        } catch {
+            /* clipboard unavailable — user can still read the secret */
+        }
     };
 
     const handleVerify2FA = async (e) => {
@@ -99,9 +152,8 @@ function LoginScreen() {
                 setIsVerifying(false);
                 return;
             }
-            const userInfo = await getUserById(pendingUserId);
-            if (userInfo?.user) setUser(userInfo.user);
-            router.push('/dashboard');
+            if (res.user) setUser(res.user);
+            router.push(res.redirectTo || '/dashboard');
         } catch (err) {
             openCustomAlertPopup("Something went wrong. Please try again.");
             setIsVerifying(false);
@@ -128,7 +180,7 @@ function LoginScreen() {
                         <div className={classes.rightPartForm}>
                             <div className={classes.dayStarLogo}></div>
 
-                            {step === 'credentials' ? (
+                            {step === 'credentials' && (
                                 <>
                                     <div className={classes.loginTextContainer}>
                                         <div className={classes.loginText}>Login</div>
@@ -159,7 +211,9 @@ function LoginScreen() {
                                         <Link href={'/forgot-password'}>Forgot Password?</Link>
                                     </div>
                                 </>
-                            ) : (
+                            )}
+
+                            {step === '2fa' && (
                                 <>
                                     <div className={classes.loginTextContainer}>
                                         <div className={classes.loginText}>Two-Factor Authentication</div>
@@ -195,6 +249,75 @@ function LoginScreen() {
                                         className={classes.verifyText}
                                     >
                                         ← Back to login
+                                    </button>
+                                </>
+                            )}
+
+                            {step === 'setup2FA' && (
+                                <>
+                                    <div className={classes.loginTextContainer}>
+                                        <div className={classes.loginText}>Set up Two-Factor Authentication</div>
+                                        <div className={classes.instructionText}>
+                                            Two-factor authentication is required. Scan the QR code with your
+                                            authenticator app, then enter the 6-digit code to finish signing in.
+                                        </div>
+                                    </div>
+                                    {setupQr ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', margin: '1rem 0' }}>
+                                            <Image src={setupQr} alt="2FA QR code" width={180} height={180} />
+                                            <div style={{ textAlign: 'center', fontSize: '0.85rem', opacity: 0.85 }}>
+                                                Can&apos;t scan? Enter this secret manually:
+                                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.35rem' }}>
+                                                    <code style={{ background: '#123751', padding: '6px 10px', borderRadius: '4px', fontSize: '0.9rem', lineHeight: 1 }}>
+                                                        {setupSecret}
+                                                    </code>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleCopySetupSecret}
+                                                        style={{ background: 'transparent', border: '1px solid #23262a', color: 'inherit', padding: '4px 10px', borderRadius: '4px', fontSize: '0.85rem', lineHeight: 1, cursor: 'pointer' }}
+                                                    >
+                                                        {setupCopied ? 'Copied' : 'Copy'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div style={{ textAlign: 'center', margin: '1rem 0', opacity: 0.75 }}>
+                                            {setupLoading ? 'Preparing your QR code…' : 'Loading…'}
+                                        </div>
+                                    )}
+                                    <form onSubmit={handleConfirmSetup2FA} className={classes.loginForm}>
+                                        <CustomTextField
+                                            label="Authenticator Code"
+                                            value={setupCode}
+                                            name="setupCode"
+                                            onChange={(e) => setSetupCode(e.target.value.replace(/\D/g, ''))}
+                                            inputMode="numeric"
+                                            maxLength={6}
+                                        />
+                                        {setupError && (
+                                            <div style={{ color: '#f87171', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                                                {setupError}
+                                            </div>
+                                        )}
+                                        <ButtonDefault
+                                            buttonText={'Enable & Sign in'}
+                                            type="submit"
+                                            loading={setupLoading}
+                                        />
+                                    </form>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setStep('credentials');
+                                            setSetupCode('');
+                                            setSetupError('');
+                                            setSetupQr('');
+                                            setSetupSecret('');
+                                        }}
+                                        className={classes.verifyText}
+                                    >
+                                        ← Cancel
                                     </button>
                                 </>
                             )}

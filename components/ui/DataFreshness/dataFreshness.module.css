@@ -1,0 +1,68 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.live {
+  background: rgba(76, 175, 80, 0.10);
+  border-color: rgba(76, 175, 80, 0.35);
+  color: var(--ds-success);
+}
+
+.live .dot {
+  background: var(--ds-success);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.18);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.delayed {
+  background: rgba(255, 152, 0, 0.10);
+  border-color: rgba(255, 152, 0, 0.35);
+  color: #ff9800;
+}
+
+.delayed .dot {
+  background: #ff9800;
+}
+
+.offline {
+  background: rgba(255, 125, 112, 0.10);
+  border-color: rgba(255, 125, 112, 0.35);
+  color: var(--ds-accent);
+}
+
+.offline .dot {
+  background: var(--ds-accent);
+}
+
+.unknown {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ds-text-hint);
+}
+
+.unknown .dot {
+  background: var(--ds-text-hint);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}

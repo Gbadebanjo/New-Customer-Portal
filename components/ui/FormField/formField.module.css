@@ -1,0 +1,91 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--ds-space-4);
+}
+
+.label {
+  color: var(--ds-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.required::after {
+  content: ' *';
+  color: var(--ds-accent);
+}
+
+.input,
+.select,
+.textarea {
+  height: 44px;
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-text);
+  padding: 0 var(--ds-space-4);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 10px var(--ds-space-4);
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--ds-accent);
+}
+
+.input:disabled,
+.select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hint {
+  color: var(--ds-text-hint);
+  font-size: 0.78rem;
+}
+
+.error {
+  color: var(--ds-accent);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.passwordWrap {
+  position: relative;
+}
+
+.passwordInput {
+  padding-right: 44px;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--ds-text-hint);
+  display: inline-flex;
+  align-items: center;
+}
+
+.togglePassword:hover {
+  color: var(--ds-text);
+}

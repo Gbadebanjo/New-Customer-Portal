@@ -1,3 +1,5 @@
+'use client';
+import { useRouter } from 'next/navigation';
 import classes from './403Forbidden.module.css';
 import NavbarEmptyComponent from "@/components/ui/NavbarEmpty/NavbarEmpty";
 import Link from "next/link";
@@ -7,6 +9,9 @@ import Button from "@/components/ui/button/Button";
 import ButtonWhite from "@/components/ui/button-white/Button"; // Import the image
 
 export default function Forbidden403Screen() {
+    // React 19 blocks href="javascript:..." — use router.back() + a safe href.
+    const router = useRouter();
+    const handleBack = (e) => { e?.preventDefault?.(); router.back(); };
 
     return (
         <div className={classes.container}>
@@ -47,7 +52,8 @@ export default function Forbidden403Screen() {
                             <p className="mt-3 mb-4"></p>
                             <div className={classes.backButton}>
                                 <ButtonWhite
-                                    link={"javascript:history.back()"}
+                                    link={"#"}
+                                    onClick={handleBack}
                                     width={237}
                                 >
                                     <div

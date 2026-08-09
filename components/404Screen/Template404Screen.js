@@ -1,3 +1,5 @@
+'use client';
+import { useRouter } from 'next/navigation';
 import classes from './template404.module.css';
 import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
@@ -6,6 +8,10 @@ import Button from "@/components/ui/button/Button";
 import ButtonBlue from "@/components/ui/button-blue/ButtonBlue"; // Import the image
 
 export default function Template404Screen() {
+    // React 19 blocks href="javascript:..." as a security precaution — use
+    // router.back() with a safe href="#" placeholder + preventDefault.
+    const router = useRouter();
+    const handleBack = (e) => { e?.preventDefault?.(); router.back(); };
     const date = new Date();
     const thisYear = date.getFullYear();
     return (
@@ -39,7 +45,8 @@ export default function Template404Screen() {
                             <p className="mt-3 mb-4"></p>
                             <div className={classes.backButton}>
                                 <ButtonBlue
-                                    link={"javascript:history.back()"}
+                                    link={"#"}
+                                    onClick={handleBack}
                                     width={150}
                                     height={50}
                                 >

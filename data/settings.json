@@ -1,0 +1,35 @@
+{
+  "general": {
+    "appName": "Daystar Customer Portal",
+    "appDescription": "Energy management portal for Daystar Power Customers",
+    "supportEmail": "support@daystarpower.com",
+    "casEmail": "CAS@daystar-power.com",
+    "nocEmail": "NOC@daystar-power.com",
+    "defaultTimezone": "Africa/Lagos",
+    "dateFormat": "DD/MM/YYYY"
+  },
+  "security": {
+    "sessionTimeoutMinutes": 60,
+    "minPasswordLength": 8,
+    "requireSpecialChars": true,
+    "requireNumbers": true,
+    "requireUppercase": true,
+    "maxLoginAttempts": 3,
+    "lockoutDurationMinutes": 15,
+    "inviteExpiryDays": 30,
+    "force2FAForAdmins": false
+  },
+  "email": {
+    "senderName": "Daystar Power",
+    "senderEmail": "noreply@daystarpower.com",
+    "smtpHost": "",
+    "smtpPort": 587,
+    "smtpSecure": false
+  },
+  "notifications": {
+    "sendAlertEmails": true,
+    "sendLoginNotifications": false,
+    "sendInvitationOnCreate": true,
+    "dailyReportEnabled": false
+  }
+}

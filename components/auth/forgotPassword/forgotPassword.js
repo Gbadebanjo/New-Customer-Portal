@@ -62,7 +62,7 @@ function ForgotPasswordComponent() {
                                 />
                                 {successMsg && (
                                     <p style={{ color: 'green', lineHeight: '1.6' }}>
-                                        If an account with <strong>{email}</strong> exists, you&apos;ll receive a reset link shortly.
+                                        If an account with <strong>{email} </strong> exists, you&apos;ll receive a reset link shortly.
                                         <br />
                                         Need help? Contact us at{' '}
                                         <a href="mailto:idt-servicedesk@daystar-power.com"

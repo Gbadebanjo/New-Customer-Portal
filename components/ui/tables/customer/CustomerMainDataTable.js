@@ -6,7 +6,7 @@ import ButtonFlexible from "@/components/ui/button-flexible/ButtonFlexible";
 import { FaSearch } from "react-icons/fa";
 import PaginationComponent from "@/components/ui/pagination/PaginationComponent";
 
-export default function CustomerMainDataTable({ allCustomers, allUsers = [] }) {
+export default function CustomerMainDataTable({ allCustomers, allUsers = [], canWrite = true }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -84,8 +84,9 @@ export default function CustomerMainDataTable({ allCustomers, allUsers = [] }) {
                                 <td>
                                     <CustomerActions
                                         menuItems={[
-                                            ['Edit', 'openEditModal', 'dialogue', myCustomer.id],
-                                            ['Delete', 'openDeleteModal', 'dialogue', myCustomer.id],
+                                            // Edit and Delete are hidden for read-only roles (DCA).
+                                            ...(canWrite ? [['Edit', 'openEditModal', 'dialogue', myCustomer.id]] : []),
+                                            ...(canWrite ? [['Delete', 'openDeleteModal', 'dialogue', myCustomer.id]] : []),
                                             ['Users', `/customers/${myCustomer.id}`, myCustomer.id],
                                         ]}
                                     />

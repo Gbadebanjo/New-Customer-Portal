@@ -1,12 +1,7 @@
 import classes from './reports.module.css';
-import NavbarComponent from "@/components/ui/Navbar/NavbarContainer";
 import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
-import RightSideComponent from "@/components/ui/rightside/RightSideComponent";
-import getAllReport from "@/lib/controllers/report/getAllReports";
 import getAllCustomers from "@/lib/controllers/customers/getAllCustomers";
-import CreateReportModal from "@/components/ui/modals/creates/createReport/CreateReportModal";
-import ReportMainDataTable from "@/components/ui/tables/report/ReportMainDataTable";
 import EditableReportTable from "@/components/ui/tables/report/EditableReportTable";
 import db from '@/database/models';
 import BackButton from '@/components/ui/BackButton/BackButton';
@@ -24,7 +19,6 @@ export default async function ReportsScreen({ userId }) {
         ? `${user.name}${user.surname ? ' ' + user.surname : ''}`.trim()
         : (user?.username || 'Admin');
 
-    const { report } = await getAllReport();
     const allCustomers = isCustomerOnly ? [] : await getAllCustomers();
 
     return (<div className={classes.content}>
@@ -39,10 +33,8 @@ export default async function ReportsScreen({ userId }) {
             <BackButton />
         </div>
 
-        {/* Top Center - Upload only visible to non-customer roles */}
         <div className={classes.topCenter}>
             <p className={classes.title}>Reports</p>
-            {/* {!isCustomerOnly && <CreateReportModal />} */}
         </div>
 
         <div className={classes.centerContent}>

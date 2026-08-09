@@ -14,6 +14,7 @@ import { validatePassword } from "@/utils/passwordValidation";
 import EyeIcon from "@/components/ui/icons/EyeIcon";
 import EyeSlashIcon from "@/components/ui/icons/EyeSlashIcon";
 import BackButton from '@/components/ui/BackButton/BackButton';
+import { getMyPrefs, setWeeklyDigestEnabled, sendMyDigestPreview } from '@/lib/controllers/userPrefs/prefsActions';
 
 
 export default function ProfileScreen() {
@@ -41,6 +42,12 @@ export default function ProfileScreen() {
     const [profileError, setProfileError] = useState('');
     const [profileLoading, setProfileLoading] = useState(false);
 
+    // Notifications state — weekly digest opt-in.
+    const [digestEnabled, setDigestEnabled] = useState(false);
+    const [digestSaving, setDigestSaving] = useState(false);
+    const [digestMessage, setDigestMessage] = useState('');
+    const [previewSending, setPreviewSending] = useState(false);
+
     // Populate personal info from user context
     useEffect(() => {
         if (user) {
@@ -51,6 +58,43 @@ export default function ProfileScreen() {
             setTimezone(user.timezone || '');
         }
     }, [user]);
+
+    // Load notification prefs from the server on mount.
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            const prefs = await getMyPrefs();
+            if (!cancelled && prefs) setDigestEnabled(Boolean(prefs.weeklyDigestEnabled));
+        })();
+        return () => { cancelled = true; };
+    }, []);
+
+    const handleToggleDigest = async (checked) => {
+        setDigestEnabled(checked);
+        setDigestSaving(true);
+        setDigestMessage('');
+        const res = await setWeeklyDigestEnabled(checked);
+        setDigestSaving(false);
+        if (!res?.ok) {
+            setDigestEnabled(!checked);
+            setDigestMessage(res?.error || 'Could not save. Try again.');
+        } else {
+            setDigestMessage(checked
+                ? 'You’re signed up — every Monday morning.'
+                : 'Weekly digest turned off.');
+            setTimeout(() => setDigestMessage(''), 4000);
+        }
+    };
+
+    const handleSendPreview = async () => {
+        setPreviewSending(true);
+        setDigestMessage('');
+        const res = await sendMyDigestPreview();
+        setPreviewSending(false);
+        setDigestMessage(res?.ok
+            ? `Preview sent to ${res.sentTo}. Check your inbox.`
+            : res?.error || 'Could not send preview.');
+    };
 
     // Handle Change Password
     const handleChangePassword = async () => {
@@ -166,6 +210,14 @@ export default function ProfileScreen() {
                                 }`}
                         >
                             Authenticator app
+                        </button>
+
+                        <button
+                            onClick={() => setActiveTab('notifications')}
+                            className={`${classes.optionInputTitle} ${activeTab === 'notifications' ? classes.active : ''
+                                }`}
+                        >
+                            Notifications
                         </button>
                     </div>
 
@@ -338,6 +390,72 @@ export default function ProfileScreen() {
 
                         {activeTab === 'auth' && (
                             <AuthenticatorSection />
+                        )}
+
+                        {activeTab === 'notifications' && (
+                            <>
+                                <h4 className={classes.optionInputHead}>Notifications</h4>
+                                {digestMessage && (
+                                    <p className={classes.successMsg} style={{ marginBottom: 12 }}>{digestMessage}</p>
+                                )}
+                                <div style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    gap: 16, padding: '14px 16px',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    borderRadius: 10, marginTop: 8,
+                                }}>
+                                    <div style={{ minWidth: 0 }}>
+                                        <div style={{ color: '#fff', fontWeight: 600, marginBottom: 4 }}>
+                                            Weekly solar summary
+                                        </div>
+                                        <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.85rem' }}>
+                                            A short email every Monday morning with your sites&rsquo; production, savings, and CO₂ avoided.
+                                        </div>
+                                    </div>
+                                    <label style={{
+                                        position: 'relative', display: 'inline-block',
+                                        width: 44, height: 24, flexShrink: 0, cursor: digestSaving ? 'wait' : 'pointer',
+                                    }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={digestEnabled}
+                                            disabled={digestSaving}
+                                            onChange={(e) => handleToggleDigest(e.target.checked)}
+                                            style={{ opacity: 0, width: 0, height: 0 }}
+                                        />
+                                        <span style={{
+                                            position: 'absolute', inset: 0,
+                                            background: digestEnabled ? '#ff7d70' : 'rgba(255,255,255,0.15)',
+                                            borderRadius: 999, transition: 'background 0.15s',
+                                        }} />
+                                        <span style={{
+                                            position: 'absolute', top: 3, left: digestEnabled ? 22 : 3,
+                                            width: 18, height: 18, borderRadius: '50%', background: '#fff',
+                                            transition: 'left 0.15s',
+                                        }} />
+                                    </label>
+                                </div>
+
+                                <div style={{ marginTop: 12 }}>
+                                    <button
+                                        type="button"
+                                        onClick={handleSendPreview}
+                                        disabled={previewSending}
+                                        style={{
+                                            padding: '8px 16px', borderRadius: 8, cursor: previewSending ? 'wait' : 'pointer',
+                                            border: '1px solid rgba(255,125,112,0.4)',
+                                            background: 'rgba(255,125,112,0.10)', color: '#ff9770',
+                                            fontSize: '0.85rem', fontWeight: 600,
+                                        }}
+                                    >
+                                        {previewSending ? 'Sending…' : 'Send me a preview'}
+                                    </button>
+                                    <span style={{ marginLeft: 12, color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem' }}>
+                                        We&rsquo;ll send today&rsquo;s digest to {email || 'your address on file'}.
+                                    </span>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>

@@ -11,7 +11,7 @@ import PaginationComponent from "@/components/ui/pagination/PaginationComponent"
 import { FaSearch, FaCheck } from "react-icons/fa";
 import { ImBlocked } from "react-icons/im";
 
-export default function UsersMainDataTable({ AllUsers, AllCustomers }) {
+export default function UsersMainDataTable({ AllUsers, AllCustomers, canWrite = true }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -129,9 +129,6 @@ export default function UsersMainDataTable({ AllUsers, AllCustomers }) {
                                 LAST MODIFICATION TIME
                             </th>
                             <th>
-                                AMMP API KEY
-                            </th>
-                            <th>
                                 CUSTOMER
                             </th>
                         </tr>
@@ -145,10 +142,12 @@ export default function UsersMainDataTable({ AllUsers, AllCustomers }) {
                                             {/* Use the ImportExportUsersComponent component */}
                                             <UserActions
                                                 menuItems={[
-                                                    ['Edit', 'openEditModal', 'dialogue', myUser.id],
-                                                    // ['Set Password', '/setLink', 'dialogue', myUser.id],
+                                                    // Edit and Delete are only for write-capable admins.
+                                                    // DCA (canWrite=false) sees "Log in with this user"
+                                                    // only — read + impersonate.
+                                                    ...(canWrite ? [['Edit', 'openEditModal', 'dialogue', myUser.id]] : []),
                                                     ...(Array.isArray(myUser.roles) && myUser.roles.some(role => role?.name === 'Customer') ? [['Log in with this user', '/host', 'dialogue', myUser.id]] : []),
-                                                    ['Delete', 'openDeleteModal', 'dialogue', myUser.id],
+                                                    ...(canWrite ? [['Delete', 'openDeleteModal', 'dialogue', myUser.id]] : []),
                                                 ]}
                                                 customers={AllCustomers}
                                             />
@@ -202,9 +201,6 @@ export default function UsersMainDataTable({ AllUsers, AllCustomers }) {
                                                 minute: '2-digit',
                                                 hour12: true
                                             })}
-                                        </td>
-                                        <td>
-                                            {myUser.ammp_api_key ? <FaCheck color='green' /> : <ImBlocked color='red' />}
                                         </td>
                                         <td>
                                             {getACustomerById(myUser.customer)}

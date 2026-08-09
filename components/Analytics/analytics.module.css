@@ -1,0 +1,146 @@
+.content {
+    padding: 0;
+    margin: 0;
+    background-color: #0D202F;
+    min-height: 100vh;
+}
+
+.topCenter {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 20px;
+    margin: 15px 30px 0;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.title {
+    margin-right: auto;
+    color: white;
+    font-size: 27px !important;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.generatedAt {
+    color: var(--ds-text-hint, rgba(255,255,255,0.55));
+    font-size: 0.78rem;
+}
+
+.centerContent {
+    margin: 10px 20px 75px;
+    border-radius: 14px;
+    background-color: #0D2638;
+    padding: 24px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    color: #4b7a9c;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.statCard {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 14px 16px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.statLabel {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.statValue {
+    color: #fff;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-family: 'Kanit', sans-serif;
+}
+
+.statHint {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+}
+
+.trendCard {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sparkline {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    height: 40px;
+}
+
+.sparklineEmpty {
+    color: var(--ds-text-hint, rgba(255,255,255,0.4));
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.emptyRow {
+    color: var(--ds-text-hint, rgba(255,255,255,0.4));
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 8px 0;
+}
+
+.topList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.topListRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.topListCount {
+    color: var(--ds-text-hint, rgba(255,255,255,0.55));
+    font-size: 0.82rem;
+}

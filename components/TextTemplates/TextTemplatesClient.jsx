@@ -1,11 +1,15 @@
 'use client'
 import { useState } from 'react';
-import { MdEmail } from 'react-icons/md';
+import { MdEmail, MdSend, MdAdd } from 'react-icons/md';
 import classes from './texttemplates.module.css';
 import TextTemplateActions from "@/components/ui/modals/otherActions/TextTemplateActions/TextTemplateActions";
+import SendTemplateEmailModal from "./SendTemplateEmailModal";
+import CreateTemplateModal from "./CreateTemplateModal";
 
-export default function TextTemplatesClient({ textTemplates }) {
+export default function TextTemplatesClient({ textTemplates, recipients = [] }) {
     const [search, setSearch] = useState('');
+    const [composeFor, setComposeFor] = useState(null); // template object when open
+    const [createOpen, setCreateOpen] = useState(false);
 
     const filtered = textTemplates.filter((t) => {
         const q = search.toLowerCase();
@@ -15,10 +19,18 @@ export default function TextTemplatesClient({ textTemplates }) {
         );
     });
 
+    // Strip tags + collapse whitespace so the preview snippet reads
+    // like prose regardless of what HTML the template stored.
+    const previewOf = (content = '') => content
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
     return (
         <>
-            {/* Search bar */}
-            <div className={classes.searchArea}>
+            {/* Search + New Template */}
+            <div className={classes.searchArea} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <input
                     type="text"
                     className={classes.inputText}
@@ -26,6 +38,19 @@ export default function TextTemplatesClient({ textTemplates }) {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
+                <button
+                    type="button"
+                    onClick={() => setCreateOpen(true)}
+                    title="Create a new email template"
+                    style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        padding: '10px 16px', background: '#ff7d70', border: 'none',
+                        color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600,
+                        cursor: 'pointer', flexShrink: 0,
+                    }}
+                >
+                    <MdAdd size={18} /> New Template
+                </button>
             </div>
 
             {/* Card grid */}
@@ -33,17 +58,27 @@ export default function TextTemplatesClient({ textTemplates }) {
                 <div className={classes.cardGrid}>
                     {filtered.map((template) => (
                         <div key={template.id} className={classes.card}>
-                            <div className={classes.cardIcon}>
-                                <MdEmail size={28} color="#ff7d70" />
+                            <div className={classes.cardHead}>
+                                <div className={classes.cardIcon}>
+                                    <MdEmail size={22} />
+                                </div>
                             </div>
                             <div className={classes.cardBody}>
                                 <p className={classes.cardTitle}>{template.display_name}</p>
                                 <p className={classes.cardSubtitle}>{template.name}</p>
-                                {template.inline_localized && (
-                                    <span className={classes.pill}>{template.inline_localized}</span>
+                                {template.content && (
+                                    <p className={classes.cardPreview}>{previewOf(template.content)}</p>
                                 )}
                             </div>
                             <div className={classes.cardFooter}>
+                                <button
+                                    type="button"
+                                    className={classes.sendBtn}
+                                    onClick={() => setComposeFor(template)}
+                                    title="Compose this template and send to selected users"
+                                >
+                                    <MdSend size={14} /> Send
+                                </button>
                                 <TextTemplateActions id={template.id} displayName={template.display_name} />
                             </div>
                         </div>
@@ -55,6 +90,18 @@ export default function TextTemplatesClient({ textTemplates }) {
                     <p>No templates found.</p>
                 </div>
             )}
+
+            <SendTemplateEmailModal
+                open={!!composeFor}
+                template={composeFor}
+                recipients={recipients}
+                onClose={() => setComposeFor(null)}
+            />
+
+            <CreateTemplateModal
+                open={createOpen}
+                onClose={() => setCreateOpen(false)}
+            />
         </>
     );
 }

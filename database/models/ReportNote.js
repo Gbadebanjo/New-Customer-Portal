@@ -1,5 +1,6 @@
 'use strict';
 import { DataTypes, Model } from "sequelize";
+import { v4 as uuidv4 } from 'uuid';
 import sequelizeConnection from '@/db_connection';
 
 class ReportNote extends Model {}
@@ -7,6 +8,9 @@ class ReportNote extends Model {}
 ReportNote.init({
   id: {
     type: DataTypes.UUID,
+    // Function form; `DataTypes.UUIDV4` literal serialises to the string
+    // 'UUIDV4' on insert under this Sequelize version.
+    defaultValue: () => uuidv4(),
     primaryKey: true,
     allowNull: false,
   },
@@ -41,6 +45,11 @@ ReportNote.init({
   edited_by: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  visible_to_customer: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
   },
 }, {
   sequelize: sequelizeConnection,

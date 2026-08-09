@@ -9,6 +9,7 @@ import saveReportData from "@/lib/controllers/reportData/saveReportData";
 import getAssetsByCustomer from "@/lib/controllers/reportData/getAssetsByCustomer";
 import getReportNotes from "@/lib/controllers/reportData/getReportNote";
 import saveReportNote from "@/lib/controllers/reportData/saveReportNote";
+import { refreshReportFromSource } from "@/lib/controllers/reportData/refreshFromSource";
 
 const MONTHS = [
   "January",
@@ -102,6 +103,30 @@ const EXCEL_COLUMN_MAP = {
 
 const TEMPLATE_HEADERS = ["Day", ...Object.keys(EXCEL_COLUMN_MAP)];
 
+// Small colored pill shown next to the Date column for Daystar users so
+// they can see at a glance which rows are still raw from the data
+// provider vs finalised by our team.
+function StatusPill({ kind }) {
+    const map = {
+        verified: { bg: 'rgba(76,175,80,0.12)',  fg: '#4caf50', bd: 'rgba(76,175,80,0.4)',  label: 'Approved' },
+        raw:      { bg: 'rgba(255,152,0,0.12)',  fg: '#ff9800', bd: 'rgba(255,152,0,0.4)',  label: 'Raw' },
+        unknown:  { bg: 'rgba(255,255,255,0.06)',fg: '#a8b3bd', bd: 'rgba(255,255,255,0.15)', label: 'Unknown' },
+    };
+    const c = map[kind] || map.unknown;
+    return (
+        <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '1px 8px', borderRadius: 999,
+            fontSize: '0.62rem', fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: 0.4,
+            background: c.bg, color: c.fg, border: `1px solid ${c.bd}`,
+        }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: c.fg }} />
+            {c.label}
+        </span>
+    );
+}
+
 function rowHasData(row) {
   return (
     (row.total_daily_consumption || 0) !== 0 ||
@@ -164,8 +189,19 @@ export default function EditableReportTable({
   // Edit tracking
   const [reportNotes, setReportNotes] = useState([]);
   const [hasExistingData, setHasExistingData] = useState(false);
-  const existingDaysRef = useRef(new Set()); // days that came from DB — ref avoids stale closures
+  // Days already APPROVED (status='verified') in the DB. Raw AMMP-ingested
+  // rows are deliberately excluded — modifying a raw row is treated as
+  // filling in fresh data, not editing an approved value, so no change-note
+  // is required. `handleCellChange` uses this set to gate `dirtyDays` and
+  // `handleSave` filters against it to decide whether to open the note modal.
+  const existingDaysRef = useRef(new Set());
   const [dirtyDays, setDirtyDays] = useState(new Set()); // existing days that were modified
+
+  // Auto-refresh guard: once we've asked AMMP for this (site, year, month)
+  // combo during this mount, don't ask again — the DB now reflects whatever
+  // AMMP had. Prevents an infinite load/refresh loop when AMMP genuinely
+  // returns nothing for the month.
+  const autoRefreshedRef = useRef(new Set());
   const [historyPanel, setHistoryPanel] = useState(null); // { day } | null
 
   // Note modal
@@ -215,7 +251,7 @@ export default function EditableReportTable({
       try {
         const { assets: fetched } = await getAssetsByCustomer(activeCustomerId);
         setAssets(fetched);
-        if (fetched.length > 0) setSelectedSite(fetched[0].asset_name);
+        if (fetched.length > 0) setSelectedSite(fetched[0].asset_id);
       } catch (err) {
         console.error('Failed to fetch assets:', err);
         setAssets([]);
@@ -261,9 +297,69 @@ export default function EditableReportTable({
         setPlannedMonthlyKwh(data[0].planned_monthly_kwh);
       }
       setHasExistingData(data.some(rowHasData));
-      existingDaysRef.current = new Set(data.filter(rowHasData).map(r => r.day));
+      // Only verified rows count as "already approved". Raw rows are
+      // treated as unapproved provider data that the operator can edit
+      // freely without needing to justify with a note.
+      existingDaysRef.current = new Set(
+        data.filter((r) => rowHasData(r) && r.status === 'verified').map((r) => r.day)
+      );
       setReportNotes(notesData);
       setLoaded(true);
+
+      // Auto-fall-back to the data provider whenever the DB is missing
+      // data the provider likely has. Two cases fire this:
+      //   1. Empty month — we've never ingested this (site, month, year).
+      //   2. Current month with a stale tail — today's row (or yesterday's
+      //      if today's still open) is missing. Otherwise NOC would have
+      //      to hit "Refresh from source" every morning.
+      // Historical/closed months skip auto-refresh once populated so we
+      // don't re-ingest data that isn't going to change.
+      const dbHasAnyRows = data.length > 0;
+      const now = new Date();
+      const isCurrentMonth =
+        selectedYear === now.getFullYear() &&
+        selectedMonth === now.getMonth() + 1;
+      const highestSavedDay = data.reduce((m, r) => Math.max(m, r.day || 0), 0);
+      // "yesterday" is the last day AMMP can reasonably have finalised;
+      // today's own reading is often still filling in.
+      const targetDay = Math.max(1, now.getDate() - 1);
+      const missingRecentDays = isCurrentMonth && highestSavedDay < targetDay;
+
+      const key = `${siteId}:${selectedYear}:${selectedMonth}`;
+      const canAutoRefresh =
+        !isCustomerOnly &&
+        !showNewSiteInput &&
+        !autoRefreshedRef.current.has(key) &&
+        (!dbHasAnyRows || missingRecentDays);
+
+      if (canAutoRefresh) {
+        autoRefreshedRef.current.add(key);
+        setStatusMsg({ text: 'No local data yet — pulling from the data provider…', type: '' });
+        try {
+          const res = await refreshReportFromSource({
+            siteId,
+            year: selectedYear,
+            month: selectedMonth,
+            customerId,
+          });
+          if (res?.ok && ((res.created ?? 0) > 0 || (res.updated ?? 0) > 0)) {
+            // Reload once so the ingested rows show up. handleLoadRef
+            // guards against re-firing this branch (autoRefreshedRef).
+            setStatusMsg({ text: '', type: '' });
+            await handleLoadRef.current();
+            return;
+          }
+          setStatusMsg({
+            text: res?.ok
+              ? 'No data available from the data provider for this month.'
+              : (res?.error || 'Could not reach the data provider.'),
+            type: res?.ok ? '' : 'error',
+          });
+        } catch (fetchErr) {
+          console.error('auto-refresh failed', fetchErr);
+          setStatusMsg({ text: 'Could not reach the data provider.', type: 'error' });
+        }
+      }
     } catch (err) {
       console.error(err);
       setHasExistingData(false);
@@ -277,6 +373,44 @@ export default function EditableReportTable({
   useEffect(() => {
     if (selectedSite && activeCustomerId) handleLoadRef.current();
   }, [selectedSite, selectedMonth, selectedYear, activeCustomerId]);
+
+  const handleRefreshFromAmmp = useCallback(async () => {
+    const siteId = showNewSiteInput ? newSite.trim() : selectedSite;
+    const customerId = isCustomerOnly ? userCustomerId : selectedCustomer;
+    if (!siteId || !customerId) {
+      setStatusMsg({ text: 'Pick a customer and site before refreshing.', type: 'error' });
+      return;
+    }
+    setLoading(true);
+    setStatusMsg({ text: 'Fetching data from data provider…', type: '' });
+    try {
+      const res = await refreshReportFromSource({
+        siteId,
+        year: selectedYear,
+        month: selectedMonth,
+        customerId,
+      });
+      if (!res?.ok) {
+        setStatusMsg({ text: res?.error || 'Refresh failed', type: 'error' });
+        setLoading(false);
+        return;
+      }
+      const parts = [];
+      if (res.created) parts.push(`${res.created} added`);
+      if (res.updated) parts.push(`${res.updated} updated`);
+      if (res.skipped) parts.push(`${res.skipped} skipped (verified)`);
+      setStatusMsg({
+        text: parts.length ? `Refresh: ${parts.join(', ')}` : 'Refresh completed — no new data.',
+        type: 'success',
+      });
+      // Re-fetch so the newly-ingested rows show up in the table.
+      await handleLoadRef.current();
+    } catch (err) {
+      console.error(err);
+      setStatusMsg({ text: 'Refresh failed', type: 'error' });
+      setLoading(false);
+    }
+  }, [selectedSite, newSite, showNewSiteInput, selectedYear, selectedMonth, isCustomerOnly, userCustomerId, selectedCustomer]);
 
   const handleDownloadTemplate = useCallback(async () => {
     const daysCount = getDaysInMonth(selectedMonth, selectedYear);
@@ -396,8 +530,16 @@ export default function EditableReportTable({
     const siteId = showNewSiteInput ? newSite.trim() : selectedSite;
     if (!siteId) return;
 
-    if (!hasExistingData || dirtyDays.size === 0) {
-      // New upload or no changes — save directly, no note required
+    // A note is only required when the operator is CHANGING a day that
+    // was already saved to the DB. Days they're filling in for the first
+    // time (empty → data) don't need a note — nothing to justify.
+    // `existingDaysRef` was set to the days-with-data at load time / last
+    // save; dirty days not in that set are net-new entries.
+    const changedExistingDays = [...dirtyDays].filter((d) => existingDaysRef.current.has(d));
+    const isEditingExisting = changedExistingDays.length > 0;
+
+    if (!isEditingExisting) {
+      // New upload, no changes, or only net-new days — save directly.
       setSaving(true);
       setStatusMsg({ text: '', type: '' });
       try {
@@ -417,13 +559,13 @@ export default function EditableReportTable({
       }
       setSaving(false);
     } else {
-      // Editing existing data — require a note
+      // At least one already-saved day is being changed — require a note.
       setPendingNote('');
       setNoteError('');
       setNoteModalOpen(true);
     }
   }, [
-    hasExistingData, dirtyDays, selectedSite, newSite, showNewSiteInput,
+    dirtyDays, selectedSite, newSite, showNewSiteInput,
     selectedMonth, selectedYear, rows, plannedMonthlyKwh,
     selectedCustomer, isCustomerOnly, userCustomerId,
   ]);
@@ -438,16 +580,18 @@ export default function EditableReportTable({
     try {
       const customerId = isCustomerOnly ? userCustomerId : selectedCustomer;
       const noteText = pendingNote.trim();
-      const days = [...dirtyDays];
+      // Only attach the note to days that were already in the DB — net-new
+      // days get saved by the main call but don't need a change-note.
+      const daysNeedingNote = [...dirtyDays].filter((d) => existingDaysRef.current.has(d));
 
       const [dataResult] = await Promise.all([
         saveReportData(siteId, selectedMonth, selectedYear, rows, plannedMonthlyKwh, customerId),
-        ...days.map(day => saveReportNote(siteId, selectedMonth, selectedYear, day, customerId, noteText, editorName)),
+        ...daysNeedingNote.map(day => saveReportNote(siteId, selectedMonth, selectedYear, day, customerId, noteText, editorName)),
       ]);
 
       if (dataResult.success) {
         existingDaysRef.current = new Set(rows.filter(rowHasData).map(r => r.day));
-        const newNotes = days.map(day => ({
+        const newNotes = daysNeedingNote.map(day => ({
           site_id: siteId,
           customer_id: customerId,
           report_month: selectedMonth,
@@ -488,6 +632,14 @@ export default function EditableReportTable({
   for (let y = 2020; y <= now + 1; y++) currentYears.push(y);
 
   const activeSite = showNewSiteInput ? newSite.trim() : selectedSite;
+  // Friendly name for headings / export filenames. The dropdown value is
+  // the AMMP asset_id (UUID) because that's what the ingester + resolver
+  // key rows by, but the user-facing chrome should show the asset_name
+  // (e.g. "SBC_ABJ_001") or long_name ("SBC Abuja") when we have them.
+  const activeAsset = assets.find((a) => a.asset_id === activeSite);
+  const activeSiteLabel = showNewSiteInput
+    ? newSite.trim()
+    : (activeAsset?.long_name || activeAsset?.asset_name || activeSite);
 
   return (
     <div className={classes.container}>
@@ -520,7 +672,7 @@ export default function EditableReportTable({
               else setSelectedSite(e.target.value);
             }}>
               <option value="">-- Select Site --</option>
-              {assets.map(a => <option key={a.asset_id} value={a.asset_name}>{a.asset_name}</option>)}
+              {assets.map(a => <option key={a.asset_id} value={a.asset_id}>{a.asset_name}</option>)}
               {!isCustomerOnly && <option value="__new__">+ Add New Site</option>}
             </select>
           )}
@@ -547,12 +699,25 @@ export default function EditableReportTable({
           </div>
         )}
 
-        <button className={classes.loadBtn} onClick={handleLoad} disabled={loading || !activeSite}>
+        <button
+          className={classes.loadBtn}
+          onClick={handleLoad}
+          disabled={loading || !activeSite}
+          title="Reload what's in our database for the selected site and month. Auto-pulls from the data provider when the DB is empty."
+        >
           {loading ? 'Loading...' : 'Load Report'}
         </button>
 
         {!isCustomerOnly && (
           <>
+            <button
+              className={classes.uploadBtn}
+              onClick={handleRefreshFromAmmp}
+              disabled={!activeSite || loading}
+              title="Force-refresh raw values from the data provider (verified rows are preserved). Use this when the provider has updated numbers since the last load."
+            >
+              {loading ? 'Refreshing…' : 'Refresh from source'}
+            </button>
             <button className={classes.uploadBtn} onClick={() => fileInputRef.current?.click()} disabled={!activeSite}>Upload Report</button>
             <input type="file" ref={fileInputRef} accept=".xlsx,.xls,.csv" style={{ display: 'none' }} onChange={handleUploadReport} />
             <button className={classes.templateBtn} onClick={handleDownloadTemplate}>Download Template</button>
@@ -568,7 +733,7 @@ export default function EditableReportTable({
               <Image src="/img/daystar/shell-daystar.png" alt="Daystar Logo" width={150} height={40} className={classes.logo} style={{ height: 'auto' }} />
             </div>
             <div className={classes.header}>
-              <h2>DAYBREAK SOLAR POWER SYSTEM - {activeSite.toUpperCase()}</h2>
+              <h2>DAYBREAK SOLAR POWER SYSTEM - {(activeSiteLabel || '').toUpperCase()}</h2>
               <h3>SOLAR HYBRID REPORT FOR {MONTHS[selectedMonth - 1].toUpperCase()} {selectedYear}</h3>
               <p>Planned Monthly kWh - {plannedMonthlyKwh.toLocaleString()}</p>
             </div>
@@ -598,29 +763,59 @@ export default function EditableReportTable({
                 {rows.map((row, idx) => {
                   const dayNotes = notesByDay[row.day] || [];
                   const isDirty = dirtyDays.has(row.day);
+                  const isVerified = row.status === 'verified';
+                  const isRaw = row.status === 'raw';
+                  const hasData = rowHasData(row);
+                  // Customers see verified rows only. Any row that has data
+                  // but hasn't been reviewed by our team is masked to a
+                  // placeholder so the customer isn't shown unaudited numbers.
+                  const hideForCustomer = isCustomerOnly && hasData && !isVerified;
                   return (
                     <tr key={row.day} className={isDirty ? classes.dirtyRow : ''}>
-                      <td>{formatDate(row.day, selectedMonth, selectedYear)}</td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                          <span>{formatDate(row.day, selectedMonth, selectedYear)}</span>
+                          {/* Daystar-only status pill so NOC can see at a
+                              glance which rows are still raw vs finalised. */}
+                          {!isCustomerOnly && hasData && (
+                            <StatusPill kind={isVerified ? 'verified' : isRaw ? 'raw' : 'unknown'} />
+                          )}
+                          {hideForCustomer && (
+                            <span style={{
+                              fontSize: '0.68rem', color: '#a8b3bd',
+                              fontStyle: 'italic',
+                            }}>Pending review</span>
+                          )}
+                        </div>
+                      </td>
                       {NUMERIC_FIELDS.map(field => (
                         <td key={field}>
-                          <input
-                            type="number"
-                            step="any"
-                            value={row[field] || ''}
-                            onChange={(e) => handleCellChange(idx, field, e.target.value, row.day)}
-                            readOnly={isCustomerOnly}
-                          />
+                          {hideForCustomer ? (
+                            <span style={{ color: '#6b7280' }}>—</span>
+                          ) : (
+                            <input
+                              type="number"
+                              step="any"
+                              value={row[field] || ''}
+                              onChange={(e) => handleCellChange(idx, field, e.target.value, row.day)}
+                              readOnly={isCustomerOnly}
+                            />
+                          )}
                         </td>
                       ))}
                       {TEXT_FIELDS.map(field => (
                         <td key={field}>
-                          <input
-                            type="text"
-                            className={classes.textInput}
-                            value={row[field] || ''}
-                            onChange={(e) => handleCellChange(idx, field, e.target.value, row.day)}
-                            readOnly={isCustomerOnly}
-                          />
+                          {hideForCustomer ? (
+                            <span style={{ color: '#6b7280' }}>—</span>
+                          ) : (
+                            <input
+                              type="text"
+                              className={classes.textInput}
+                              value={row[field] || ''}
+                              onChange={(e) => handleCellChange(idx, field, e.target.value, row.day)}
+                              readOnly={isCustomerOnly}
+                            />
+                          )}
                         </td>
                       ))}
                       <td className={classes.historyCell}>
@@ -679,7 +874,12 @@ export default function EditableReportTable({
             )}
             <button className={classes.templateBtn} onClick={handleExportReport}>Export Report</button>
             {!isCustomerOnly && (
-              <button className={classes.saveBtn} onClick={handleSave} disabled={saving}>
+              <button
+                className={classes.saveBtn}
+                onClick={handleSave}
+                disabled={saving}
+                title="Submitting this report will email the customer that a new report is available."
+              >
                 {saving ? 'Saving...' : 'Save Report'}
               </button>
             )}
@@ -802,7 +1002,7 @@ export default function EditableReportTable({
                     {noteError}
                   </p>
                 ) : (
-                  <p className={classes.noteModalHint}>This note will be visible to the customer.</p>
+                  <p className={classes.noteModalHint}>This note will be visible to the customer, and they will be emailed that a new report is available.</p>
                 )}
                 <span className={`${classes.charCount}${pendingNote.length > MAX_NOTE * 0.9 ? ` ${classes.charCountWarn}` : ''}`}>
                   {pendingNote.length}/{MAX_NOTE}
@@ -814,7 +1014,12 @@ export default function EditableReportTable({
               <button className={classes.noteModalCancel} onClick={() => setNoteModalOpen(false)} disabled={noteSubmitting}>
                 Cancel
               </button>
-              <button className={classes.noteModalSubmit} onClick={handleConfirmSave} disabled={noteSubmitting || !pendingNote.trim()}>
+              <button
+                className={classes.noteModalSubmit}
+                onClick={handleConfirmSave}
+                disabled={noteSubmitting || !pendingNote.trim()}
+                title="Submitting this edit will email the customer that a new report is available."
+              >
                 {noteSubmitting ? (<><span className={classes.spinner} />Saving...</>) : 'Save Edit'}
               </button>
             </div>

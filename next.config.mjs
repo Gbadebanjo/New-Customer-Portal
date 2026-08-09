@@ -1,6 +1,18 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Pin Turbopack's workspace root to this project. Next 16's auto-inference
+// walks up looking for a package.json and, on Windows, can misidentify the
+// root when there are stray lockfiles/package.json files further up the
+// tree — producing "We couldn't find the Next.js package (next/package.json)
+// from the project directory" build errors.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    turbopack: {},
+    turbopack: {
+        root: __dirname,
+    },
     images: {
         qualities: [10, 75],
     },

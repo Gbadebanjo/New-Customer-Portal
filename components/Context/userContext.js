@@ -1,57 +1,33 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 
 const UserContext = createContext();
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const pathname = usePathname();
+/**
+ * Client-side holder for the current user. The user object comes from
+ * the server layout (`app/layout.js` → `getInitialUser`), so there is
+ * NO client fetch, NO /api/auth/me poll, and NO localStorage seed to
+ * drift out of sync with the real session.
+ *
+ * On navigation, the server layout re-runs, computes a fresh
+ * `initialUser` from the request cookie, and passes it down. The
+ * effect below syncs local state to that fresh value — so a login,
+ * logout, or impersonation switch (all of which hard-navigate through
+ * a server action) is reflected here without a network round-trip.
+ *
+ * Callers can still mutate optimistically via `setUser` (e.g. login
+ * screen after a successful 2FA) so the sidebar updates before the
+ * next navigation.
+ */
+export function UserProvider({ initialUser = null, children }) {
+  const [user, setUser] = useState(initialUser);
 
-  // Seed from localStorage after hydration so navbar renders quickly
-  // without causing a server/client mismatch.
+  // Keep local state in sync with server-provided prop across
+  // navigations. React only initialises useState on mount, so a fresh
+  // prop from the server won't overwrite existing state without this.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('user');
-      if (stored) setUser(JSON.parse(stored));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // Re-fetch the current user from the server on every navigation.
-  // This ensures impersonation start/exit (which do a hard reload + redirect)
-  // always get the correct user's roles for the new session.
-  useEffect(() => {
-    async function fetchCurrentUser() {
-      try {
-        const res = await fetch('/api/auth/me', { credentials: 'include' });
-        if (res.ok) {
-          const data = await res.json();
-          if (data) {
-            setUser(data);
-            localStorage.setItem('user', JSON.stringify(data));
-            return;
-          }
-        }
-        // Not authenticated — clear stale data
-        setUser(null);
-        localStorage.removeItem('user');
-      } catch {
-        // Network failure — keep existing user state
-      }
-    }
-    fetchCurrentUser();
-  }, [pathname]);
-
-  // Keep localStorage in sync when user changes (e.g. after login/profile update)
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
+    setUser(initialUser);
+  }, [initialUser]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
