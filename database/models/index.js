@@ -31,9 +31,15 @@ let models;
 // the cached registry (typically because a new model was added since
 // the dev process started), rebuild — otherwise the caller sees a very
 // unhelpful "Cannot read properties of undefined (reading 'findAll')".
+// Names as they appear on `sequelizeConnection.models` — this is each
+// model's `modelName` field, NOT the file name. SecurityLog(s) is
+// registered as `SecurityLogs` (plural) because its model class is
+// `class SecurityLogs extends Model`; using the singular name here
+// would make the cache-invalidation check always report it missing
+// and rebuild the whole registry on every request.
 const REQUIRED_MODELS = [
   'User', 'AuditLog', 'Customer', 'PowerProductionPlan', 'PowerProductionPlanItem',
-  'ReportData', 'SecurityLog', 'SupportQuery',
+  'ReportData', 'SecurityLogs', 'SupportQuery',
   'SupportQueryCategory', 'SupportQueryMessage', 'SupportQueryStatus',
   'TextTemplate', 'UserRole', 'ReportNote', 'UserSession', 'VerificationCode',
   'ApiKey', 'Notification', 'CronRun', 'CustomerSiteMapping',

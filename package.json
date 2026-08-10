@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage",
     "migrate": "dotenv -- sequelize-cli db:migrate",
     "seed": "dotenv -- sequelize-cli db:seed:all",
+    "db:setup": "npm run migrate && npm run seed",
     "migrate:rollback:all": "dotenv -- sequelize-cli db:migrate:undo:all",
     "migrate:rollback": "dotenv -- sequelize-cli db:migrate:undo",
     "migrations:create": "dotenv -- sequelize-cli migrations:create"

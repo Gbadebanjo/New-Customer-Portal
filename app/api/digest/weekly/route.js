@@ -58,7 +58,7 @@ export async function POST(request) {
         return !u.is_locked_out && !u.not_active;
     });
 
-    const portalBaseUrl = process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || '';
+    const portalBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
     const results = { sent: 0, skipped: 0, failed: 0, details: [] };
 
     for (const user of recipients) {
