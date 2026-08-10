@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import UserActions from "@/components/ui/modals/otherActions/UserActions/UserActions";
 import classes from "./dataTable.module.css";
 import ButtonFlexible from "@/components/ui/button-flexible/ButtonFlexible";
@@ -153,7 +154,13 @@ export default function UsersMainDataTable({ AllUsers, AllCustomers, canWrite = 
                                             />
                                         </td>
                                         <td>
-                                            {myUser.username}
+                                            <Link
+                                                href={`/admin/identity/users/${myUser.id}`}
+                                                style={{ color: '#ff9770', textDecoration: 'none', fontWeight: 500 }}
+                                                title="Open user detail"
+                                            >
+                                                {myUser.username}
+                                            </Link>
                                         </td>
                                         <td style={{ whiteSpace: 'nowrap' }}>
                                             {myUser.email}

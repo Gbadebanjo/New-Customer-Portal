@@ -21,7 +21,6 @@ export default function ActionAlert({ dialogRef, message, closeButton, SubmitBut
         >
             <div className="modal-box" style={{
                 background: "#123751",
-                marginTop: "5rem",
                 width: "700px",
                 maxWidth: "40vw",
                 padding: "2.5rem 2rem",

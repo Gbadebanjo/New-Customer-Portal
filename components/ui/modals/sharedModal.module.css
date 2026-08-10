@@ -1,7 +1,14 @@
 .modalLayout {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  /* `safe center` vertically centers the modal in the viewport, but
+     falls back to top-alignment when the modal is taller than the
+     viewport — so tall dialogs (edit-user, create-user, template
+     compose) still get their top row visible instead of getting cut
+     off from both sides. Fixes the "some alerts appear top of screen,
+     others centered" inconsistency vs. customAlertModal which was
+     hard-coded to align-items: center. */
+  align-items: safe center;
   scrollbar-width: thin;
   overflow-y: auto;
   height: auto;

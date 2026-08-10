@@ -112,6 +112,16 @@ User.init({
     allowNull: true,
     defaultValue: null,
   },
+  // Timestamp of the most recent failed login. Drives the sliding-
+  // window reset — if a new failed attempt lands more than
+  // `lockoutDurationMinutes` after this timestamp, failed_login_attempts
+  // resets to 1 before checking against maxAttempts. That way harmless
+  // typos hours apart don't accumulate into a lockout.
+  last_failed_login_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null,
+  },
 }, {
   sequelize: sequelizeConnection,
   createdAt: "created_at",
