@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { Kanit } from "next/font/google";
 import "./globals.css";
 import ClientLayoutWrapper from "@/components/Layout/ClientLayoutWrapper";
 import { UserProvider } from "@/components/Context/userContext";
 import ImpersonationBanner from "@/components/Layout/ImpersonationBanner";
+import GlobalProgress from "@/components/ui/GlobalProgress/GlobalProgress";
 import { verifyAuth } from "@/lib/auth/auth";
 import getUserById from "@/lib/controllers/users/getUserById";
 
@@ -48,6 +50,12 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={kanit.className}>
+        {/* useSearchParams() needs a Suspense boundary in the App
+            Router — a bare mount opts the whole tree out of static
+            rendering. */}
+        <Suspense fallback={null}>
+          <GlobalProgress />
+        </Suspense>
         <UserProvider initialUser={initialUser}>
           <ClientLayoutWrapper impersonationBanner={<ImpersonationBanner />}>
             {children}

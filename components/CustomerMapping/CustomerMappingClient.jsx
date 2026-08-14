@@ -7,6 +7,7 @@ import {
     deleteEmptyCustomer,
 } from '@/lib/controllers/customerMapping/customerMappingActions';
 import classes from './customerMapping.module.css';
+import ConfirmModal from '@/components/ui/modals/customAlertModal/ConfirmModal';
 
 export default function CustomerMappingClient({ initialCustomers, initialGroups, error }) {
     const router = useRouter();
@@ -19,6 +20,8 @@ export default function CustomerMappingClient({ initialCustomers, initialGroups,
     const [err, setErr] = useState('');
     const [pending, startTransition] = useTransition();
     const [customerFilter, setCustomerFilter] = useState('');
+    // { id, name } while awaiting user confirmation to delete an empty customer.
+    const [pendingDelete, setPendingDelete] = useState(null);
 
     const reload = () => startTransition(async () => {
         const res = await listCustomerMappings();
@@ -68,9 +71,14 @@ export default function CustomerMappingClient({ initialCustomers, initialGroups,
         });
     };
 
-    const handleDelete = async (id, name) => {
-        if (typeof window !== 'undefined' &&
-            !window.confirm(`Delete empty customer "${name}"?`)) return;
+    const handleDelete = (id, name) => {
+        setPendingDelete({ id, name });
+    };
+
+    const confirmDelete = () => {
+        const { id, name } = pendingDelete || {};
+        setPendingDelete(null);
+        if (!id) return;
         setMsg(''); setErr('');
         startTransition(async () => {
             const res = await deleteEmptyCustomer(id);
@@ -232,6 +240,15 @@ export default function CustomerMappingClient({ initialCustomers, initialGroups,
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                open={!!pendingDelete}
+                message={pendingDelete ? `Delete empty customer "${pendingDelete.name}"?` : ''}
+                confirmLabel="Delete"
+                tone="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setPendingDelete(null)}
+            />
         </>
     );
 }

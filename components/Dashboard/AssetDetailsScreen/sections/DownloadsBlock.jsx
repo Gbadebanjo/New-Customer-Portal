@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAvailableReportMonths } from '@/lib/controllers/reportData/getAvailableReportMonths';
 import getReportData from '@/lib/controllers/reportData/getReportData';
 import InfoTooltip from '@/components/ui/InfoTooltip/InfoTooltip';
+import CustomAlertModal from '@/components/ui/modals/customAlertModal/customAlertModal';
 
 const MONTH_LABELS = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -63,6 +64,9 @@ export default function DownloadsBlock({ assetId, siteName }) {
     const [months, setMonths] = useState(null);
     const [error, setError] = useState(null);
     const [busyKey, setBusyKey] = useState(null);
+    // App-styled feedback message for the two cases where we used to
+    // pop native alert(): no-data-for-month, and export failed.
+    const [alertMsg, setAlertMsg] = useState(null);
 
     useEffect(() => {
         if (!assetId) return;
@@ -86,7 +90,7 @@ export default function DownloadsBlock({ assetId, siteName }) {
             // NOC either verified or left as raw; both come through here.
             const rows = await getReportData(assetId, month, year);
             if (!Array.isArray(rows) || rows.length === 0) {
-                alert('No data available for the selected month.');
+                setAlertMsg('No data available for the selected month.');
                 return;
             }
             const csv = toCsv(rows);
@@ -95,7 +99,7 @@ export default function DownloadsBlock({ assetId, siteName }) {
             downloadBlob(`${safeSite}_${monthLabel}_${year}.csv`, 'text/csv', csv);
         } catch (err) {
             console.error('DownloadsBlock: export failed', err);
-            alert('Sorry, that export failed. Please try again.');
+            setAlertMsg('Sorry, that export failed. Please try again.');
         } finally {
             setBusyKey(null);
         }
@@ -205,6 +209,12 @@ export default function DownloadsBlock({ assetId, siteName }) {
                     })}
                 </div>
             )}
+
+            <CustomAlertModal
+                open={!!alertMsg}
+                message={alertMsg || ''}
+                onClose={() => setAlertMsg(null)}
+            />
         </div>
     );
 }

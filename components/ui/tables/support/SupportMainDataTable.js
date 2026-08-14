@@ -115,11 +115,6 @@ export default function SupportMainDataTable({
                     </div>
                 </div>
             </form>
-            <div className={classes.filterText}>
-                <span>
-                    Advanced Filters
-                </span>
-            </div>
             <main className={classes.mainContent}>
                 {/* <div style={{ width: '100%', overflowX: 'auto' }}> */}
                 <table className={`table table-bordered ${classes.table}`}>

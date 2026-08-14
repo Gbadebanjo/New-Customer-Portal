@@ -263,50 +263,6 @@ const CustomerActions = ({ menuItems }) => {
                 </div>
             </dialog>
 
-            {/* <dialog
-                id="import_modal"
-                className="modal"
-                ref={deletePopupRef}
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "rgba(255, 255, 255, 0.5)",
-                }}
-            >
-                <div className="modal-box" style={{
-                    background: "#123751",
-                    marginTop: "5rem",
-                    width: "700px",
-                    maxWidth: "40vw",
-                    padding: "2.5rem 2rem",
-                }}>
-                    <div className="py-4">
-                        <form method="dialog">
-                            <div aria-labelledby="export-user-modal-tabs_0-tab" id="create-user-modal-tabs_0"
-                                role="tabpanel">
-                                <div>
-                                    <center className='gap-5 flex flex-col'>
-                                        <div><WarnCircleBigIcon /></div>
-                                        <div><p className="font-bold text-xl">Are you sure you want to delete this record?</p></div>
-                                        <div>
-                                            <div className={classes.buttonContainer}>
-                                                <div style={{ marginRight: 5 }}>
-                                                    <ButtonWhite onClick={closeDeleteModal} link="#">Cancel</ButtonWhite>
-                                                </div>
-                                                <div style={{ marginLeft: 5 }}>
-                                                    <ButtonSaveSubmit buttonText={'Yes'} onClick={deleteCustomer} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </center>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </dialog> */}
-
             <ActionAlert
                 dialogRef={deletePopupRef}
                 message='Are you sure you want to delete this record?'

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import FullScreenLoader from '@/components/LoadingSkeleton/LoadingSkeleton';
+import FullScreenLoader from '@/components/ui/Loader/PageLoader';
 import classes from './alertsTable.module.css';
 import getAssetAlerts from '@/lib/controllers/alerts/getAssetAlerts';
 

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
-import FullScreenLoader from "@/components/LoadingSkeleton/LoadingSkeleton";
+import FullScreenLoader from "@/components/ui/Loader/PageLoader";
 import Image from "next/image";
 import { saveAs } from "file-saver";
 import classes from "./editableReportTable.module.css";
@@ -1020,7 +1020,7 @@ export default function EditableReportTable({
                 disabled={noteSubmitting || !pendingNote.trim()}
                 title="Submitting this edit will email the customer that a new report is available."
               >
-                {noteSubmitting ? (<><span className={classes.spinner} />Saving...</>) : 'Save Edit'}
+                {noteSubmitting ? 'Saving…' : 'Save Edit'}
               </button>
             </div>
           </div>

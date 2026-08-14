@@ -3,6 +3,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createApiKey, revokeApiKey, listApiKeys } from '@/lib/controllers/apiKeys/apiKeyActions';
 import classes from './apiKeys.module.css';
+import ConfirmModal from '@/components/ui/modals/customAlertModal/ConfirmModal';
 
 function fmtDate(iso) {
     if (!iso) return '—';
@@ -26,6 +27,8 @@ export default function ApiKeysClient({ initialKeys, customers }) {
     const [msg, setMsg] = useState('');
     const [err, setErr] = useState('');
     const [pending, startTransition] = useTransition();
+    // { id, label } while awaiting user confirmation to revoke.
+    const [pendingRevoke, setPendingRevoke] = useState(null);
 
     const reload = () => {
         startTransition(async () => {
@@ -60,8 +63,14 @@ export default function ApiKeysClient({ initialKeys, customers }) {
         } finally { setCreating(false); }
     };
 
-    const handleRevoke = async (id, label) => {
-        if (!confirm(`Revoke the key "${label}"? Callers using it will start getting 401s immediately.`)) return;
+    const handleRevoke = (id, label) => {
+        setPendingRevoke({ id, label });
+    };
+
+    const confirmRevoke = () => {
+        const { id } = pendingRevoke || {};
+        setPendingRevoke(null);
+        if (!id) return;
         setMsg(''); setErr('');
         startTransition(async () => {
             const res = await revokeApiKey(id);
@@ -252,6 +261,17 @@ export default function ApiKeysClient({ initialKeys, customers }) {
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                open={!!pendingRevoke}
+                message={pendingRevoke
+                    ? `Revoke the key "${pendingRevoke.label}"? Callers using it will start getting 401s immediately.`
+                    : ''}
+                confirmLabel="Revoke"
+                tone="danger"
+                onConfirm={confirmRevoke}
+                onCancel={() => setPendingRevoke(null)}
+            />
         </>
     );
 }

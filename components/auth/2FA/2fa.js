@@ -101,8 +101,8 @@ function TwoFactorVerification() {
                                     maxLength={6}
                                 />
                                 <ButtonDefault
-                                    // className="btn"
                                     buttonText={'Submit'}
+                                    loadingText={'Verifying…'}
                                     type="submit"
                                     loading={isSubmitting}
                                 />

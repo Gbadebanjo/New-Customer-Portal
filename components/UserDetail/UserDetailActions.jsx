@@ -8,20 +8,30 @@ import {
     sendPasswordResetForUser,
 } from '@/lib/controllers/users/adminUserActions';
 import { impersonateUser } from '@/lib/auth/impersonationActions';
+import ConfirmModal from '@/components/ui/modals/customAlertModal/ConfirmModal';
 
 // Panel with the quick-action buttons on the identity card.
-// Each action calls a server action gated by requireWriteAdminAuth,
-// then router.refresh()s so the page picks up new state.
+// Each destructive action opens the app-styled ConfirmModal (replacing
+// window.confirm which pops OS-level and looks off-brand).
 export default function UserDetailActions({ userId, isLocked, canImpersonate }) {
     const router = useRouter();
-    const [busy, setBusy] = useState(null); // action key currently running
+    const [busy, setBusy] = useState(null);
     const [msg, setMsg] = useState(null);
+    // { key, message, confirmLabel, tone, fn } — non-null while awaiting user confirmation.
+    const [pending, setPending] = useState(null);
 
-    const run = async (key, fn, confirmText) => {
+    const start = (key, fn, confirmDetails) => {
         if (busy) return;
-        if (confirmText && !window.confirm(confirmText)) return;
-        setBusy(key);
         setMsg(null);
+        if (confirmDetails) {
+            setPending({ key, fn, ...confirmDetails });
+        } else {
+            run(key, fn);
+        }
+    };
+
+    const run = async (key, fn) => {
+        setBusy(key);
         try {
             const res = await fn();
             if (res?.ok) {
@@ -37,42 +47,59 @@ export default function UserDetailActions({ userId, isLocked, canImpersonate }) 
         }
     };
 
+    const confirmPending = () => {
+        const p = pending;
+        setPending(null);
+        if (p) run(p.key, p.fn);
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end' }}>
                 <Btn
-                    onClick={() => run('lock', () => toggleUserLocked(userId, !isLocked),
-                        isLocked
+                    onClick={() => start('lock', () => toggleUserLocked(userId, !isLocked), {
+                        message: isLocked
                             ? 'Unlock this account and clear failed-attempt counters?'
-                            : 'Lock this account? The user won\'t be able to log in until you unlock or the window expires.')}
+                            : "Lock this account? The user won't be able to log in until you unlock or the window expires.",
+                        confirmLabel: isLocked ? 'Unlock' : 'Lock',
+                        tone: isLocked ? 'default' : 'danger',
+                    })}
                     busy={busy === 'lock'}
                 >
                     {isLocked ? 'Unlock account' : 'Lock account'}
                 </Btn>
                 <Btn
-                    onClick={() => run('logout', () => forceLogoutUser(userId),
-                        'Force-logout every active session for this user?')}
+                    onClick={() => start('logout', () => forceLogoutUser(userId), {
+                        message: 'Force-logout every active session for this user?',
+                        confirmLabel: 'Force logout',
+                        tone: 'danger',
+                    })}
                     busy={busy === 'logout'}
                 >
                     Force logout
                 </Btn>
                 <Btn
-                    onClick={() => run('reset2fa', () => resetUserTwoFactor(userId),
-                        'Clear this user\'s 2FA? They\'ll be forced to set it up again on next login.')}
+                    onClick={() => start('reset2fa', () => resetUserTwoFactor(userId), {
+                        message: "Clear this user's 2FA? They'll be forced to set it up again on next login.",
+                        confirmLabel: 'Reset 2FA',
+                        tone: 'danger',
+                    })}
                     busy={busy === 'reset2fa'}
                 >
                     Reset 2FA
                 </Btn>
                 <Btn
-                    onClick={() => run('sendreset', () => sendPasswordResetForUser(userId),
-                        'Email a password-reset link to this user?')}
+                    onClick={() => start('sendreset', () => sendPasswordResetForUser(userId), {
+                        message: 'Email a password-reset link to this user?',
+                        confirmLabel: 'Send',
+                    })}
                     busy={busy === 'sendreset'}
                 >
                     Send password reset
                 </Btn>
                 {canImpersonate && (
                     <Btn
-                        onClick={() => run('impersonate', () => impersonateUser(userId))}
+                        onClick={() => start('impersonate', () => impersonateUser(userId))}
                         busy={busy === 'impersonate'}
                         variant="primary"
                     >
@@ -86,6 +113,15 @@ export default function UserDetailActions({ userId, isLocked, canImpersonate }) 
                     color: msg.tone === 'good' ? '#4caf50' : '#f87171',
                 }}>{msg.text}</div>
             )}
+
+            <ConfirmModal
+                open={!!pending}
+                message={pending?.message}
+                confirmLabel={pending?.confirmLabel}
+                tone={pending?.tone}
+                onConfirm={confirmPending}
+                onCancel={() => setPending(null)}
+            />
         </div>
     );
 }

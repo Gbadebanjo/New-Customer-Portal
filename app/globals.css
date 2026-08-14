@@ -58,24 +58,59 @@ body {
   }
 }
 
+/* Slides the global top-progress bar across the viewport. Consumed by
+   <GlobalProgress /> in the root layout. */
+@keyframes ds-progress-slide {
+  0%   { transform: translateX(-60%); }
+  50%  { transform: translateX(70%);  }
+  100% { transform: translateX(200%); }
+}
+
 /* --- Consistent breadcrumb-header appearance across every screen ---
-   Every screen uses the module-scoped class `.header`, which Turbopack
-   compiles to `<file>-module__<hash>__header`. Two visual variants had
-   grown up in parallel — most screens had a plain padding-only header,
-   a handful (Customers, Dashboard, 404) had a bordered/background one.
-   Pull them all onto the same look: same font size, colour, padding,
-   subtle underline, family — with any nested <small> inheriting the
-   container size so the tag no longer changes visual weight.
-   `__headerTitle`, `__headerRight`, etc. are not matched because they
-   have suffix characters after "__header". */
-[class$="__header"],
-[class*="__header "] {
+   Every screen's top breadcrumb row uses the module-scoped class
+   `.header` (compiles to `<file>-module__<hash>__header`). Screens
+   had drifted apart: font sizes ranged from 14px to 0.85rem to
+   inherited, padding from `0 20px` to `10px 20px` to `5px 20px`,
+   some had a border-bottom + background + rounded top corners
+   (Customers, Dashboard, 404), others had none (Alerts, Settings,
+   TextTemplates, etc.).
+
+   The `body` prefix bumps this rule's specificity to (0,1,1) which
+   beats the (0,1,0) of the per-module `.header` class, so this always
+   wins the visual-consistency vocabulary (size, colour, padding,
+   underline, family). Per-module layout choices — `grid-area`,
+   `position: sticky`, `background-color`, `border-top-*-radius` — are
+   NOT declared here, so they still take effect where set. */
+body [class$="__header"],
+body [class*="__header "] {
   font-size: 14px;
   line-height: 1.4;
   color: var(--ds-text-muted, #b0b7bd);
   font-family: 'Kanit', sans-serif;
   padding: 10px 20px;
   border-bottom: 1px solid var(--ds-border-subtle, rgba(173, 216, 230, 0.1));
+}
+
+body [class$="__header"] small,
+body [class*="__header "] small {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* --- Centre every DaisyUI-styled dialog when it's open ---
+   Every alert / edit / create modal in the app is a native <dialog>
+   with `className="modal"` (some also add `.modalLayout` from
+   sharedModal.module.css). The .modalLayout class already sets
+   `align-items: safe center` (fixed earlier), but dialogs that use
+   only "modal" fall back to DaisyUI's defaults and land off-centre.
+   Force the same centred flex layout on every open dialog so the two
+   patterns behave identically. `safe center` falls back to top-align
+   for dialogs taller than the viewport, so nothing gets clipped. */
+dialog.modal[open] {
+  display: flex;
+  align-items: safe center;
+  justify-content: center;
 }
 
 /* --- Hide the browser-native password-reveal / clear icons ---

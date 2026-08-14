@@ -9,7 +9,7 @@ import { BsDashLg } from "react-icons/bs";
 import { getHistoricAsset } from '@/lib/controllers/historicalAssets/getHistoricalAsset';
 import getPlannedVsActualData from '@/lib/controllers/powerProductionPlanItem/getPlannedVsActualData';
 import PlannedVsActualChart from '../ui/charts/PlannedVsActualChart';
-import FullScreenLoader from '@/components/LoadingSkeleton/LoadingSkeleton';
+import FullScreenLoader from '@/components/ui/Loader/PageLoader';
 import BackButton from '@/components/ui/BackButton/BackButton';
 
 export default function 

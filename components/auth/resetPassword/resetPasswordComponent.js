@@ -100,6 +100,7 @@ function ResetPasswordComponent() {
                                 <ButtonDefault
                                     className="btn"
                                     buttonText={'Submit'}
+                                    loadingText={'Resetting…'}
                                     type="submit"
                                     loading={loading}
                                 />

@@ -196,38 +196,6 @@ const SupportActions = ({ menuItems, supportQueryCategories }) => {
             />
 
 
-            {/* {isDeleteModalOpen && (
-                <div className={styles.modalOverlay}>
-                    <div className="modal-box" style={{ background: '#0D202F', borderColor: '#0D202F' }}>
-                        <div className={classes.popUpHeader}></div>
-                        <div className="py-4">
-                            <form method="dialog">
-                                <div aria-labelledby="export-user-modal-tabs_0-tab" id="create-user-modal-tabs_0"
-                                    role="tabpanel">
-                                    <div>
-                                        <center>
-                                            <div><WarnCircleBigIcon /></div>
-                                            <div><h2 className="font-bold text-xl lg">Are you sure</h2></div>
-                                            <div><p>Are you sure you want to details this record?</p></div>
-                                            <div>
-                                                <div className={classes.buttonContainer}>
-                                                    <div style={{ marginRight: 5 }}>
-                                                        <ButtonWhite onClick={closeDeleteModal} />
-                                                    </div>
-                                                    <div style={{ marginLeft: 5 }}>
-                                                        <ButtonSaveSubmit buttonText={'Yes'} onClick={deleteSupportQuery} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </center>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )} */}
-
             {isCustomAlertModalOpen && (
                 <div className={styles.modalOverlay}>
                     <div className="modal-box" style={{ background: '#0D202F', borderColor: '#0D202F' }}>

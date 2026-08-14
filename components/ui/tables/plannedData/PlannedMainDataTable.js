@@ -69,11 +69,6 @@ export default function PlannedMainDataTable({ allPowerProductionPlans }) {
                     </div>
                 </div>
             </form>
-            <div className={classes.filterText}>
-                <span>
-                    Advanced Filters
-                </span>
-            </div>
             <main className={classes.mainContent}>
                     <table className={`table table-bordered ${classes.table}`}>
                         <thead>

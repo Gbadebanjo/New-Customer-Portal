@@ -4,22 +4,39 @@ import CopyRight from '@/components/ui/CopyRight/copyright';
 import InfoTooltip from '@/components/ui/InfoTooltip/InfoTooltip';
 import { getAdminAnalytics } from '@/lib/controllers/analytics/getAdminAnalytics';
 import { getRecentActivity } from '@/lib/controllers/analytics/getRecentActivity';
+import ActivityFeed from './ActivityFeed';
 
 function fmtNumber(n) {
     if (n == null) return '—';
     return new Intl.NumberFormat('en-US').format(n);
 }
 
-function fmtHours(h) {
-    if (h == null) return '—';
-    if (h < 1) return `${Math.round(h * 60)} min`;
-    if (h < 24) return `${Math.round(h * 10) / 10} hr`;
-    return `${Math.round((h / 24) * 10) / 10} d`;
+function fmtPercent(x) {
+    if (x == null) return '—';
+    return `${Math.round(x * 100)}%`;
 }
 
-function StatCard({ label, value, hint, tooltip }) {
+function fmtTimeAgo(iso) {
+    if (!iso) return 'Never';
+    const t = new Date(iso).getTime();
+    if (isNaN(t)) return 'Never';
+    const diff = Date.now() - t;
+    if (diff < 60_000) return 'just now';
+    const mins = Math.floor(diff / 60_000);
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days}d ago`;
+    return new Date(iso).toLocaleDateString();
+}
+
+function StatCard({ label, value, hint, tooltip, tone }) {
+    const toneClass = tone === 'danger' ? classes.statCardDanger
+        : tone === 'warn' ? classes.statCardWarn
+        : '';
     return (
-        <div className={classes.statCard}>
+        <div className={`${classes.statCard} ${toneClass}`}>
             <div className={classes.statLabel}>
                 {label}
                 {tooltip && <InfoTooltip title={label} placement="bottom">{tooltip}</InfoTooltip>}
@@ -30,7 +47,8 @@ function StatCard({ label, value, hint, tooltip }) {
     );
 }
 
-// Minimal inline SVG sparkline — no dependency, no client component needed.
+// Inline dependency-free sparkline. Chart libs would pull ~40kb + a
+// client bundle for what's a 40px trend line.
 function Sparkline({ data }) {
     if (!data || data.length === 0) {
         return <div className={classes.sparklineEmpty}>No data yet</div>;
@@ -54,56 +72,11 @@ function Sparkline({ data }) {
     );
 }
 
-function relTime(iso) {
-    if (!iso) return '';
-    const t = new Date(iso).getTime();
-    if (isNaN(t)) return '';
-    const diff = Date.now() - t;
-    if (diff < 60_000) return 'just now';
-    const mins = Math.floor(diff / 60_000);
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}d ago`;
-    return new Date(iso).toLocaleDateString();
-}
-
-function eventDot(outcome) {
-    const c = outcome === 'failed' ? '#ef4444'
-        : outcome === 'running' ? '#60a5fa'
-        : outcome === 'info' ? '#f4a742'
-        : '#4caf50';
-    return <span style={{
-        display: 'inline-block',
-        width: 8, height: 8,
-        borderRadius: '50%',
-        background: c,
-        flexShrink: 0,
-        marginTop: 6,
-    }} />;
-}
-
-function eventKindPill(kind) {
-    const map = {
-        audit:        { label: 'Audit',     bg: 'rgba(96,165,250,0.12)', color: '#60a5fa' },
-        cron:         { label: 'Cron',      bg: 'rgba(255,152,0,0.12)',  color: '#ff9800' },
-        notification: { label: 'Alert',     bg: 'rgba(255,125,112,0.12)',color: '#ff7d70' },
-    };
-    const c = map[kind] || { label: kind, bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.65)' };
-    return (
-        <span style={{
-            padding: '1px 8px',
-            borderRadius: 999,
-            background: c.bg,
-            color: c.color,
-            fontSize: '0.65rem',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
-        }}>{c.label}</span>
-    );
-}
+const KNOWN_CRON_LABELS = {
+    sync_asset_groups: 'Asset group sync',
+    ingest_daily: 'Daily ingestion',
+    notify_reports: 'Report-ready notifications',
+};
 
 export default async function AnalyticsScreen() {
     const [data, activity] = await Promise.all([
@@ -129,32 +102,149 @@ export default async function AnalyticsScreen() {
                         <StatCard
                             label="Total users"
                             value={fmtNumber(data.engagement.totalUsers)}
-                            hint="All registered accounts"
+                            hint={`${data.engagement.adminCount} admin · ${data.engagement.dcaCount} DCA · ${data.engagement.customerUserCount} customer`}
                         />
                         <StatCard
                             label="Active last 24h"
                             value={fmtNumber(data.engagement.activeUsers24h)}
-                            tooltip="Distinct users who logged in in the last 24 hours (from security logs)."
+                            tooltip="Distinct users who successfully logged in in the last 24 hours."
                         />
                         <StatCard
                             label="Active last 7d"
                             value={fmtNumber(data.engagement.activeUsers7d)}
-                            tooltip="Distinct users who logged in in the last 7 days."
                         />
                         <StatCard
                             label="Active last 30d"
                             value={fmtNumber(data.engagement.activeUsers30d)}
-                            tooltip="Distinct users who logged in in the last 30 days."
                         />
                     </div>
                     <div className={classes.trendCard}>
-                        <div className={classes.statLabel}>Logins — last 7 days</div>
+                        <div className={classes.statLabel}>Successful logins — last 7 days</div>
                         <Sparkline data={data.engagement.loginTrend} />
                     </div>
                 </section>
 
                 <section className={classes.section}>
-                    <h2 className={classes.sectionTitle}>NOC throughput</h2>
+                    <h2 className={classes.sectionTitle}>Live sessions</h2>
+                    <div className={classes.statGrid}>
+                        <StatCard
+                            label="Active sessions"
+                            value={fmtNumber(data.sessions.active)}
+                            hint="Non-expired session rows"
+                        />
+                        <StatCard
+                            label="Admin online"
+                            value={fmtNumber(data.sessions.admin)}
+                            tooltip="Distinct Daystar-role users with a live session."
+                        />
+                        <StatCard
+                            label="Customers online"
+                            value={fmtNumber(data.sessions.customer)}
+                        />
+                    </div>
+                </section>
+
+                <section className={classes.section}>
+                    <h2 className={classes.sectionTitle}>Security posture</h2>
+                    <div className={classes.statGrid}>
+                        <StatCard
+                            label="Failed logins (24h)"
+                            value={fmtNumber(data.security.failedLogins24h)}
+                            tone={data.security.failedLogins24h > 0 ? 'warn' : undefined}
+                            tooltip="LoginFailed + TwoFactorFailed + AccountLocked events in the last 24 hours."
+                        />
+                        <StatCard
+                            label="Locked accounts"
+                            value={fmtNumber(data.security.lockedAccounts)}
+                            tone={data.security.lockedAccounts > 0 ? 'danger' : undefined}
+                        />
+                        <StatCard
+                            label="Users without 2FA"
+                            value={fmtNumber(data.security.usersWithout2fa)}
+                            tone={data.security.usersWithout2fa > 0 ? 'warn' : undefined}
+                            tooltip="Accounts that haven't set up their authenticator app yet."
+                        />
+                        <StatCard
+                            label="Unverified accounts"
+                            value={fmtNumber(data.security.unverifiedUsers)}
+                            tooltip="Invited users who haven't completed their first login."
+                        />
+                    </div>
+                </section>
+
+                <section className={classes.section}>
+                    <h2 className={classes.sectionTitle}>Pipeline health</h2>
+                    <div className={classes.statGrid}>
+                        <StatCard
+                            label="Cron success (7d)"
+                            value={fmtPercent(data.pipeline.successRate7d)}
+                            hint={`${data.pipeline.runsLast7d} run${data.pipeline.runsLast7d === 1 ? '' : 's'}`}
+                            tone={data.pipeline.successRate7d != null && data.pipeline.successRate7d < 0.8 ? 'warn' : undefined}
+                        />
+                        <StatCard
+                            label="Last failure"
+                            value={data.pipeline.lastFailure ? fmtTimeAgo(data.pipeline.lastFailure.at) : 'None'}
+                            hint={data.pipeline.lastFailure?.kind || undefined}
+                            tone={data.pipeline.lastFailure ? 'danger' : undefined}
+                        />
+                    </div>
+                    <div className={classes.trendCard}>
+                        <div className={classes.statLabel}>Last successful run per job</div>
+                        <ul className={classes.topList}>
+                            {Object.keys(KNOWN_CRON_LABELS).map((kind) => (
+                                <li key={kind} className={classes.topListRow}>
+                                    <span>{KNOWN_CRON_LABELS[kind]}</span>
+                                    <span className={classes.topListCount}>
+                                        {fmtTimeAgo(data.pipeline.lastSuccesses[kind])}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </section>
+
+                <section className={classes.section}>
+                    <h2 className={classes.sectionTitle}>Fleet health</h2>
+                    <div className={classes.statGrid}>
+                        <StatCard
+                            label="Total customers"
+                            value={fmtNumber(data.fleet.totalCustomers)}
+                        />
+                        <StatCard
+                            label="Sites reporting today"
+                            value={fmtNumber(data.fleet.sitesReportingToday)}
+                            tooltip="Distinct sites with a report_data row ingested since UTC midnight."
+                        />
+                        <StatCard
+                            label="Reports pending approval"
+                            value={fmtNumber(data.fleet.reportsPendingApproval)}
+                            tone={data.fleet.reportsPendingApproval > 0 ? 'warn' : undefined}
+                            tooltip="Raw report_data rows awaiting NOC verification."
+                        />
+                        <StatCard
+                            label="Outstanding invitations"
+                            value={fmtNumber(data.fleet.outstandingInvitations)}
+                            tooltip="Users invited but who haven't set a password yet."
+                        />
+                    </div>
+                </section>
+
+                <section className={classes.section}>
+                    <h2 className={classes.sectionTitle}>Growth (7d)</h2>
+                    <div className={classes.statGrid}>
+                        <StatCard
+                            label="New users"
+                            value={fmtNumber(data.growth.newUsers7d)}
+                        />
+                        <StatCard
+                            label="New customers"
+                            value={fmtNumber(data.growth.newCustomers7d)}
+                        />
+                    </div>
+                </section>
+
+                <section className={classes.section}>
+                    <h2 className={classes.sectionTitle}>Support</h2>
                     <div className={classes.statGrid}>
                         <StatCard
                             label="Tickets created (30d)"
@@ -167,79 +257,14 @@ export default async function AnalyticsScreen() {
                         <StatCard
                             label="Open now"
                             value={fmtNumber(data.support.ticketsOpenNow)}
-                            hint="Everything not yet Resolved"
+                            tone={data.support.ticketsOpenNow > 0 ? 'warn' : undefined}
                         />
-                        <StatCard
-                            label="Median first response"
-                            value={fmtHours(data.support.medianResponseHours)}
-                            tooltip="Time from ticket creation to first NOC reply, across tickets created in the last 30 days."
-                        />
-                    </div>
-                </section>
-
-                <section className={classes.section}>
-                    <h2 className={classes.sectionTitle}>Fleet</h2>
-                    <div className={classes.statGrid}>
-                        <StatCard
-                            label="Total customers"
-                            value={fmtNumber(data.fleet.totalCustomers)}
-                        />
-                    </div>
-                    <div className={classes.trendCard}>
-                        <div className={classes.statLabel}>Top customers by user count</div>
-                        {data.fleet.topCustomers.length === 0 ? (
-                            <div className={classes.emptyRow}>No customer assignments yet.</div>
-                        ) : (
-                            <ul className={classes.topList}>
-                                {data.fleet.topCustomers.map((c) => (
-                                    <li key={c.customer} className={classes.topListRow}>
-                                        <span>{c.customer}</span>
-                                        <span className={classes.topListCount}>{c.count} user{c.count === 1 ? '' : 's'}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
                     </div>
                 </section>
 
                 <section className={classes.section}>
                     <h2 className={classes.sectionTitle}>Recent activity</h2>
-                    <div className={classes.trendCard}>
-                        {activity.events.length === 0 ? (
-                            <div className={classes.emptyRow}>No activity yet.</div>
-                        ) : (
-                            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                {activity.events.map((e) => (
-                                    <li key={e.id} style={{
-                                        display: 'flex',
-                                        gap: 10,
-                                        padding: '10px 12px',
-                                        borderRadius: 6,
-                                        background: 'rgba(255,255,255,0.02)',
-                                    }}>
-                                        {eventDot(e.outcome)}
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
-                                                {eventKindPill(e.kind)}
-                                                <strong style={{ fontSize: '0.86rem', color: '#e2e8f0' }}>{e.title}</strong>
-                                                <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#94a3b8' }}>{relTime(e.at)}</span>
-                                            </div>
-                                            {e.subtitle && (
-                                                <div style={{
-                                                    marginTop: 2,
-                                                    fontSize: '0.78rem',
-                                                    color: '#94a3b8',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap',
-                                                }}>{e.subtitle}</div>
-                                            )}
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
+                    <ActivityFeed initial={activity} />
                 </section>
 
             </div>

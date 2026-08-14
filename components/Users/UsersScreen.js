@@ -3,8 +3,6 @@ import HomeIcon from "@/components/ui/icons/HomeIcon";
 import Link from "next/link";
 import getAllUsers from "@/lib/controllers/users/getAllUsers";
 import CreateUsersComponent from "@/components/ui/modals/creates/createUsers/CreateUsersModal"
-// import getAllCustomers from "@/lib/controllers/customers/getAllCustomers";
-// import getCustomerById from "@/lib/controllers/customers/getCustomerById";
 import UsersMainDataTable from "@/components/ui/tables/users/UsersMainDataTable";
 import CopyRight from '../ui/CopyRight/copyright';
 import BackButton from '@/components/ui/BackButton/BackButton';

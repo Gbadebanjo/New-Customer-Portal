@@ -202,6 +202,7 @@ function LoginScreen() {
                                         <ButtonDefault
                                             className="btn"
                                             buttonText={'Login'}
+                                            loadingText={'Signing in…'}
                                             type="submit"
                                             loading={isPending}
                                         />
@@ -231,6 +232,7 @@ function LoginScreen() {
                                         />
                                         <ButtonDefault
                                             buttonText={'Verify'}
+                                            loadingText={'Verifying…'}
                                             type="submit"
                                             loading={isVerifying}
                                         />
@@ -301,6 +303,7 @@ function LoginScreen() {
                                         )}
                                         <ButtonDefault
                                             buttonText={'Enable & Sign in'}
+                                            loadingText={'Enabling…'}
                                             type="submit"
                                             loading={setupLoading}
                                         />

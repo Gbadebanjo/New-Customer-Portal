@@ -144,3 +144,169 @@
     color: var(--ds-text-hint, rgba(255,255,255,0.55));
     font-size: 0.82rem;
 }
+
+.statCardWarn {
+    border-color: rgba(244,167,66,0.35);
+    background: rgba(244,167,66,0.06);
+}
+
+.statCardDanger {
+    border-color: rgba(239,68,68,0.35);
+    background: rgba(239,68,68,0.06);
+}
+
+.feedControls {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.feedChips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.feedChip {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+}
+
+.feedChip:hover:not(:disabled) {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+}
+
+.feedChip:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.feedChipActive {
+    background: rgba(255,125,112,0.14);
+    border-color: rgba(255,125,112,0.5);
+    color: #ff9770;
+}
+
+.feedSearch {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 0.82rem;
+    min-width: 220px;
+    outline: none;
+}
+
+.feedSearch:focus {
+    border-color: rgba(255,125,112,0.5);
+}
+
+.feedSearch:disabled {
+    opacity: 0.5;
+}
+
+.feedList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.feedItem {
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+}
+
+.feedItem:hover {
+    background: rgba(255,255,255,0.04);
+}
+
+.feedDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.feedBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.feedHeader {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.feedPill {
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.feedTitle {
+    font-size: 0.86rem;
+    color: #e2e8f0;
+}
+
+.feedTime {
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.feedSubtitle {
+    margin-top: 2px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.loadMoreBtn {
+    align-self: center;
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: rgba(255,125,112,0.1);
+    border: 1px solid rgba(255,125,112,0.35);
+    color: #ff9770;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+    background: rgba(255,125,112,0.18);
+}
+
+.loadMoreBtn:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
