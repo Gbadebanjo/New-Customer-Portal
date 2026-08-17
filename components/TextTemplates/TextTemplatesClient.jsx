@@ -29,28 +29,38 @@ export default function TextTemplatesClient({ textTemplates, recipients = [] }) 
 
     return (
         <>
-            {/* Search + New Template */}
-            <div className={classes.searchArea} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input
-                    type="text"
-                    className={classes.inputText}
-                    placeholder="Search templates..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+            {/* Actions bar — counts summary + primary CTA. Mirrors the
+                layout on API Keys so admin screens read as one system. */}
+            <div className={classes.actionsBar}>
+                <div className={classes.countsSummary}>
+                    <span className={classes.countChip}>
+                        <strong>{textTemplates.length}</strong> template{textTemplates.length === 1 ? '' : 's'}
+                    </span>
+                    {search && (
+                        <span className={classes.countChipMuted}>
+                            <strong>{filtered.length}</strong> match{filtered.length === 1 ? '' : 'es'}
+                        </span>
+                    )}
+                </div>
                 <button
                     type="button"
+                    className={classes.primaryBtn}
                     onClick={() => setCreateOpen(true)}
                     title="Create a new email template"
-                    style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                        padding: '10px 16px', background: '#ff7d70', border: 'none',
-                        color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600,
-                        cursor: 'pointer', flexShrink: 0,
-                    }}
                 >
                     <MdAdd size={18} /> New Template
                 </button>
+            </div>
+
+            {/* Search */}
+            <div className={classes.searchArea}>
+                <input
+                    type="text"
+                    className={classes.inputText}
+                    placeholder="Search templates by name…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
             </div>
 
             {/* Card grid */}
@@ -87,7 +97,14 @@ export default function TextTemplatesClient({ textTemplates, recipients = [] }) 
             ) : (
                 <div className={classes.emptyState}>
                     <MdEmail size={48} color="#b0b7bd" />
-                    <p>No templates found.</p>
+                    <p className={classes.emptyTitle}>
+                        {search ? 'No templates match your search' : 'No templates yet'}
+                    </p>
+                    <p className={classes.emptyHint}>
+                        {search
+                            ? `Try a different name — nothing matched "${search}".`
+                            : 'Create your first template to reuse it across emails.'}
+                    </p>
                 </div>
             )}
 

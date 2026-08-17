@@ -4,6 +4,19 @@ import BackButton from '@/components/ui/BackButton/BackButton';
 import UserDetailActions from './UserDetailActions';
 import ActivityTimeline from './ActivityTimeline';
 import SessionsList from './SessionsList';
+import { displayTimezone } from '@/lib/utils/timezone';
+
+// A value counts as "empty" for display when it's null/undefined, an
+// empty/whitespace string, or one of the sentinel strings we know
+// legacy rows have leaked ('undefined', 'null'). Anything else prints
+// as-is; the Field component falls back to '—' when this returns null.
+function displayValue(v) {
+    if (v == null) return null;
+    const s = String(v).trim();
+    if (!s) return null;
+    if (s === 'undefined' || s === 'null') return null;
+    return s;
+}
 
 // Formats a role list for display; falls back to "—" when empty.
 function rolesLabel(user) {
@@ -38,10 +51,11 @@ function StatPill({ label, value, tone = 'neutral' }) {
 }
 
 function Field({ label, value }) {
+    const clean = displayValue(value);
     return (
         <div>
             <div style={{ fontSize: 11, color: '#7c8796', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 4 }}>{label}</div>
-            <div style={{ fontSize: 14, color: '#e1e7ed', wordBreak: 'break-word' }}>{value || '—'}</div>
+            <div style={{ fontSize: 14, color: '#e1e7ed', wordBreak: 'break-word' }}>{clean || '—'}</div>
         </div>
     );
 }
@@ -108,7 +122,7 @@ export default async function UserDetailScreen({ user, activity, sessions, faile
                         <Field label="Username" value={user.username} />
                         <Field label="Phone" value={user.phone_number} />
                         <Field label="Customer ID" value={user.customer} />
-                        <Field label="Timezone" value={user.timezone} />
+                        <Field label="Timezone" value={displayTimezone(user.timezone)} />
                         <Field label="Failed logins" value={`${failedLoginCount} in last ${failedLoginWindowDays} days`} />
                         <Field label="Active sessions" value={String(activeSessionCount)} />
                         <Field label="Created" value={user.created_at ? new Date(user.created_at).toLocaleString() : (user.creation_time ? new Date(user.creation_time).toLocaleString() : '—')} />

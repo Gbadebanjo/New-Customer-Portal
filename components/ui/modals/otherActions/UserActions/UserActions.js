@@ -14,6 +14,10 @@ import getUserById from "@/lib/controllers/users/getUserById";
 import deleteUserById from "@/lib/controllers/users/deleteUserById";
 import updateUserById from "@/lib/controllers/users/updateUserById";
 import { AllTimezones } from "@/utils/constants";
+
+// `AllTimezones` entries are `{ id, name: 'Africa/Lagos (UTC+1)' }`. Strip
+// the `(UTC±N)` display suffix to get the IANA identifier we store.
+const ianaFromLabel = (label) => (label || '').replace(/\s*\([^)]*\)\s*$/, '');
 import { RiSettings5Fill } from "react-icons/ri";
 import { impersonateUser } from "@/lib/auth/impersonationActions";
 
@@ -37,7 +41,7 @@ const UserActions = ({ menuItems, customers }) => {
     const [existingUserObject, setExistingUserObject] = useState(null);
 
     const [activeTab, setActiveTab] = useState('userInfo');
-    const [selectedTimezone, setSelectedTimezone] = useState(AllTimezones[0]);
+    const [selectedTimezone, setSelectedTimezone] = useState('Africa/Lagos');
     const [selectedCustomer, setSelectedCustomer] = useState('');
     // A user has exactly one role. Kept as a single string to match the
     // create-user modal's radio-group pattern. Multi-checkbox was the
@@ -245,7 +249,7 @@ const UserActions = ({ menuItems, customers }) => {
             setName('');
             setSurname('');
             setSelectedCustomer('');
-            setSelectedTimezone(AllTimezones[0]);
+            setSelectedTimezone('Africa/Lagos');
             setRoles('');
             setIsLockedOut(false);
             setNotActive(false);
@@ -359,7 +363,7 @@ const UserActions = ({ menuItems, customers }) => {
                                         <option value="Africa/Lagos">Africa/Lagos</option>
                                         <option disabled value="">-None-</option>
                                         {AllTimezones.map(tz => (
-                                            <option key={tz.id} value={tz.id}>{tz.name}</option>
+                                            <option key={tz.id} value={ianaFromLabel(tz.name)}>{tz.name}</option>
                                         ))}
                                     </select>
                                 </label>

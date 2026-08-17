@@ -15,19 +15,24 @@ export default async function ApiKeysScreen() {
     return (
         <div className={classes.content}>
             <PageHeader crumbs={['Admin', 'API keys']} />
-            <div className={classes.topCenter}>
-                <p className={classes.title}>
-                    API keys
-                    <a href="/docs/api" target="_blank" rel="noopener" className={classes.docsLink}>
+            <header className={classes.pageHeader}>
+                <div className={classes.pageHeaderRow}>
+                    <h1 className={classes.title}>API keys</h1>
+                    <a
+                        href="/docs/api"
+                        target="_blank"
+                        rel="noopener"
+                        className={classes.docsLink}
+                    >
                         View API documentation ↗
                     </a>
-                </p>
+                </div>
                 <p className={classes.subtitle}>
                     Manage keys used to access the public Cleaned Data API.
                     Customer-scoped keys only see one customer&rsquo;s data;
                     fleet-scoped keys can query every customer.
                 </p>
-            </div>
+            </header>
 
             <div className={classes.centerContent}>
                 <ApiKeysClient

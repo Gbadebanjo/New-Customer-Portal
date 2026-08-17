@@ -27,31 +27,12 @@ function fmtWhen(iso) {
     return d.toLocaleString();
 }
 
-function statusStyle(status) {
-    switch (status) {
-        case 'ok':      return { bg: 'rgba(76,175,80,0.15)',  border: 'rgba(76,175,80,0.45)',  color: '#4caf50' };
-        case 'failed':  return { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.45)',  color: '#ef4444' };
-        case 'running': return { bg: 'rgba(96,165,250,0.15)', border: 'rgba(96,165,250,0.45)', color: '#60a5fa' };
-        default:        return { bg: 'rgba(200,200,200,0.12)', border: 'rgba(200,200,200,0.35)', color: '#888' };
-    }
-}
-
 function StatusPill({ status }) {
-    const s = statusStyle(status);
-    return (
-        <span style={{
-            display: 'inline-block',
-            padding: '2px 10px',
-            borderRadius: 999,
-            background: s.bg,
-            border: `1px solid ${s.border}`,
-            color: s.color,
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.03em',
-        }}>{status || 'never run'}</span>
-    );
+    const cls = status === 'ok' ? classes.pillOk
+        : status === 'failed' ? classes.pillFailed
+        : status === 'running' ? classes.pillRunning
+        : classes.pillNever;
+    return <span className={`${classes.statusPill} ${cls}`}>{status || 'never run'}</span>;
 }
 
 export default function CronCard({ cron }) {
@@ -81,11 +62,11 @@ export default function CronCard({ cron }) {
     return (
         <div className={classes.card}>
             <div className={classes.cardHeader}>
-                <div style={{ minWidth: 0 }}>
+                <div className={classes.cardHeaderMain}>
                     <h3 className={classes.cardTitle}>{cron.label}</h3>
                     <p className={classes.cardDescription}>{cron.description}</p>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+                <div className={classes.cardHeaderAside}>
                     <StatusPill status={lr?.status} />
                     <button
                         type="button"
@@ -113,7 +94,7 @@ export default function CronCard({ cron }) {
                 </div>
                 <div>
                     <div className={classes.metricLabel}>Failed (30d)</div>
-                    <div className={classes.metricValue} style={{ color: cron.failuresLast30d > 0 ? '#ef4444' : undefined }}>
+                    <div className={cron.failuresLast30d > 0 ? classes.metricValueAlert : classes.metricValue}>
                         {cron.failuresLast30d}
                     </div>
                 </div>
@@ -124,53 +105,57 @@ export default function CronCard({ cron }) {
             </div>
 
             {(msg || err) && (
-                <div style={{ marginTop: 8, fontSize: '0.8rem', color: err ? '#ef4444' : '#4caf50' }}>
+                <div className={err ? classes.flashError : classes.flashSuccess}>
                     {err || msg}
                 </div>
             )}
 
             {lr?.error_text && (
                 <details className={classes.details}>
-                    <summary style={{ color: '#ef4444', cursor: 'pointer' }}>Last error</summary>
+                    <summary className={classes.summaryDanger}>Last error</summary>
                     <pre className={classes.pre}>{lr.error_text}</pre>
                 </details>
             )}
 
             {lr?.summary && (
                 <details className={classes.details}>
-                    <summary style={{ cursor: 'pointer' }}>Last summary</summary>
+                    <summary className={classes.summary}>Last summary</summary>
                     <pre className={classes.pre}>{JSON.stringify(lr.summary, null, 2)}</pre>
                 </details>
             )}
 
             {cron.recentRuns && cron.recentRuns.length > 1 && (
                 <details className={classes.details}>
-                    <summary style={{ cursor: 'pointer' }}>Recent runs ({cron.recentRuns.length})</summary>
-                    <table className={classes.recentTable}>
-                        <thead>
-                            <tr>
-                                <th>Started</th>
-                                <th>Status</th>
-                                <th>Duration</th>
-                                <th>Triggered by</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cron.recentRuns.map((r) => {
-                                const dur = r.finished_at && r.started_at
-                                    ? new Date(r.finished_at).getTime() - new Date(r.started_at).getTime()
-                                    : null;
-                                return (
-                                    <tr key={r.id}>
-                                        <td>{fmtWhen(r.started_at)}</td>
-                                        <td><StatusPill status={r.status} /></td>
-                                        <td>{fmtDuration(dur)}</td>
-                                        <td>{r.triggered_by_user_id ? 'manual' : 'scheduled'}</td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                    <summary className={classes.summary}>
+                        Recent runs ({cron.recentRuns.length})
+                    </summary>
+                    <div className={classes.recentTableWrap}>
+                        <table className={classes.recentTable}>
+                            <thead>
+                                <tr>
+                                    <th>Started</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Triggered by</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {cron.recentRuns.map((r) => {
+                                    const dur = r.finished_at && r.started_at
+                                        ? new Date(r.finished_at).getTime() - new Date(r.started_at).getTime()
+                                        : null;
+                                    return (
+                                        <tr key={r.id}>
+                                            <td>{fmtWhen(r.started_at)}</td>
+                                            <td><StatusPill status={r.status} /></td>
+                                            <td>{fmtDuration(dur)}</td>
+                                            <td>{r.triggered_by_user_id ? 'manual' : 'scheduled'}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </details>
             )}
         </div>

@@ -25,21 +25,29 @@ export default async function TextTemplatesScreen() {
 
     return (
         <div className={classes.content}>
-            {/* Breadcrumb Header */}
-            <div className={classes.header}>
-                <span>
-                    <Link href='/dashboard'>
-                        <HomeIcon />
-                    </Link>
-                </span>
-                <span><small> | &nbsp; Admin &nbsp; | &nbsp; Text Templates</small></span>
-                <BackButton />
-            </div>
+            {/* Breadcrumb */}
+            <nav className={classes.header} aria-label="Breadcrumb">
+                <Link href="/dashboard" className={classes.crumbHome}>
+                    <HomeIcon />
+                </Link>
+                <span className={classes.crumbSep}>|</span>
+                <span className={classes.crumbMuted}>Admin</span>
+                <span className={classes.crumbSep}>|</span>
+                <span className={classes.crumbCurrent}>Text Templates</span>
+                <span className={classes.crumbBack}><BackButton /></span>
+            </nav>
 
-            {/* Page Title */}
-            <div className={classes.topCenter}>
-                <p className={classes.title}>Text Templates</p>
-            </div>
+            {/* Page header — title, subtitle */}
+            <header className={classes.pageHeader}>
+                <div className={classes.pageHeaderRow}>
+                    <h1 className={classes.title}>Text Templates</h1>
+                </div>
+                <p className={classes.subtitle}>
+                    Reusable email templates the app sends on your behalf — invitations,
+                    password resets, report-ready notices, and any custom messages you
+                    compose from here.
+                </p>
+            </header>
 
             {/* Client component handles search + card grid */}
             <div className={classes.centerContent}>

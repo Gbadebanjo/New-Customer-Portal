@@ -271,16 +271,6 @@ export default function Navbar({
               </li>
               <li className={classes.innerMenuItem}>
                 <Link
-                  href="/admin/customer-mapping"
-                  onClick={closeAdminOnLeafClick}
-                  className={subItemClass(path.startsWith("/admin/customer-mapping"))}
-                >
-                  <span className={classes.icon}><CustomerIcon /></span>
-                  <span className={classes.label}>Customer Mapping</span>
-                </Link>
-              </li>
-              <li className={classes.innerMenuItem}>
-                <Link
                   href="/admin/cron-health"
                   onClick={closeAdminOnLeafClick}
                   className={subItemClass(path.startsWith("/admin/cron-health"))}

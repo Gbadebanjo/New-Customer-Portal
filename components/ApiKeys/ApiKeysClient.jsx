@@ -121,8 +121,13 @@ export default function ApiKeysClient({ initialKeys, customers }) {
     return (
         <>
             <div className={classes.actionsBar}>
-                <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}>
-                    {activeKeys.length} active · {revokedKeys.length} revoked
+                <div className={classes.countsSummary}>
+                    <span className={classes.countChip}>
+                        <strong>{activeKeys.length}</strong> active
+                    </span>
+                    <span className={classes.countChipMuted}>
+                        <strong>{revokedKeys.length}</strong> revoked
+                    </span>
                 </div>
                 <button type="button" className={classes.primaryBtn} onClick={openNew} disabled={pending}>
                     + Generate new key
@@ -130,7 +135,7 @@ export default function ApiKeysClient({ initialKeys, customers }) {
             </div>
 
             {(msg || err) && (
-                <div style={{ margin: '8px 0', fontSize: '0.85rem', color: err ? '#ef4444' : '#4caf50' }}>
+                <div className={err ? classes.flashError : classes.flashSuccess}>
                     {err || msg}
                 </div>
             )}
@@ -191,7 +196,7 @@ export default function ApiKeysClient({ initialKeys, customers }) {
                             </label>
                         )}
 
-                        {err && <div style={{ color: '#ef4444', fontSize: '0.82rem', marginTop: 4 }}>{err}</div>}
+                        {err && <div className={classes.flashError}>{err}</div>}
 
                         <div className={classes.modalFooter}>
                             <button type="button" className={classes.ghostBtn} onClick={() => setModal(null)} disabled={creating}>
@@ -210,33 +215,27 @@ export default function ApiKeysClient({ initialKeys, customers }) {
                 <div className={classes.modalOverlay}>
                     <div className={classes.modal}>
                         <h3 className={classes.modalTitle}>Copy the key now</h3>
-                        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.88rem', margin: '0 0 12px' }}>
+                        <p className={classes.modalLead}>
                             This is the only time you&rsquo;ll see it. If you lose it, generate a new one.
                         </p>
                         <div className={classes.keyDisplay}>
                             <code>{reveal.key}</code>
                             <button type="button" className={classes.smallBtn} onClick={() => copyKey(reveal.key)}>Copy key</button>
                         </div>
-                        <div style={{ marginTop: 6, color: 'rgba(255,255,255,0.55)', fontSize: '0.78rem' }}>
-                            Label: <strong>{reveal.row.label}</strong> · Scope: {reveal.row.scope === 'fleet' ? 'Fleet-wide' : `Customer ${reveal.row.customerId?.slice(0, 8) || ''}`}
+                        <div className={classes.keyMeta}>
+                            <span>Label</span>
+                            <strong>{reveal.row.label}</strong>
+                            <span>Scope</span>
+                            <strong>
+                                {reveal.row.scope === 'fleet'
+                                    ? 'Fleet-wide'
+                                    : `Customer ${reveal.row.customerId?.slice(0, 8) || ''}`}
+                            </strong>
                         </div>
 
-                        <div style={{
-                            marginTop: 14,
-                            padding: '10px 12px',
-                            background: 'rgba(96,165,250,0.06)',
-                            border: '1px solid rgba(96,165,250,0.25)',
-                            borderRadius: 8,
-                            fontSize: '0.8rem',
-                            color: 'rgba(255,255,255,0.75)',
-                        }}>
+                        <div className={classes.infoPanel}>
                             Share this key with the consumer alongside the docs at{' '}
-                            <a
-                                href="/docs/api"
-                                target="_blank"
-                                rel="noopener"
-                                style={{ color: '#60a5fa', textDecoration: 'underline' }}
-                            >
+                            <a href="/docs/api" target="_blank" rel="noopener" className={classes.inlineLink}>
                                 /docs/api
                             </a>
                             . Or click below to copy a ready-made welcome message.
@@ -278,16 +277,16 @@ export default function ApiKeysClient({ initialKeys, customers }) {
 
 function Section({ title, children }) {
     return (
-        <div style={{ marginTop: 20 }}>
-            <div className={classes.sectionTitle}>{title}</div>
+        <section className={classes.tableSection}>
+            <h2 className={classes.sectionTitle}>{title}</h2>
             {children}
-        </div>
+        </section>
     );
 }
 
 function KeyTable({ rows, customers, onRevoke }) {
     return (
-        <div style={{ overflowX: 'auto' }}>
+        <div className={classes.tableWrap}>
             <table className={classes.table}>
                 <thead>
                     <tr>
@@ -301,14 +300,14 @@ function KeyTable({ rows, customers, onRevoke }) {
                 </thead>
                 <tbody>
                     {rows.map((k) => (
-                        <tr key={k.id} style={{ opacity: k.revokedAt ? 0.55 : 1 }}>
+                        <tr key={k.id} className={k.revokedAt ? classes.rowRevoked : ''}>
                             <td>{k.label}</td>
-                            <td><code style={{ fontSize: '0.75rem' }}>{k.keyPrefix}…</code></td>
+                            <td><code className={classes.keyPrefix}>{k.keyPrefix}…</code></td>
                             <td>{scopeLabel(k, customers)}</td>
                             <td>{fmtDate(k.createdAt)}</td>
                             <td>{fmtDate(k.lastUsedAt)}</td>
                             {onRevoke && (
-                                <td style={{ textAlign: 'right' }}>
+                                <td className={classes.actionCell}>
                                     <button
                                         type="button"
                                         className={classes.dangerBtn}

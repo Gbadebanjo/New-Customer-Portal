@@ -5,25 +5,104 @@
     min-height: 100vh;
 }
 
-.topCenter {
+/* ── Page header — same shape as API Keys / Text Templates ─── */
+.pageHeader {
     padding: 0 20px;
-    margin: 15px 30px 0;
+    margin: 20px 30px 0;
+}
+
+.pageHeaderRow {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .title {
     color: white;
-    font-size: 27px !important;
+    font-size: 1.7rem;
     font-weight: 500;
     line-height: 1.2;
     margin: 0;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: 0.01em;
 }
 
 .subtitle {
-    color: rgba(255,255,255,0.5);
-    font-size: 0.85rem;
-    margin: 4px 0 0;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin: 8px 0 0;
+    max-width: 780px;
 }
 
+/* ── Actions bar — counts summary chips ─────────────────────── */
+.actionsBar {
+    margin: 18px 30px 0;
+    padding: 0 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.countsSummary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.countChip,
+.countChipHealthy,
+.countChipFailing,
+.countChipRunning,
+.countChipMuted {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
+
+.countChip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.65);
+}
+.countChip strong {
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+}
+
+.countChipHealthy {
+    background: rgba(76,175,80,0.10);
+    border: 1px solid rgba(76,175,80,0.28);
+    color: #a7d3aa;
+}
+.countChipHealthy strong { color: #4caf50; font-weight: 700; }
+
+.countChipFailing {
+    background: rgba(239,68,68,0.10);
+    border: 1px solid rgba(239,68,68,0.32);
+    color: #f7a4a4;
+}
+.countChipFailing strong { color: #ef4444; font-weight: 700; }
+
+.countChipRunning {
+    background: rgba(96,165,250,0.10);
+    border: 1px solid rgba(96,165,250,0.32);
+    color: #a8c9f6;
+}
+.countChipRunning strong { color: #60a5fa; font-weight: 700; }
+
+.countChipMuted {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+}
+.countChipMuted strong { color: rgba(255,255,255,0.75); font-weight: 700; }
+
+/* ── Card list ──────────────────────────────────────────────── */
 .centerContent {
     margin: 16px 20px 75px;
     display: flex;
@@ -35,7 +114,7 @@
     background: #0D2638;
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 12px;
-    padding: 18px 20px;
+    padding: 18px 22px;
     color: #cbd5e1;
 }
 
@@ -47,17 +126,33 @@
     flex-wrap: wrap;
 }
 
+.cardHeaderMain {
+    min-width: 0;
+    flex: 1;
+}
+
+.cardHeaderAside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .cardTitle {
     color: white;
     font-size: 1.05rem;
     font-weight: 600;
     margin: 0;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: 0.01em;
 }
 
 .cardDescription {
     color: rgba(255,255,255,0.6);
-    font-size: 0.82rem;
-    margin: 4px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin: 6px 0 0;
     max-width: 700px;
 }
 
@@ -82,6 +177,43 @@
     cursor: not-allowed;
 }
 
+/* ── Status pill (used in the header + recent-runs table) ─── */
+.statusPill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.pillOk {
+    background: rgba(76,175,80,0.14);
+    border: 1px solid rgba(76,175,80,0.4);
+    color: #4caf50;
+}
+
+.pillFailed {
+    background: rgba(239,68,68,0.14);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: #ef4444;
+}
+
+.pillRunning {
+    background: rgba(96,165,250,0.14);
+    border: 1px solid rgba(96,165,250,0.4);
+    color: #60a5fa;
+}
+
+.pillNever {
+    background: rgba(200,200,200,0.1);
+    border: 1px solid rgba(200,200,200,0.3);
+    color: #888;
+}
+
+/* ── Metrics row ────────────────────────────────────────────── */
 .metricsRow {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -99,21 +231,58 @@
     margin-bottom: 4px;
 }
 
-.metricValue {
+.metricValue,
+.metricValueAlert {
     color: #fff;
     font-size: 1rem;
     font-weight: 600;
     font-family: 'Kanit', sans-serif;
 }
 
-.details {
+.metricValueAlert {
+    color: #ef4444;
+}
+
+/* ── Flash line for run-now feedback ────────────────────────── */
+.flashSuccess,
+.flashError {
     margin-top: 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.flashSuccess { color: #4caf50; }
+.flashError { color: #ef4444; }
+
+/* ── Collapsible details (Last error / Last summary / Recent) ─ */
+.details {
+    margin-top: 12px;
     font-size: 0.82rem;
 }
 
-.details summary {
+.summary,
+.summaryDanger {
+    padding: 6px 0;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    user-select: none;
+}
+
+.summary {
     color: rgba(255,255,255,0.7);
-    padding: 4px 0;
+}
+
+.summary:hover {
+    color: #fff;
+}
+
+.summaryDanger {
+    color: #ef4444;
+}
+
+.summaryDanger:hover {
+    color: #f87171;
 }
 
 .pre {
@@ -131,19 +300,26 @@
     margin: 6px 0 0;
 }
 
+/* ── Recent-runs table ──────────────────────────────────────── */
+.recentTableWrap {
+    overflow-x: auto;
+    margin-top: 6px;
+}
+
 .recentTable {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 8px;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
 }
 
 .recentTable th,
 .recentTable td {
-    padding: 6px 10px;
+    padding: 8px 12px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     text-align: left;
     color: #cbd5e1;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .recentTable th {
@@ -151,5 +327,5 @@
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.7rem;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
 }

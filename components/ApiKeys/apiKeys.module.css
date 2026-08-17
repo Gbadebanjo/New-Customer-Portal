@@ -5,29 +5,35 @@
     min-height: 100vh;
 }
 
-.topCenter {
+/* Page header — title + docs link on one row, subtitle underneath. */
+.pageHeader {
     padding: 0 20px;
-    margin: 15px 30px 0;
+    margin: 20px 30px 0;
 }
 
-.title {
-    color: white;
-    font-size: 27px !important;
-    font-weight: 500;
-    line-height: 1.2;
-    margin: 0;
+.pageHeaderRow {
     display: flex;
     align-items: baseline;
     gap: 16px;
     flex-wrap: wrap;
 }
 
+.title {
+    color: white;
+    font-size: 1.7rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: 0.01em;
+}
+
 .docsLink {
     color: var(--ds-accent, #ff7d70);
     font-size: 0.82rem;
-    font-weight: 500;
+    font-weight: 600;
     text-decoration: none;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border: 1px solid rgba(255,125,112,0.35);
     border-radius: 999px;
     transition: background 0.15s;
@@ -38,28 +44,69 @@
 }
 
 .subtitle {
-    color: rgba(255,255,255,0.55);
-    font-size: 0.85rem;
-    margin: 4px 0 0;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin: 8px 0 0;
     max-width: 780px;
 }
 
 .centerContent {
-    margin: 16px 20px 75px;
+    margin: 20px 20px 75px;
     background: #0D2638;
     border-radius: 12px;
-    padding: 20px 22px;
+    padding: 22px 24px;
     color: #cbd5e1;
 }
 
+/* Top actions bar — counts summary on the left, primary CTA on the right. */
 .actionsBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    padding-bottom: 12px;
+    padding-bottom: 14px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.countsSummary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.countChip,
+.countChipMuted {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
+
+.countChip {
+    background: rgba(76,175,80,0.10);
+    border: 1px solid rgba(76,175,80,0.28);
+    color: #a7d3aa;
+}
+
+.countChip strong {
+    color: #4caf50;
+    font-weight: 700;
+}
+
+.countChipMuted {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.55);
+}
+
+.countChipMuted strong {
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
 }
 
 .primaryBtn {
@@ -116,13 +163,33 @@
     flex-shrink: 0;
 }
 
+/* Inline flash text below the actions bar. */
+.flashSuccess,
+.flashError {
+    margin: 10px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.flashSuccess { color: #4caf50; }
+.flashError { color: #ef4444; }
+
+/* Section — Active / Revoked lists. Larger, more legible section title. */
+.tableSection {
+    margin-top: 22px;
+}
+
 .sectionTitle {
-    color: rgba(255,255,255,0.6);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 700;
-    margin: 0 0 8px;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    margin: 0 0 10px;
+    font-family: 'Kanit', sans-serif;
+}
+
+.tableWrap {
+    overflow-x: auto;
 }
 
 .table {
@@ -132,28 +199,49 @@
     color: #cbd5e1;
 }
 
-.table th, .table td {
+.table th,
+.table td {
     padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     white-space: nowrap;
+    vertical-align: middle;
 }
 
 .table th {
     color: rgba(255,255,255,0.55);
     text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.04em;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.rowRevoked {
+    opacity: 0.55;
+}
+
+.actionCell {
+    text-align: right;
+}
+
+.keyPrefix {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.03);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .empty {
     color: rgba(255,255,255,0.4);
     font-style: italic;
-    padding: 20px 0;
+    padding: 22px 0;
     text-align: center;
     font-size: 0.9rem;
 }
 
+/* Modal shell. */
 .modalOverlay {
     position: fixed;
     inset: 0;
@@ -169,7 +257,7 @@
     background: #0D2638;
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px;
-    padding: 20px 22px;
+    padding: 22px 24px;
     width: 100%;
     max-width: 520px;
     color: #cbd5e1;
@@ -177,16 +265,25 @@
 
 .modalTitle {
     color: white;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    margin: 0 0 8px;
+    margin: 0 0 6px;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: 0.01em;
+}
+
+.modalLead {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 0 0 14px;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin: 12px 0;
+    gap: 5px;
+    margin: 14px 0;
 }
 
 .field > span {
@@ -197,7 +294,8 @@
     font-weight: 600;
 }
 
-.field input, .field select {
+.field input,
+.field select {
     background: rgba(0,0,0,0.35);
     border: 1px solid rgba(255,255,255,0.12);
     color: #fff;
@@ -210,7 +308,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 18px;
+    margin-top: 20px;
 }
 
 .keyDisplay {
@@ -232,4 +330,46 @@
     white-space: nowrap;
     flex: 1;
     min-width: 0;
+}
+
+/* Meta below the revealed key — Label / Scope label + value pairs. */
+.keyMeta {
+    display: grid;
+    grid-template-columns: auto 1fr auto 1fr;
+    gap: 4px 10px;
+    margin-top: 10px;
+    font-size: 0.78rem;
+}
+
+.keyMeta span {
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.keyMeta strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Callout inside the reveal modal explaining how to hand the key over. */
+.infoPanel {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: rgba(96,165,250,0.06);
+    border: 1px solid rgba(96,165,250,0.25);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.78);
+}
+
+.inlineLink {
+    color: #60a5fa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.inlineLink:hover {
+    color: #93c5fd;
 }

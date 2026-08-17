@@ -265,10 +265,6 @@ export default function SettingsClient({ initialSettings }) {
                             <input style={inputStyle} type="number" min={1} max={365} value={s.inviteExpiryDays ?? 30} onChange={(e) => update('security', 'inviteExpiryDays', parseInt(e.target.value))} />
                         </FieldRow>
                     </SectionCard>
-                    <SectionCard title="Two-Factor Authentication">
-                        <ToggleRow label="Require 2FA for Admin users" hint="Admins and Portal Admins must enable 2FA"
-                            checked={s.force2FAForAdmins} onChange={(v) => update('security', 'force2FAForAdmins', v)} />
-                    </SectionCard>
                     {saved === 'security' ? <SavedBanner /> : <SaveButton onClick={() => save('security')} saving={saving} />}
                 </>
             )}

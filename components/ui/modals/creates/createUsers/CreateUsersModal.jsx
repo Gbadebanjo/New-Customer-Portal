@@ -4,6 +4,11 @@ import ButtonFlexible from "@/components/ui/button-flexible/ButtonFlexible";
 import classes from "@/components/ui/modals/sharedModal.module.css";
 import ImportExportUsersComponent from "@/components/ui/modals/creates/ImportExportUsers/ImportExportUsersComponent";
 import { AllTimezones, UserConstants } from "@/utils/constants";
+
+// `AllTimezones` entries look like `{ id: 0, name: 'Africa/Lagos (UTC+1)' }`.
+// The trailing `(UTC±N)` is display sugar — the value we actually want to
+// store is the IANA identifier on its own.
+const ianaFromLabel = (label) => (label || '').replace(/\s*\([^)]*\)\s*$/, '');
 import { ButtonSaveSubmit } from "@/components/ui/ButtonSaveAndSubmit/ButtonSaveAndSubmit";
 import AddUser from "@/lib/controllers/users/AddUser";
 import WarnCircleBigIcon from "@/components/ui/icons/WarnCircleBigIcon";
@@ -13,9 +18,7 @@ import ButtonWhite from "@/components/ui/button-white/Button";
 const CreateUsersModal = ({ customers, users }) => {
   const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("userInfo");
-  const [selectedTimezone, setSelectedTimezone] = useState(
-    AllTimezones[0].value
-  );
+  const [selectedTimezone, setSelectedTimezone] = useState('Africa/Lagos');
   const [selectedCustomer, setSelectedCustomer] = useState("");
   // Single role per user. Options are the four canonical role names as
   // stored in the DB (`Admin`, `Customer`, `Daystar Customer Admin`,
@@ -133,7 +136,7 @@ const CreateUsersModal = ({ customers, users }) => {
       setName("");
       setEmail("");
       setSelectedCustomer("");
-      setSelectedTimezone(AllTimezones[0].value);
+      setSelectedTimezone('Africa/Lagos');
       setPhone("");
       setSelectedRole("Customer");
       setIsActive(false);
@@ -362,7 +365,7 @@ const CreateUsersModal = ({ customers, users }) => {
                         {AllTimezones.map((singleTimezone) => (
                           <option
                             key={singleTimezone.id}
-                            value={singleTimezone.id}
+                            value={ianaFromLabel(singleTimezone.name)}
                           >
                             {singleTimezone.name}
                           </option>

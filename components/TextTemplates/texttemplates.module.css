@@ -14,31 +14,63 @@
     display: flex;
     align-items: center;
     padding: 10px 20px;
-    gap: 6px;
+    gap: 8px;
     color: #b0b7bd;
     font-size: 0.85rem;
 }
 
-.header span:first-child {
-    display: flex;
+.crumbHome {
+    display: inline-flex;
     align-items: center;
+    color: inherit;
 }
 
-/* ── Title row ──────────────────────────────────────── */
-.topCenter {
+.crumbSep {
+    color: rgba(255,255,255,0.25);
+}
+
+.crumbMuted {
+    color: #b0b7bd;
+}
+
+.crumbCurrent {
+    color: #e1e7ed;
+    font-weight: 500;
+}
+
+.crumbBack {
+    margin-left: auto;
+}
+
+/* ── Page header — title + subtitle ─────────────────── */
+.pageHeader {
+    padding: 4px 20px 16px;
+    margin: 0 6px;
+}
+
+.pageHeaderRow {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px 16px;
-    margin-left: 6px;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .title {
-    font-size: 26px;
+    font-size: 1.7rem;
     font-weight: 500;
     color: #ffffff;
     margin: 0;
     line-height: 1.2;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: 0.01em;
+}
+
+.subtitle {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin: 8px 0 0;
+    max-width: 780px;
 }
 
 /* ── Outer panel ────────────────────────────────────── */
@@ -49,6 +81,83 @@
     padding: 24px 24px 60px;
     position: relative;
     min-height: 420px;
+}
+
+/* ── Top actions bar — matches the API Keys screen ─── */
+.actionsBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.countsSummary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.countChip,
+.countChipMuted {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+}
+
+.countChip {
+    background: rgba(76,175,80,0.10);
+    border: 1px solid rgba(76,175,80,0.28);
+    color: #a7d3aa;
+}
+
+.countChip strong {
+    color: #4caf50;
+    font-weight: 700;
+}
+
+.countChipMuted {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.55);
+}
+
+.countChipMuted strong {
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+}
+
+.primaryBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #ff7d70;
+    border: 1px solid rgba(255,125,112,0.6);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    font-family: inherit;
+}
+
+.primaryBtn:hover:not(:disabled) {
+    background: #ff9385;
+}
+
+.primaryBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 /* ── Search bar ─────────────────────────────────────── */
@@ -250,10 +359,26 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 6px;
     min-height: 280px;
-    color: #b0b7bd;
-    font-size: 15px;
+    text-align: center;
+    padding: 20px;
+}
+
+.emptyTitle {
+    color: #e1e7ed;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 8px 0 0;
+    font-family: 'Kanit', sans-serif;
+}
+
+.emptyHint {
+    color: #7c8796;
+    font-size: 0.85rem;
+    margin: 0;
+    max-width: 340px;
+    line-height: 1.5;
 }
 
 /* ── Copyright ──────────────────────────────────────── */

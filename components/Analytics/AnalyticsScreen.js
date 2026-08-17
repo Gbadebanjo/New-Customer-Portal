@@ -47,31 +47,6 @@ function StatCard({ label, value, hint, tooltip, tone }) {
     );
 }
 
-// Inline dependency-free sparkline. Chart libs would pull ~40kb + a
-// client bundle for what's a 40px trend line.
-function Sparkline({ data }) {
-    if (!data || data.length === 0) {
-        return <div className={classes.sparklineEmpty}>No data yet</div>;
-    }
-    const w = 200;
-    const h = 40;
-    const max = Math.max(1, ...data.map((d) => d.count));
-    const step = data.length > 1 ? w / (data.length - 1) : 0;
-    const points = data
-        .map((d, i) => `${i * step},${h - (d.count / max) * h}`)
-        .join(' ');
-    return (
-        <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className={classes.sparkline}>
-            <polyline
-                points={points}
-                fill="none"
-                stroke="var(--ds-accent, #ff7d70)"
-                strokeWidth="1.6"
-            />
-        </svg>
-    );
-}
-
 const KNOWN_CRON_LABELS = {
     sync_asset_groups: 'Asset group sync',
     ingest_daily: 'Daily ingestion',
@@ -117,10 +92,6 @@ export default async function AnalyticsScreen() {
                             label="Active last 30d"
                             value={fmtNumber(data.engagement.activeUsers30d)}
                         />
-                    </div>
-                    <div className={classes.trendCard}>
-                        <div className={classes.statLabel}>Successful logins — last 7 days</div>
-                        <Sparkline data={data.engagement.loginTrend} />
                     </div>
                 </section>
 
@@ -216,6 +187,11 @@ export default async function AnalyticsScreen() {
                             tooltip="Distinct sites with a report_data row ingested since UTC midnight."
                         />
                         <StatCard
+                            label="Sites with published reports"
+                            value={fmtNumber(data.fleet.sitesWithPublishedReports)}
+                            tooltip="Sites where NOC has verified at least one report — these are the ones customers can actually see."
+                        />
+                        <StatCard
                             label="Reports pending approval"
                             value={fmtNumber(data.fleet.reportsPendingApproval)}
                             tone={data.fleet.reportsPendingApproval > 0 ? 'warn' : undefined}
@@ -225,20 +201,6 @@ export default async function AnalyticsScreen() {
                             label="Outstanding invitations"
                             value={fmtNumber(data.fleet.outstandingInvitations)}
                             tooltip="Users invited but who haven't set a password yet."
-                        />
-                    </div>
-                </section>
-
-                <section className={classes.section}>
-                    <h2 className={classes.sectionTitle}>Growth (7d)</h2>
-                    <div className={classes.statGrid}>
-                        <StatCard
-                            label="New users"
-                            value={fmtNumber(data.growth.newUsers7d)}
-                        />
-                        <StatCard
-                            label="New customers"
-                            value={fmtNumber(data.growth.newCustomers7d)}
                         />
                     </div>
                 </section>
