@@ -60,7 +60,7 @@ function Field({ label, value }) {
     );
 }
 
-export default async function UserDetailScreen({ user, activity, sessions, failedLoginCount, failedLoginWindowDays }) {
+export default async function UserDetailScreen({ user, customerName, callerIsAdmin, activity, sessions, failedLoginCount, failedLoginWindowDays }) {
     const activeSessionCount = sessions.filter((s) => s.active).length;
     const initials = ((user.name?.[0] || '') + (user.surname?.[0] || '')).toUpperCase()
         || (user.username?.[0] || 'U').toUpperCase();
@@ -112,6 +112,7 @@ export default async function UserDetailScreen({ user, activity, sessions, faile
                         isLocked={!!user.is_locked_out}
                         userEmail={user.email}
                         canImpersonate={Array.isArray(user.roles) && user.roles.some((r) => r?.name === 'Customer')}
+                        isAdmin={!!callerIsAdmin}
                     />
                 </section>
 
@@ -121,7 +122,7 @@ export default async function UserDetailScreen({ user, activity, sessions, faile
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 12 }}>
                         <Field label="Username" value={user.username} />
                         <Field label="Phone" value={user.phone_number} />
-                        <Field label="Customer ID" value={user.customer} />
+                        <Field label="Customer" value={customerName || (user.customer ? '(unresolved)' : null)} />
                         <Field label="Timezone" value={displayTimezone(user.timezone)} />
                         <Field label="Failed logins" value={`${failedLoginCount} in last ${failedLoginWindowDays} days`} />
                         <Field label="Active sessions" value={String(activeSessionCount)} />

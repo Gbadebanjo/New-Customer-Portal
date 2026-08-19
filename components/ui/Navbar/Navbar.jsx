@@ -72,11 +72,11 @@ export default function Navbar({
 
   const showCustomers = hasAdminRole || hasDaystarCustomerAdmin;
   const showPlannedDataUpload = hasAdminRole || hasDaystarCustomerAdmin;
-  // DCA gets Administration → Identity management → Users only, so they
-  // can reach the impersonate action. Everything else under Administration
-  // (Roles, Security Logs, Analytics, API keys, Templates, Audit Logs,
-  // Settings) stays hidden for DCA.
-  const showAdministration = hasAdminRole || hasDaystarCustomerAdmin;
+  // Administration is Daystar-Portal-Admin-only. Daystar Customer Admin
+  // reaches the users list (and impersonate action) through the
+  // Customers screen instead — the entire Administration section is
+  // hidden from their sidebar.
+  const showAdministration = hasAdminRole;
   const showFullAdmin = hasAdminRole;
 
   const [adminMenuOpen, setAdminMenuOpen] = useState(path.includes("/admin/"));

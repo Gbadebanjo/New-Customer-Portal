@@ -7,13 +7,18 @@ import {
     toggleUserLocked,
     sendPasswordResetForUser,
 } from '@/lib/controllers/users/adminUserActions';
+import deleteUserById from '@/lib/controllers/users/deleteUserById';
 import { impersonateUser } from '@/lib/auth/impersonationActions';
 import ConfirmModal from '@/components/ui/modals/customAlertModal/ConfirmModal';
 
 // Panel with the quick-action buttons on the identity card.
 // Each destructive action opens the app-styled ConfirmModal (replacing
 // window.confirm which pops OS-level and looks off-brand).
-export default function UserDetailActions({ userId, isLocked, canImpersonate }) {
+//
+// `isAdmin` controls the Delete-user button: only the top-tier Admin
+// role sees it, since user deletion is irreversible. Portal Admin and
+// DCA still see the other admin actions.
+export default function UserDetailActions({ userId, userEmail, isLocked, canImpersonate, isAdmin }) {
     const router = useRouter();
     const [busy, setBusy] = useState(null);
     const [msg, setMsg] = useState(null);
@@ -35,6 +40,13 @@ export default function UserDetailActions({ userId, isLocked, canImpersonate }) 
         try {
             const res = await fn();
             if (res?.ok) {
+                // Delete is terminal — the current /admin/identity/users/[id]
+                // route no longer resolves once the row is gone, so we bounce
+                // back to the users list instead of refreshing in place.
+                if (key === 'delete') {
+                    router.push('/admin/identity/users');
+                    return;
+                }
                 setMsg({ tone: 'good', text: 'Done.' });
                 router.refresh();
             } else {
@@ -106,6 +118,19 @@ export default function UserDetailActions({ userId, isLocked, canImpersonate }) 
                         Impersonate
                     </Btn>
                 )}
+                {isAdmin && (
+                    <Btn
+                        onClick={() => start('delete', () => deleteUserById(userId), {
+                            message: `Permanently delete ${userEmail || 'this user'}? This removes the account, all sessions, and every verification token — it can't be undone.`,
+                            confirmLabel: 'Delete user',
+                            tone: 'danger',
+                        })}
+                        busy={busy === 'delete'}
+                        variant="danger"
+                    >
+                        Delete user
+                    </Btn>
+                )}
             </div>
             {msg && (
                 <div style={{
@@ -129,6 +154,8 @@ export default function UserDetailActions({ userId, isLocked, canImpersonate }) 
 function Btn({ children, onClick, busy, variant = 'default' }) {
     const styles = variant === 'primary' ? {
         background: '#ff7d70', border: '1px solid #ff7d70', color: '#fff',
+    } : variant === 'danger' ? {
+        background: 'rgba(239,68,68,0.14)', border: '1px solid rgba(239,68,68,0.5)', color: '#f87171',
     } : {
         background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', color: '#e1e7ed',
     };

@@ -1,10 +1,14 @@
 // Short display labels for roles so long names like "Daystar Customer Admin"
 // don't overflow / get ellipsised in tight UI spots like the sidebar role
 // badge. Falls back to the raw role name when there's no mapping.
+// Compact labels used in the right-sidebar role badge. `DCA` and
+// `Portal Adm` are deliberate abbreviations — the badge is a tight
+// pill, and the full role name is still exposed via the wrapper's
+// `title` attribute for hover / screen-reader disclosure.
 const SHORT_LABELS = {
     'Admin': 'Admin',
-    'Daystar Portal Admin': 'Portal Admin',
-    'Daystar Customer Admin': 'Customer Admin',
+    'Daystar Portal Admin': 'Portal Adm',
+    'Daystar Customer Admin': 'DCA',
     'Customer User': 'Customer',
     'Customer': 'Customer',
 };
