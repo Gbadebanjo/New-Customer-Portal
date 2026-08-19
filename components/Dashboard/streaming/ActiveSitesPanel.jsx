@@ -40,8 +40,15 @@ const SEARCH_MIN_SITES = 5;
 /**
  * Active Sites panel — search + health rollup + site list. Receives assets
  * and the freshness lookup map from a Suspense-wrapped server parent.
+ *
+ * `variant`:
+ *   - 'sidebar' (default) — vertical list with `<hr />` separators; the
+ *     panel lives in the right-hand grid column and scrolls internally.
+ *   - 'grid' — responsive 3-column card grid for wide-fleet customers
+ *     (15+ sites) where the panel is stacked full-width below the KPIs.
  */
-export default function ActiveSitesPanel({ assets = [], freshnessMap = {} }) {
+export default function ActiveSitesPanel({ assets = [], freshnessMap = {}, variant = 'sidebar' }) {
+    const isGrid = variant === 'grid';
     const [siteSearch, setSiteSearch] = useState('');
     const { isFavorite, toggle: toggleFavorite } = useFavoriteSites();
     const showSiteSearch = (assets?.length ?? 0) > SEARCH_MIN_SITES;
@@ -168,7 +175,7 @@ export default function ActiveSitesPanel({ assets = [], freshnessMap = {} }) {
                     </span>
                 ))}
             </div>
-            <div>
+            <div className={isGrid ? classes.siteGrid : undefined}>
                 {filteredAssets.length > 0 ? (
                     filteredAssets.map((asset) => {
                         const fav = isFavorite(asset.asset_id);
@@ -179,45 +186,56 @@ export default function ActiveSitesPanel({ assets = [], freshnessMap = {} }) {
                         const capacityLine = siteType.hasSolar
                             ? `Solar capacity: ${toStringCapacity(asset.total_pv_power)}`
                             : 'No solar array on this site';
-                        return (
+                        const rowInner = (
+                            <>
+                                <span style={{ display: 'flex', gap: 10, alignItems: 'flex-start', minWidth: 0 }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleFavorite(asset.asset_id)}
+                                        aria-label={fav ? 'Unstar site' : 'Star site'}
+                                        title={fav ? 'Remove from favorites' : 'Add to favorites'}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            padding: 4,
+                                            marginTop: 3,
+                                            cursor: 'pointer',
+                                            color: fav ? '#f4a742' : 'var(--ds-text-hint)',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            transition: 'color 0.15s, transform 0.15s',
+                                        }}
+                                        onMouseEnter={(e) => { if (!fav) e.currentTarget.style.color = 'var(--ds-text)'; }}
+                                        onMouseLeave={(e) => { if (!fav) e.currentTarget.style.color = 'var(--ds-text-hint)'; }}
+                                    >
+                                        {fav ? <FaStar size={14} /> : <FaRegStar size={14} />}
+                                    </button>
+                                    <span style={{ minWidth: 0 }}>
+                                        <h3 className={classes.rightSideName}>
+                                            {asset.long_name}
+                                            <TypeChip siteType={siteType} />
+                                        </h3>
+                                        <p className={classes.rightSideDetails}>{capacityLine}</p>
+                                        <div style={{ marginTop: 6 }}>
+                                            <DataFreshness lastReceived={freshnessMap[asset.asset_id?.toString()]} />
+                                        </div>
+                                    </span>
+                                </span>
+                                <span>
+                                    <Link className={classes.rightBtn} href={`/Assets/Details/${asset.asset_id}`}>View</Link>
+                                </span>
+                            </>
+                        );
+                        // Grid mode gets a bordered card, no dividing rule.
+                        // Sidebar mode keeps the flush-row + <hr /> pattern.
+                        return isGrid ? (
+                            <div key={asset.asset_id} className={classes.siteGridCard}>
+                                {rowInner}
+                            </div>
+                        ) : (
                             <div key={asset.asset_id}>
                                 <div className={classes.rightContainer}>
-                                    <span style={{ display: 'flex', gap: 10, alignItems: 'flex-start', minWidth: 0 }}>
-                                        <button
-                                            type="button"
-                                            onClick={() => toggleFavorite(asset.asset_id)}
-                                            aria-label={fav ? 'Unstar site' : 'Star site'}
-                                            title={fav ? 'Remove from favorites' : 'Add to favorites'}
-                                            style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                padding: 4,
-                                                marginTop: 3,
-                                                cursor: 'pointer',
-                                                color: fav ? '#f4a742' : 'var(--ds-text-hint)',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                transition: 'color 0.15s, transform 0.15s',
-                                            }}
-                                            onMouseEnter={(e) => { if (!fav) e.currentTarget.style.color = 'var(--ds-text)'; }}
-                                            onMouseLeave={(e) => { if (!fav) e.currentTarget.style.color = 'var(--ds-text-hint)'; }}
-                                        >
-                                            {fav ? <FaStar size={14} /> : <FaRegStar size={14} />}
-                                        </button>
-                                        <span style={{ minWidth: 0 }}>
-                                            <h3 className={classes.rightSideName}>
-                                                {asset.long_name}
-                                                <TypeChip siteType={siteType} />
-                                            </h3>
-                                            <p className={classes.rightSideDetails}>{capacityLine}</p>
-                                            <div style={{ marginTop: 6 }}>
-                                                <DataFreshness lastReceived={freshnessMap[asset.asset_id?.toString()]} />
-                                            </div>
-                                        </span>
-                                    </span>
-                                    <span>
-                                        <Link className={classes.rightBtn} href={`/Assets/Details/${asset.asset_id}`}>View</Link>
-                                    </span>
+                                    {rowInner}
                                 </div>
                                 <hr />
                             </div>
@@ -253,8 +271,11 @@ export default function ActiveSitesPanel({ assets = [], freshnessMap = {} }) {
 
 /**
  * Skeleton for the Active Sites panel while its freshness data loads.
+ * `variant` mirrors the real panel so the fallback shape doesn't jump
+ * when the real data lands.
  */
-export function ActiveSitesPanelSkeleton({ assets = [] }) {
+export function ActiveSitesPanelSkeleton({ assets = [], variant = 'sidebar' }) {
+    const isGrid = variant === 'grid';
     // We can render the site names immediately (assets already came in from
     // the parent) — just show a small placeholder for the freshness badge.
     return (
@@ -267,14 +288,14 @@ export function ActiveSitesPanelSkeleton({ assets = [] }) {
                     <div key={k} style={{ width: 70, height: 22, borderRadius: 999, background: 'rgba(255,255,255,0.05)' }} />
                 ))}
             </div>
-            {assets.map((asset) => {
-                const hasSolar = typeof asset.total_pv_power === 'number' && asset.total_pv_power > 0;
-                const capacityLine = hasSolar
-                    ? `Solar capacity: ${toStringCapacity(asset.total_pv_power)}`
-                    : 'No solar array on this site';
-                return (
-                    <div key={asset.asset_id}>
-                        <div className={classes.rightContainer}>
+            <div className={isGrid ? classes.siteGrid : undefined}>
+                {assets.map((asset) => {
+                    const hasSolar = typeof asset.total_pv_power === 'number' && asset.total_pv_power > 0;
+                    const capacityLine = hasSolar
+                        ? `Solar capacity: ${toStringCapacity(asset.total_pv_power)}`
+                        : 'No solar array on this site';
+                    const rowInner = (
+                        <>
                             <span>
                                 <h3 className={classes.rightSideName}>{asset.long_name}</h3>
                                 <p className={classes.rightSideDetails}>{capacityLine}</p>
@@ -283,11 +304,22 @@ export function ActiveSitesPanelSkeleton({ assets = [] }) {
                             <span>
                                 <Link className={classes.rightBtn} href={`/Assets/Details/${asset.asset_id}`}>View</Link>
                             </span>
+                        </>
+                    );
+                    return isGrid ? (
+                        <div key={asset.asset_id} className={classes.siteGridCard}>
+                            {rowInner}
                         </div>
-                        <hr />
-                    </div>
-                );
-            })}
+                    ) : (
+                        <div key={asset.asset_id}>
+                            <div className={classes.rightContainer}>
+                                {rowInner}
+                            </div>
+                            <hr />
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

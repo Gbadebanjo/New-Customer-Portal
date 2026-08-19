@@ -18,6 +18,84 @@
   background-size: cover;
 }
 
+/*
+ * Wide-fleet layout — applied on top of `.gridContainer` when the
+ * customer has many sites (~15+). The sidebar layout squeezes both the
+ * KPI stack and the site list; instead we drop the sidebar and stack
+ * everything full-width: KPIs → sites grid → trend → donut. Sites
+ * render as a responsive 3-col grid so 30+ sites are quick to scan.
+ * Only the desktop (>1200px) template needs to change — the tablet /
+ * mobile media queries on `.gridContainer` already stack everything
+ * and continue to apply here because we keep both class names on the
+ * element.
+ */
+.gridContainerWideFleet {
+  grid-template-areas:
+    "topLeft    topCenter1  topCenter1  topRight"
+    "solar      co2         trees       diesel"
+    "trend      trend       trend       trend"
+    "donut      donut       donut       donut"
+    "rightSide  rightSide   rightSide   rightSide";
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto auto auto;
+}
+
+/* When the sites panel is stacked full-width, undo the fixed height /
+   internal scroll — its natural height is fine now. */
+.gridContainerWideFleet .rightSide {
+  max-height: none;
+  overflow-y: visible;
+  align-self: auto;
+}
+
+/* Grid variant of the site-list body. Tighter than the sidebar rows —
+   for a 30+ site fleet we want density over air, so the whole list is
+   scannable without a lot of scroll. Minimum column width dropped to
+   fit ~4-5 cards per row on wide viewports. */
+.siteGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+
+.siteGridCard {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+}
+
+.siteGridCard:hover {
+  border-color: rgba(255, 125, 112, 0.35);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+/* Compact typography for the grid cards — the sidebar variant keeps
+   its original larger text via the plain `.rightSideName` /
+   `.rightSideDetails` classes elsewhere. */
+.siteGridCard .rightSideName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.siteGridCard .rightSideDetails {
+  font-size: 0.75rem;
+  color: #b0b7bd;
+  margin: 2px 0 0;
+}
+
+.siteGridCard .rightBtn {
+  padding: 5px 10px;
+  font-size: 0.75rem;
+}
+
 .card {
   border-radius: 24px;
   padding: 15px;

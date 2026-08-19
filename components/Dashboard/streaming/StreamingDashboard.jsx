@@ -27,13 +27,24 @@ function computeDaysActive() {
     return Math.ceil((Date.now() - Date.UTC(2021, 0, 1)) / 86_400_000);
 }
 
+// Customers past this threshold get the "wide-fleet" layout — the
+// sites panel drops the right sidebar and stacks full-width below the
+// KPI cards as a responsive grid. For anything smaller the existing
+// side-by-side layout stays: it looks natural when there are only a
+// few sites in the list.
+const WIDE_FLEET_THRESHOLD = 15;
 
 export default function StreamingDashboard({ assets, token, autoRefreshMs, userId }) {
     const daysActive = computeDaysActive();
+    const siteCount = Array.isArray(assets) ? assets.length : 0;
+    const isWideFleet = siteCount >= WIDE_FLEET_THRESHOLD;
+    const gridClass = isWideFleet
+        ? `${classes.gridContainer} ${classes.gridContainerWideFleet}`
+        : classes.gridContainer;
 
     return (
         <>
-            <div className={classes.gridContainer}>
+            <div className={gridClass}>
                 <div className={classes.topLeft}>
                     <h2 className={classes.whiteTitle} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                         Solar Impact
@@ -68,8 +79,8 @@ export default function StreamingDashboard({ assets, token, autoRefreshMs, userI
                 </HooksErrorBoundary>
 
                 <HooksErrorBoundary label="ActiveSites">
-                    <Suspense fallback={<ActiveSitesPanelSkeleton assets={assets} />}>
-                        <ActiveSitesSection assets={assets} token={token} />
+                    <Suspense fallback={<ActiveSitesPanelSkeleton assets={assets} variant={isWideFleet ? 'grid' : 'sidebar'} />}>
+                        <ActiveSitesSection assets={assets} token={token} variant={isWideFleet ? 'grid' : 'sidebar'} />
                     </Suspense>
                 </HooksErrorBoundary>
 

@@ -591,6 +591,16 @@ export default function EditableReportTable({
 
       if (dataResult.success) {
         existingDaysRef.current = new Set(rows.filter(rowHasData).map(r => r.day));
+        // saveReportData stamps every row-with-data as verified server-side.
+        // Mirror that on the client so the ReportAssuranceBar's raw/verified
+        // pills update immediately instead of showing stale "raw" until the
+        // user reloads the page.
+        const verifiedAt = new Date().toISOString();
+        setRows(prev => prev.map(r =>
+          rowHasData(r)
+            ? { ...r, status: 'verified', verified_at: verifiedAt }
+            : r
+        ));
         const newNotes = daysNeedingNote.map(day => ({
           site_id: siteId,
           customer_id: customerId,
