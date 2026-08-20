@@ -1,0 +1,69 @@
+name: portal-dev
+
+services:
+  db:
+    build:
+      context: ./deploy
+      dockerfile: postgres/Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/etc/postgresql/certs/server.crt
+      -c ssl_key_file=/etc/postgresql/certs/server.key
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    # No published host port — only "app"/"migrate" reach this, over the
+    # compose network. nginx is the only thing that faces the host, same
+    # posture as the Daycore deployment.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
+    volumes:
+      - ./deploy/certs/ca.crt:/certs/ca.crt:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # localhost-only, same pattern as Daycore's 127.0.0.1:8081/8082 —
+      # nginx is what actually faces the internet.
+      - "127.0.0.1:8090:3000"
+
+  # One-off migration/seed runner. Built from the Dockerfile's "builder"
+  # stage, which still has full node_modules (incl. sequelize-cli) and the
+  # database/ folder — the final "runner" stage the "app" service uses is
+  # slimmed down to just the standalone build output and doesn't have
+  # either. Not started by `docker compose up`; run explicitly:
+  #   docker compose run --rm migrate
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    env_file: .env
+    environment:
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
+    volumes:
+      - ./deploy/certs/ca.crt:/certs/ca.crt:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["npm", "run", "db:setup"]
+    profiles: ["tools"]
+
+volumes:
+  db-data:

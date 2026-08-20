@@ -35,6 +35,12 @@ env-example
 # vercel
 .vercel
 
+# private key material — never commit, regardless of location
+# (docker-compose.yml and deploy/ config ARE tracked; only the actual
+# key/serial files under deploy/certs/ are excluded)
+*.key
+*.srl
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
