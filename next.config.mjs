@@ -13,6 +13,12 @@ const nextConfig = {
     turbopack: {
         root: __dirname,
     },
+    // Required for the Dockerfile's runner stage, which copies
+    // .next/standalone — without this the build output the Dockerfile
+    // expects is never produced.
+    // NOTE: restored locally on the deploy server after a repo migration —
+    // not present in the upstream repo as of this commit, needs pushing.
+    output: 'standalone',
     images: {
         qualities: [10, 75],
     },
