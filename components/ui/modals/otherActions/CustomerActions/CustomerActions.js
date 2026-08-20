@@ -32,7 +32,6 @@ const CustomerActions = ({ menuItems }) => {
     const [alertMessage, setAlertMessage] = useState('');
     const [customerIdToEdit, setCustomerIdToEdit] = useState('');
     const [customerIdToDelete, setCustomerIdToDelete] = useState('');
-    const [file, setFile] = useState(null);
     const [existingCustomerObject, setExistingCustomerObject] = useState(null);
 
     const togglePopup = () => {
@@ -141,7 +140,6 @@ const CustomerActions = ({ menuItems }) => {
         try {
             const customerData = {
                 company_name: name,
-                logo_file_name: file ? file.name : '',
                 users: [
                     {
                         users: 'logged_in_user',
@@ -152,7 +150,6 @@ const CustomerActions = ({ menuItems }) => {
             setIsEditModalOpen(false);
             setIsOpen(false);
             setName('');
-            setFile(null);
             openCustomAlertPopup("Customer updated successfully")
         } catch (error) {
             setIsEditModalOpen(false);
@@ -234,19 +231,6 @@ const CustomerActions = ({ menuItems }) => {
                                             value={name}
                                             style={{ backgroundColor: '#123751', borderColor: '#23262a' }}
                                             onChange={(e) => setName(e.target.value)}
-                                        />
-                                    </label>
-                                    <label className="form-control w-full"
-                                        style={{ marginBottom: '20px', maxWidth: '133%', }}>
-                                        <div>
-                                            <span className="label">File</span>
-                                        </div>
-                                        <input
-                                            type="file"
-                                            name="image"
-                                            className="file-input file-input-bordered w-full"
-                                            accept="image/gif, image/jpeg, image/png"
-                                            onChange={(e) => setFile(e.target.files[0])}
                                         />
                                     </label>
                                 </div>

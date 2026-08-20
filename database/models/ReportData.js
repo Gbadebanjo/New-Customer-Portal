@@ -74,6 +74,34 @@ ReportData.init({
     allowNull: true,
     defaultValue: 0,
   },
+  // ── Detailed / Hybrid-site fields — nullable so Solar-only sites
+  // simply leave them unset. Auto-shown by the editor when the site's
+  // deriveSiteType() is `hybrid` or `battery-only`; otherwise hidden
+  // (each is still individually toggleable via the Columns dropdown).
+  energy_from_grid: {
+    type: DataTypes.DOUBLE,
+    allowNull: true,
+  },
+  actual_yield_lv: {
+    type: DataTypes.DOUBLE,
+    allowNull: true,
+  },
+  daily_totalizer_pv_reading: {
+    type: DataTypes.DOUBLE,
+    allowNull: true,
+  },
+  power_from_generator_to_charge_bess: {
+    type: DataTypes.DOUBLE,
+    allowNull: true,
+  },
+  auxiliary_consumption: {
+    type: DataTypes.DOUBLE,
+    allowNull: true,
+  },
+  auxiliary_consumption_operator_room: {
+    type: DataTypes.DOUBLE,
+    allowNull: true,
+  },
   daily_daytime_solar_displacement: {
     type: DataTypes.STRING,
     allowNull: true,

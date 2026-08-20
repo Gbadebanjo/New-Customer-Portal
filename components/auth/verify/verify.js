@@ -43,9 +43,23 @@ function VerifyComponent() {
         setModalOpen(false);
     }
 
+    // Session-expired = the 10-min login-pending cookie is gone.
+    // Route back to /login with the server's message so the user
+    // isn't stranded on this screen with a generic "Verification
+    // failed" alert.
+    const handleSessionExpired = (msg) => {
+        openCustomAlertPopup(msg || 'Session expired. Please log in again.');
+        try { localStorage.removeItem('email'); localStorage.removeItem('userId'); } catch { /* ignore */ }
+        setTimeout(() => router.push('/login'), 1500);
+    };
+
     const resendCode = async () => {
         try {
             const result = await generateCode(userId, email);
+            if (result?.reason === 'session_expired') {
+                handleSessionExpired(result?.message);
+                return;
+            }
             if (!result?.success) {
                 openCustomAlertPopup(result?.message || "Failed to resend verification code. Please try again.");
                 return;
@@ -68,6 +82,10 @@ function VerifyComponent() {
         try {
             const result = await validateCode(userId, code);
             if (!result?.success) {
+                if (result?.reason === 'session_expired') {
+                    handleSessionExpired(result?.message);
+                    return;
+                }
                 openCustomAlertPopup(result?.message || "Verification failed.");
                 setVerificationSuccess(false);
                 setIsSubmitting(false);

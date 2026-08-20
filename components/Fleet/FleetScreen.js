@@ -10,6 +10,8 @@ import ChartIcon from '@/components/ui/icons/ChartIcon';
 import { getAuthorizedAssets } from '@/lib/services/ammp/getAuthorizedAssets';
 import { deriveSiteType } from '@/lib/services/siteType/deriveSiteType';
 import { countryName } from '@/utils/countryNames';
+import { getReportManagement } from '@/lib/controllers/reportData/getReportManagement';
+import ReportsManagement from '@/components/Analytics/ReportsManagement';
 import classes from '@/components/Dashboard/dashboardLanding.module.css';
 
 // Fleet landing (Daystar-only). Renders a KPI band, quick-access tiles
@@ -23,8 +25,16 @@ function formatCapacity(totalKw) {
 }
 
 async function FleetBody({ userId }) {
-    const { assets } = await getAuthorizedAssets(userId);
+    const [{ assets }, reportsMgmt] = await Promise.all([
+        getAuthorizedAssets(userId),
+        // Same source of truth as the Admin Analytics enrichment. Any
+        // caller who reaches /fleet is a Daystar role, so the auth
+        // gate inside `getReportManagement` will pass.
+        getReportManagement({ limit: 150 }),
+    ]);
     const list = Array.isArray(assets) ? assets : [];
+    const reportsItems = reportsMgmt?.ok ? reportsMgmt.items : [];
+    const reportsTotals = reportsMgmt?.ok ? reportsMgmt.totals : { pendingSites: 0, sentSites: 0, rawSites: 0 };
 
     const enriched = list.map((a) => {
         const type = deriveSiteType(a);
@@ -103,7 +113,19 @@ async function FleetBody({ userId }) {
                     ))}
                 </div>
 
+                <div className={classes.sectionHeading}>Reports</div>
                 <div className={classes.tableCard}>
+                    <div className={classes.tableHeadingRow}>
+                        <span className={classes.tableHeading}>Reports pipeline</span>
+                        <span className={classes.tableHint}>
+                            {reportsTotals.pendingSites} site{reportsTotals.pendingSites === 1 ? '' : 's'} awaiting send &middot;
+                            {' '}{reportsTotals.sentSites} sent
+                        </span>
+                    </div>
+                    <ReportsManagement items={reportsItems} totals={reportsTotals} />
+                </div>
+
+                <div className={classes.tableCard} style={{ marginTop: 32 }}>
                     <div className={classes.tableHeadingRow}>
                         <span className={classes.tableHeading}>All sites</span>
                         <span className={classes.tableHint}>Click a row to open its detail view.</span>

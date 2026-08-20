@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import classes from './dataTable.module.css';
 import modalClasses from '@/components/ui/modals/sharedModal.module.css';
 import { FaSearch, FaEye, FaTimes } from 'react-icons/fa';
+import { formatIpAddress } from '@/utils/formatIp';
 
 const LIMIT = 20;
 
@@ -208,7 +209,7 @@ export default function AuditLogTable() {
                                     <td style={{ maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                         {row.url || '—'}
                                     </td>
-                                    <td>{row.client_ip_address || '—'}</td>
+                                    <td>{formatIpAddress(row.client_ip_address)}</td>
                                     <td>{row.duration != null ? `${row.duration} ms` : '—'}</td>
                                     <td><StatusBadge value={row.has_exception} /></td>
                                 </tr>
@@ -280,7 +281,7 @@ export default function AuditLogTable() {
                                 ['User', selectedLog.user_name || '—'],
                                 ['HTTP Method', selectedLog.http_request || '—'],
                                 ['URL', selectedLog.url || '—'],
-                                ['IP Address', selectedLog.client_ip_address || '—'],
+                                ['IP Address', formatIpAddress(selectedLog.client_ip_address)],
                                 ['Duration', selectedLog.duration != null ? `${selectedLog.duration} ms` : '—'],
                                 ['Has Exception', selectedLog.has_exception === 'true' || selectedLog.has_exception === true ? 'Yes' : 'No'],
                                 ['Correlation ID', selectedLog.correlation_id || '—'],

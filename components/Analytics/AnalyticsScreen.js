@@ -4,7 +4,9 @@ import CopyRight from '@/components/ui/CopyRight/copyright';
 import InfoTooltip from '@/components/ui/InfoTooltip/InfoTooltip';
 import { getAdminAnalytics } from '@/lib/controllers/analytics/getAdminAnalytics';
 import { getRecentActivity } from '@/lib/controllers/analytics/getRecentActivity';
+import { getReportManagement } from '@/lib/controllers/reportData/getReportManagement';
 import ActivityFeed from './ActivityFeed';
+import ReportsManagement from './ReportsManagement';
 
 function fmtNumber(n) {
     if (n == null) return '—';
@@ -54,11 +56,14 @@ const KNOWN_CRON_LABELS = {
 };
 
 export default async function AnalyticsScreen() {
-    const [data, activity] = await Promise.all([
+    const [data, activity, reportsMgmt] = await Promise.all([
         getAdminAnalytics(),
         getRecentActivity({ limit: 25 }),
+        getReportManagement({ limit: 200 }),
     ]);
     const generatedAt = new Date(data.generatedAt);
+    const reportsItems = reportsMgmt?.ok ? reportsMgmt.items : [];
+    const reportsTotals = reportsMgmt?.ok ? reportsMgmt.totals : { pendingSites: 0, sentSites: 0, rawSites: 0 };
 
     return (
         <div className={classes.content}>
@@ -203,6 +208,11 @@ export default async function AnalyticsScreen() {
                             tooltip="Users invited but who haven't set a password yet."
                         />
                     </div>
+                </section>
+
+                <section className={classes.section}>
+                    <h2 className={classes.sectionTitle}>Reports management</h2>
+                    <ReportsManagement items={reportsItems} totals={reportsTotals} />
                 </section>
 
                 <section className={classes.section}>

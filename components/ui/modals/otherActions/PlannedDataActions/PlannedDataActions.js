@@ -11,7 +11,6 @@ import WarnCircleBigIcon from "@/components/ui/icons/WarnCircleBigIcon";
 import getPlannedUploadById from "@/lib/controllers/powerProductionPlan/getPowerProductionPlanById";
 import deletePlannedUploadById from "@/lib/controllers/powerProductionPlan/deletePowerProductionPlanById";
 import updatePlannedUploadById from "@/lib/controllers/powerProductionPlan/updatePowerProductionPlanById";
-import {v4 as uuidv4} from "uuid";
 
 const PlannedDataActions = ({ menuItems }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -142,7 +141,6 @@ const PlannedDataActions = ({ menuItems }) => {
             const plannedUploadData = {
                 file_name: fileName,
                 note: note,
-                unique_file_name: uuidv4(),
             }
             await updatePlannedUploadById(plannedUploadIdToEdit, plannedUploadData);
             setIsEditModalOpen(false);

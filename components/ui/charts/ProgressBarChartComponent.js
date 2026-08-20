@@ -1,9 +1,9 @@
 'use client'
 import React from 'react';
-import Chart from 'chart.js/auto';
 import PowerSupGeneratorIcon from "@/components/ui/icons/dashboardIcons/PowerSupGeneratorIcon";
 import PowerSupSolarIcon from "@/components/ui/icons/dashboardIcons/PowerSupSolarIcon";
 import PowerSupGridIcon from "@/components/ui/icons/dashboardIcons/PowerSupGridIcon";
+import { toStringEnergy } from "@/utils/constants";
 
 const labelData = [
     {
@@ -87,7 +87,7 @@ const ProgressBarChartComponent = ({ progressData }) => {
                             marginBottom: 4,
                             marginLeft: 2,
                         }}>
-                            {values[idx]}
+                            {toStringEnergy(values[idx])}
                         </span>
                         <div style={{
                             display: 'flex',

@@ -53,6 +53,77 @@
     background: #123751;
 }
 
+/* ── Searchable asset dropdown — matches the .select field width, opens
+   below on focus, closes on outside-click. Kept visually equivalent to
+   the previous native <select> — same input footprint, dropdown extends
+   without changing the field itself. ───────────────────────────────── */
+.assetDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: #123751;
+    border: 1px solid #1d4d6e;
+    border-radius: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 20;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.assetDropdown::-webkit-scrollbar { width: 8px; }
+.assetDropdown::-webkit-scrollbar-thumb { background: #3498DB; border-radius: 6px; }
+
+.assetOption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 9px 12px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: #E1E7ED;
+    font-family: 'Kanit', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.assetOption:last-child { border-bottom: none; }
+.assetOption:hover { background: rgba(52, 152, 219, 0.14); }
+
+.assetOptionActive {
+    background: rgba(52, 152, 219, 0.22);
+    color: #fff;
+}
+
+.assetOptionName {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.assetOptionCode {
+    color: #9aafc4;
+    font-size: 0.75rem;
+    font-family: ui-monospace, Menlo, monospace;
+    flex-shrink: 0;
+}
+
+.assetOptionEmpty {
+    padding: 14px 12px;
+    color: #9aafc4;
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+}
+
+
 /* Webkit datetime-local icon color */
 .dateInput::-webkit-calendar-picker-indicator {
     filter: invert(0.7);

@@ -44,6 +44,18 @@ function TwoFactorVerification() {
         setModalOpen(false);
     }
 
+    // Session-expired = the 10-min login-pending cookie is gone. The
+    // user has to restart from /login. We surface the server message,
+    // then bounce them shortly after so they see what happened without
+    // being trapped on this screen with a generic "invalid code" alert.
+    const handleSessionExpired = (msg) => {
+        openCustomAlertPopup(msg || 'Session expired. Please log in again.');
+        // Clear stored ids so the effect on /login doesn't re-route back
+        // here. Small delay so the alert is legible before we navigate.
+        try { localStorage.removeItem('email'); localStorage.removeItem('userId'); } catch { /* ignore */ }
+        setTimeout(() => router.push('/login'), 1500);
+    };
+
     const handleVerify = async (e) => {
         e.preventDefault();
 
@@ -56,6 +68,10 @@ function TwoFactorVerification() {
         try {
             const res = await verify2FA(userId, code.trim());
             if (!res || !res.valid) {
+                if (res?.reason === 'session_expired') {
+                    handleSessionExpired(res?.message);
+                    return;
+                }
                 openCustomAlertPopup(res?.message || "Invalid authenticator code.");
                 setIsSubmitting(false);
                 return;
@@ -72,10 +88,17 @@ function TwoFactorVerification() {
 
      const handleUseEmail = async () => {
         try {
-            await generateCode(userId, email);
+            const res = await generateCode(userId, email);
+            if (res?.reason === 'session_expired') {
+                handleSessionExpired(res?.message);
+                return;
+            }
+            if (res?.success === false) {
+                openCustomAlertPopup(res?.message || "Failed to send verification email. Try again.");
+                return;
+            }
             router.push('/verify');
         } catch (err) {
-            // console.error('Generate email code error:', err);
             openCustomAlertPopup("Failed to send verification email. Try again.");
         }
     };

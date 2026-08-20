@@ -7,7 +7,7 @@ import UsersMainDataTable from "@/components/ui/tables/users/UsersMainDataTable"
 import CopyRight from '../ui/CopyRight/copyright';
 import BackButton from '@/components/ui/BackButton/BackButton';
 
-export default async function UsersScreen({ users, customers, canWrite = true }) {
+export default async function UsersScreen({ users, customers, canWrite = true, callerIsAdmin = false }) {
     return (
         <div className={classes.content}>
             {/* Header */}
@@ -27,6 +27,7 @@ export default async function UsersScreen({ users, customers, canWrite = true })
                     <CreateUsersComponent
                         customers={customers}
                         users={users}
+                        callerIsAdmin={callerIsAdmin}
                     />
                 </div>
             )}

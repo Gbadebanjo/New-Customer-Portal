@@ -205,6 +205,40 @@
     opacity: 0.5;
 }
 
+/* Dark-themed <select> for the Reports pipeline period dropdown.
+   `color-scheme: dark` is what tells the browser to render the popup
+   list in dark mode (matches the rest of the page) instead of the
+   default white — Chromium and Firefox both honour it. */
+.periodSelect {
+    padding: 6px 32px 6px 12px;
+    border-radius: 8px;
+    background-color: #0d2638;
+    color: #e1e7ed;
+    border: 1px solid rgba(255,255,255,0.14);
+    font-size: 0.82rem;
+    min-width: 170px;
+    outline: none;
+    color-scheme: dark;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    /* Inline SVG chevron — data URI so no extra network request. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23b0b7bd' d='M0 0l5 6 5-6z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 6px;
+}
+
+.periodSelect:focus {
+    border-color: rgba(255,125,112,0.5);
+}
+
+.periodSelect option {
+    background: #0d2638;
+    color: #e1e7ed;
+}
+
 .feedList {
     list-style: none;
     margin: 0;

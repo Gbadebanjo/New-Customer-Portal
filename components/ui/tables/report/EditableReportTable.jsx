@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import FullScreenLoader from "@/components/ui/Loader/PageLoader";
 import Image from "next/image";
 import { saveAs } from "file-saver";
@@ -10,6 +11,7 @@ import getAssetsByCustomer from "@/lib/controllers/reportData/getAssetsByCustome
 import getReportNotes from "@/lib/controllers/reportData/getReportNote";
 import saveReportNote from "@/lib/controllers/reportData/saveReportNote";
 import { refreshReportFromSource } from "@/lib/controllers/reportData/refreshFromSource";
+import ReportAssuranceBar from "./ReportAssuranceBar";
 
 const MONTHS = [
   "January",
@@ -26,23 +28,23 @@ const MONTHS = [
   "December",
 ];
 
-const NUMERIC_FIELDS = [
-  "total_daily_consumption",
-  "total_daytime_consumption",
-  "planned_daytime_consumption",
-  "pv_production",
-  "planned_pv_production",
-  "energy_production_turbine",
-  "energy_production_diesel_generator",
-];
+// Every field in the daily report is defined in the central column
+// config. NUMERIC_FIELDS and TEXT_FIELDS are derived so this file, the
+// server-side save loop, and the visibility toggle all read from the
+// same source of truth and can't drift apart.
+import { REPORT_COLUMNS, OPTIONAL_COLUMN_IDS, defaultVisibleForSiteKind } from "@/lib/reports/columnConfig";
+import { getReportColumnPref, saveReportColumnPref } from "@/lib/controllers/reportData/columnPrefs";
+import { deriveSiteType } from "@/lib/services/siteType/deriveSiteType";
 
-const TEXT_FIELDS = [
-  "daily_daytime_solar_displacement",
-  "total_solar_displacement",
-  "data_capture_daytime",
-  "data_capture_entire_day",
-  "remarks",
-];
+const NUMERIC_FIELDS = REPORT_COLUMNS
+  .filter((c) => c.dataType === "number")
+  .map((c) => c.id);
+
+const TEXT_FIELDS = REPORT_COLUMNS
+  .filter((c) => c.dataType === "text")
+  .map((c) => c.id);
+
+const OPTIONAL_SET = new Set(OPTIONAL_COLUMN_IDS);
 
 const MAX_NOTE = 500;
 
@@ -108,9 +110,10 @@ const TEMPLATE_HEADERS = ["Day", ...Object.keys(EXCEL_COLUMN_MAP)];
 // provider vs finalised by our team.
 function StatusPill({ kind }) {
     const map = {
-        verified: { bg: 'rgba(76,175,80,0.12)',  fg: '#4caf50', bd: 'rgba(76,175,80,0.4)',  label: 'Approved' },
-        raw:      { bg: 'rgba(255,152,0,0.12)',  fg: '#ff9800', bd: 'rgba(255,152,0,0.4)',  label: 'Raw' },
-        unknown:  { bg: 'rgba(255,255,255,0.06)',fg: '#a8b3bd', bd: 'rgba(255,255,255,0.15)', label: 'Unknown' },
+        verified:    { bg: 'rgba(76,175,80,0.12)',  fg: '#4caf50', bd: 'rgba(76,175,80,0.4)',  label: 'Sent' },
+        in_progress: { bg: 'rgba(96,165,250,0.12)', fg: '#60a5fa', bd: 'rgba(96,165,250,0.4)', label: 'In progress' },
+        raw:         { bg: 'rgba(255,152,0,0.12)',  fg: '#ff9800', bd: 'rgba(255,152,0,0.4)',  label: 'Raw' },
+        unknown:     { bg: 'rgba(255,255,255,0.06)',fg: '#a8b3bd', bd: 'rgba(255,255,255,0.15)', label: 'Unknown' },
     };
     const c = map[kind] || map.unknown;
     return (
@@ -186,6 +189,130 @@ export default function EditableReportTable({
   const [loadingAssets, setLoadingAssets] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Deep-link support: `/reports?site=<id>&month=<m>&year=<y>&customer=<id>`.
+  // When the Reports pipeline (Analytics or Fleet screen) links here,
+  // pre-select the target site + period so the report opens straight
+  // to what the admin clicked instead of the default empty picker.
+  //
+  // The customer-change effect below re-fetches assets for the picked
+  // customer AND auto-selects the first asset — which would clobber the
+  // deep-linked `site`. `pendingDeepLinkSiteRef` holds the target until
+  // the assets arrive, then that effect uses it instead of defaulting
+  // to `fetched[0]`.
+  const searchParams = useSearchParams();
+  const deepLinkAppliedRef = useRef(false);
+  const pendingDeepLinkSiteRef = useRef(null);
+  useEffect(() => {
+    if (deepLinkAppliedRef.current) return;
+    const site = searchParams.get('site');
+    const month = searchParams.get('month');
+    const year = searchParams.get('year');
+    const customer = searchParams.get('customer');
+    if (!site && !month && !year && !customer) return;
+    deepLinkAppliedRef.current = true;
+    if (site) {
+      pendingDeepLinkSiteRef.current = site;
+      setSelectedSite(site);
+    }
+    const m = Number(month);
+    if (Number.isFinite(m) && m >= 1 && m <= 12) setSelectedMonth(m);
+    const y = Number(year);
+    if (Number.isFinite(y) && y >= 2000 && y <= 9999) setSelectedYear(y);
+    // Customer scoping — customer-only users are always locked to their
+    // own customer_id and ignore this param.
+    if (customer && !isCustomerOnly) setSelectedCustomer(customer);
+  }, [searchParams, isCustomerOnly]);
+
+  // Report-column visibility (per site, persisted per user in the
+  // `report_column_prefs` table). Auto-derived from deriveSiteType()
+  // on first load and overrideable via the Columns ▾ toolbar toggle.
+  const [visibleColumnIds, setVisibleColumnIds] = useState(() =>
+    new Set(REPORT_COLUMNS.filter((c) => c.defaultVisibleFor === 'always').map((c) => c.id))
+  );
+  const [columnsMenuOpen, setColumnsMenuOpen] = useState(false);
+  const columnsMenuRef = useRef(null);
+
+  // NOC path: on site change, prefer the user's saved per-site pref,
+  // else fall back to the site-type default. Customer path handled by
+  // the data-driven effect below — customers must never see a
+  // NOC's "hidden for me" choice.
+  useEffect(() => {
+    if (isCustomerOnly) return;
+    const siteId = showNewSiteInput ? newSite.trim() : selectedSite;
+    if (!siteId) return;
+    let cancelled = false;
+    (async () => {
+      const res = await getReportColumnPref(siteId);
+      if (cancelled) return;
+      // Derive the fallback from the selected asset's site type.
+      const asset = assets.find((a) => a.asset_id === siteId);
+      const siteType = asset ? deriveSiteType(asset).kind : 'unknown';
+      const defaults = defaultVisibleForSiteKind(siteType);
+      const always = REPORT_COLUMNS.filter((c) => c.defaultVisibleFor === 'always').map((c) => c.id);
+      if (res?.ok && Array.isArray(res.visibleColumns)) {
+        // Saved pref is the optional-column overrides only — merge with
+        // the always-visible set to get the full visible list.
+        setVisibleColumnIds(new Set([...always, ...res.visibleColumns]));
+      } else {
+        setVisibleColumnIds(new Set(defaults));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [selectedSite, showNewSiteInput, newSite, assets, isCustomerOnly]);
+
+  // Customer path: derive visibility from the actual data in the
+  // loaded rows. Any optional column with a non-null / non-zero /
+  // non-empty value on at least one day is shown; everything else
+  // stays hidden. This decouples what the customer sees from any
+  // per-user pref — whatever the NOC filled in and sent lands on
+  // the customer's report, regardless of site-type default.
+  useEffect(() => {
+    if (!isCustomerOnly) return;
+    const alwaysIds = REPORT_COLUMNS
+      .filter((c) => c.defaultVisibleFor === 'always')
+      .map((c) => c.id);
+    const dataDrivenIds = REPORT_COLUMNS
+      .filter((c) => c.defaultVisibleFor !== 'always')
+      .filter((c) => rows.some((r) => {
+        const v = r[c.id];
+        if (v == null) return false;
+        return typeof v === 'number' ? v !== 0 : String(v).trim() !== '';
+      }))
+      .map((c) => c.id);
+    setVisibleColumnIds(new Set([...alwaysIds, ...dataDrivenIds]));
+  }, [isCustomerOnly, rows]);
+
+  // Close the Columns menu on outside click.
+  useEffect(() => {
+    if (!columnsMenuOpen) return undefined;
+    const onDown = (e) => {
+      if (columnsMenuRef.current && !columnsMenuRef.current.contains(e.target)) {
+        setColumnsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [columnsMenuOpen]);
+
+  const toggleColumn = useCallback((id) => {
+    if (!OPTIONAL_SET.has(id)) return; // always-visible columns can't be toggled
+    const siteId = showNewSiteInput ? newSite.trim() : selectedSite;
+    setVisibleColumnIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      // Persist the optional-columns subset so the DB doesn't have to
+      // remember structural columns the server would ignore anyway.
+      if (siteId) {
+        const opts = [...next].filter((k) => OPTIONAL_SET.has(k));
+        saveReportColumnPref(siteId, opts).catch((err) =>
+          console.error('saveReportColumnPref failed:', err?.message)
+        );
+      }
+      return next;
+    });
+  }, [selectedSite, showNewSiteInput, newSite]);
+
   // Edit tracking
   const [reportNotes, setReportNotes] = useState([]);
   const [hasExistingData, setHasExistingData] = useState(false);
@@ -247,11 +374,26 @@ export default function EditableReportTable({
     if (!activeCustomerId) { setAssets([]); setSelectedSite(''); return; }
     (async () => {
       setLoadingAssets(true);
-      setSelectedSite('');
+      // Don't blank the site if we're honouring a deep link — the URL
+      // is our source of truth for which site to open until the assets
+      // list arrives to confirm/deny it.
+      if (!pendingDeepLinkSiteRef.current) setSelectedSite('');
       try {
         const { assets: fetched } = await getAssetsByCustomer(activeCustomerId);
         setAssets(fetched);
-        if (fetched.length > 0) setSelectedSite(fetched[0].asset_id);
+        // If a deep-linked site is still pending, resolve it now:
+        //   * present in the fetched list → keep it selected
+        //   * not present (URL was stale / wrong customer) → fall
+        //     through to the default first-asset pick
+        // Consuming the ref regardless prevents future customer
+        // changes from re-honouring the same stale target.
+        const pending = pendingDeepLinkSiteRef.current;
+        pendingDeepLinkSiteRef.current = null;
+        if (pending && fetched.some((a) => String(a.asset_id) === String(pending))) {
+          setSelectedSite(String(pending));
+        } else if (fetched.length > 0) {
+          setSelectedSite(fetched[0].asset_id);
+        }
       } catch (err) {
         console.error('Failed to fetch assets:', err);
         setAssets([]);
@@ -550,6 +692,11 @@ export default function EditableReportTable({
           existingDaysRef.current = new Set(rows.filter(rowHasData).map(r => r.day));
           setDirtyDays(new Set());
           setStatusMsg({ text: 'Report saved successfully.', type: 'success' });
+          // Refresh from the server so the row `status` (now
+          // `in_progress`), timestamps and any concurrent edits are
+          // reflected. `handleLoadRef` avoids the useCallback dep
+          // cycle that a direct `handleLoad()` call would create.
+          await handleLoadRef.current?.();
         } else {
           setStatusMsg({ text: result.error || 'Failed to save report.', type: 'error' });
         }
@@ -591,14 +738,15 @@ export default function EditableReportTable({
 
       if (dataResult.success) {
         existingDaysRef.current = new Set(rows.filter(rowHasData).map(r => r.day));
-        // saveReportData stamps every row-with-data as verified server-side.
-        // Mirror that on the client so the ReportAssuranceBar's raw/verified
-        // pills update immediately instead of showing stale "raw" until the
-        // user reloads the page.
-        const verifiedAt = new Date().toISOString();
+        // Only flip the rows the user actually touched to `in_progress`.
+        // Previously we blindly patched every row-with-data, which
+        // pushed already-sent (verified) days that weren't edited back
+        // into the pending bucket. The server-side save is now no-op
+        // safe for unchanged rows; the client mirrors that.
+        const touchedDays = new Set(dirtyDays);
         setRows(prev => prev.map(r =>
-          rowHasData(r)
-            ? { ...r, status: 'verified', verified_at: verifiedAt }
+          touchedDays.has(r.day) && rowHasData(r)
+            ? { ...r, status: 'in_progress', verified_at: null }
             : r
         ));
         const newNotes = daysNeedingNote.map(day => ({
@@ -616,6 +764,10 @@ export default function EditableReportTable({
         setNoteModalOpen(false);
         setPendingNote('');
         setStatusMsg({ text: 'Report updated successfully.', type: 'success' });
+        // Pull the canonical server state (status, timestamps, any
+        // parallel notes) so the UI reflects the DB rather than only
+        // the optimistic patch above.
+        await handleLoadRef.current?.();
       } else {
         setStatusMsg({ text: dataResult.error || 'Failed to save report.', type: 'error' });
         setNoteModalOpen(false);
@@ -731,6 +883,50 @@ export default function EditableReportTable({
             <button className={classes.uploadBtn} onClick={() => fileInputRef.current?.click()} disabled={!activeSite}>Upload Report</button>
             <input type="file" ref={fileInputRef} accept=".xlsx,.xls,.csv" style={{ display: 'none' }} onChange={handleUploadReport} />
             <button className={classes.templateBtn} onClick={handleDownloadTemplate}>Download Template</button>
+
+            {/* Columns visibility toggle. Only optional columns appear
+                here — structural columns (Date, remarks, etc.) are
+                always visible. Toggle state is persisted per-site in
+                report_column_prefs. */}
+            <div ref={columnsMenuRef} style={{ position: 'relative' }}>
+              <button
+                type="button"
+                className={classes.uploadBtn}
+                onClick={() => setColumnsMenuOpen((o) => !o)}
+                disabled={!activeSite}
+                title="Show or hide optional report columns for this site"
+              >
+                Columns ▾
+              </button>
+              {columnsMenuOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 6px)', right: 0,
+                  background: '#0d2638', border: '1px solid rgba(255,255,255,0.14)',
+                  borderRadius: 8, padding: 10, minWidth: 260, zIndex: 20,
+                  boxShadow: '0 6px 24px rgba(0,0,0,0.35)',
+                }}>
+                  <div style={{
+                    color: 'rgba(255,255,255,0.55)', fontSize: '0.72rem',
+                    textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700,
+                    marginBottom: 6,
+                  }}>Optional columns</div>
+                  {REPORT_COLUMNS.filter((c) => c.defaultVisibleFor !== 'always').map((c) => (
+                    <label key={c.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '5px 4px', fontSize: '0.85rem', color: '#e1e7ed',
+                      cursor: 'pointer',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={visibleColumnIds.has(c.id)}
+                        onChange={() => toggleColumn(c.id)}
+                      />
+                      <span>{c.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
@@ -749,23 +945,25 @@ export default function EditableReportTable({
             </div>
           </div>
 
+          <ReportAssuranceBar
+            rows={rows}
+            siteId={showNewSiteInput ? newSite.trim() : selectedSite}
+            year={selectedYear}
+            month={selectedMonth}
+            customerId={isCustomerOnly ? userCustomerId : selectedCustomer}
+            isCustomerOnly={isCustomerOnly}
+            onChanged={handleLoad}
+          />
+
           <div className={classes.tableWrapper}>
             <table className={classes.reportTable}>
               <thead>
                 <tr>
-                  <th rowSpan={2}>Date</th>
-                  <th rowSpan={2}>Total Daily<br />Consumption (kWh)</th>
-                  <th rowSpan={2}>Total Daytime<br />Consumption (kWh)<br />(7AM to 5PM)</th>
-                  <th rowSpan={2}>Planned Daytime<br />Consumption (kWh)<br />(7AM to 5PM)</th>
-                  <th rowSpan={2}>PV Production<br />(kWh)</th>
-                  <th rowSpan={2}>Planned PV<br />Production (kWh)</th>
-                  <th rowSpan={2}>Energy Production -<br />Turbine(kWh)</th>
-                  <th rowSpan={2}>Energy Production - Diesel<br />Generator(kWh)</th>
-                  <th rowSpan={2}>Daily Day-time<br />Solar Displacement<br />(7AM to 5PM)</th>
-                  <th rowSpan={2}>Total Solar<br />Displacement (24<br />hour period)</th>
-                  <th rowSpan={2}>Data Capture period<br />(Daytime)</th>
-                  <th rowSpan={2}>Data Capture period<br />(Entire Day)</th>
-                  <th rowSpan={2}>Remarks</th>
+                  {REPORT_COLUMNS.filter((c) => visibleColumnIds.has(c.id)).map((c) => (
+                    <th key={c.id} rowSpan={2}>
+                      {c.label}{c.unit ? <><br />({c.unit})</> : null}
+                    </th>
+                  ))}
                   <th rowSpan={2} className={classes.historyHeader}>History</th>
                 </tr>
               </thead>
@@ -774,60 +972,63 @@ export default function EditableReportTable({
                   const dayNotes = notesByDay[row.day] || [];
                   const isDirty = dirtyDays.has(row.day);
                   const isVerified = row.status === 'verified';
+                  const isInProgress = row.status === 'in_progress';
                   const isRaw = row.status === 'raw';
                   const hasData = rowHasData(row);
                   // Customers see verified rows only. Any row that has data
-                  // but hasn't been reviewed by our team is masked to a
-                  // placeholder so the customer isn't shown unaudited numbers.
+                  // but hasn't been sent to them yet (raw OR in-progress) is
+                  // masked to a placeholder so unaudited numbers stay hidden.
                   const hideForCustomer = isCustomerOnly && hasData && !isVerified;
                   return (
                     <tr key={row.day} className={isDirty ? classes.dirtyRow : ''}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                          <span>{formatDate(row.day, selectedMonth, selectedYear)}</span>
-                          {/* Daystar-only status pill so NOC can see at a
-                              glance which rows are still raw vs finalised. */}
-                          {!isCustomerOnly && hasData && (
-                            <StatusPill kind={isVerified ? 'verified' : isRaw ? 'raw' : 'unknown'} />
-                          )}
-                          {hideForCustomer && (
-                            <span style={{
-                              fontSize: '0.68rem', color: '#a8b3bd',
-                              fontStyle: 'italic',
-                            }}>Pending review</span>
-                          )}
-                        </div>
-                      </td>
-                      {NUMERIC_FIELDS.map(field => (
-                        <td key={field}>
-                          {hideForCustomer ? (
-                            <span style={{ color: '#6b7280' }}>—</span>
-                          ) : (
-                            <input
-                              type="number"
-                              step="any"
-                              value={row[field] || ''}
-                              onChange={(e) => handleCellChange(idx, field, e.target.value, row.day)}
-                              readOnly={isCustomerOnly}
-                            />
-                          )}
-                        </td>
-                      ))}
-                      {TEXT_FIELDS.map(field => (
-                        <td key={field}>
-                          {hideForCustomer ? (
-                            <span style={{ color: '#6b7280' }}>—</span>
-                          ) : (
+                      {REPORT_COLUMNS.filter((c) => visibleColumnIds.has(c.id)).map((c) => {
+                        if (c.id === 'day') {
+                          return (
+                            <td key={c.id}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                <span>{formatDate(row.day, selectedMonth, selectedYear)}</span>
+                                {!isCustomerOnly && hasData && (
+                                  <StatusPill kind={isVerified ? 'verified' : isInProgress ? 'in_progress' : isRaw ? 'raw' : 'unknown'} />
+                                )}
+                                {hideForCustomer && (
+                                  <span style={{
+                                    fontSize: '0.68rem', color: '#a8b3bd',
+                                    fontStyle: 'italic',
+                                  }}>Pending review</span>
+                                )}
+                              </div>
+                            </td>
+                          );
+                        }
+                        if (hideForCustomer) {
+                          return <td key={c.id}><span style={{ color: '#6b7280' }}>—</span></td>;
+                        }
+                        if (c.dataType === 'number') {
+                          return (
+                            <td key={c.id}>
+                              <input
+                                type="number"
+                                step="any"
+                                value={row[c.id] || ''}
+                                onChange={(e) => handleCellChange(idx, c.id, e.target.value, row.day)}
+                                readOnly={isCustomerOnly}
+                              />
+                            </td>
+                          );
+                        }
+                        // text
+                        return (
+                          <td key={c.id}>
                             <input
                               type="text"
                               className={classes.textInput}
-                              value={row[field] || ''}
-                              onChange={(e) => handleCellChange(idx, field, e.target.value, row.day)}
+                              value={row[c.id] || ''}
+                              onChange={(e) => handleCellChange(idx, c.id, e.target.value, row.day)}
                               readOnly={isCustomerOnly}
                             />
-                          )}
-                        </td>
-                      ))}
+                          </td>
+                        );
+                      })}
                       <td className={classes.historyCell}>
                         <button
                           type="button"
@@ -847,24 +1048,18 @@ export default function EditableReportTable({
                 })}
 
                 <tr className={classes.totalRow}>
-                  <td className={classes.percentCell}>
-                    Total
-                    {/* {totals.planned_pv_production > 0
-                      ? `${Math.round((totals.pv_production / totals.planned_pv_production) * 100)}%`
-                      : 'Total'} */}
-                  </td>
-                  <td>{Math.round(totals.total_daily_consumption).toLocaleString()}</td>
-                  <td>{Math.round(totals.total_daytime_consumption).toLocaleString()}</td>
-                  <td>{Math.round(totals.planned_daytime_consumption).toLocaleString()}</td>
-                  <td>{Math.round(totals.pv_production).toLocaleString()}</td>
-                  <td>{Math.round(totals.planned_pv_production).toLocaleString()}</td>
-                  <td>{Math.round(totals.energy_production_turbine).toLocaleString()}</td>
-                  <td>{Math.round(totals.energy_production_diesel_generator).toLocaleString()}</td>
-                  <td style={{ textAlign: 'center' }}>-</td>
-                  <td style={{ textAlign: 'center' }}>-</td>
-                  <td style={{ textAlign: 'center' }}>-</td>
-                  <td style={{ textAlign: 'center' }}>-</td>
-                  <td style={{ textAlign: 'center' }}>-</td>
+                  {REPORT_COLUMNS.filter((c) => visibleColumnIds.has(c.id)).map((c) => {
+                    if (c.id === 'day') {
+                      return <td key={c.id} className={classes.percentCell}>Total</td>;
+                    }
+                    if (c.dataType === 'number') {
+                      return <td key={c.id}>{Math.round(totals[c.id] || 0).toLocaleString()}</td>;
+                    }
+                    // text columns don't have a total — render an em dash so
+                    // the row alignment stays consistent.
+                    return <td key={c.id} style={{ textAlign: 'center' }}>-</td>;
+                  })}
+                  {/* History column has no total. */}
                   <td></td>
                 </tr>
               </tbody>

@@ -15,7 +15,12 @@ import WarnCircleBigIcon from "@/components/ui/icons/WarnCircleBigIcon";
 import { FaPlus, FaXmark } from "react-icons/fa6";
 import ButtonWhite from "@/components/ui/button-white/Button";
 
-const CreateUsersModal = ({ customers, users }) => {
+// Only Admin can grant these role names. Portal Admin creating a
+// user sees them locked; the server enforces the same rule in
+// lib/controllers/users/AddUser.js.
+const ELEVATED_ROLES = new Set(['Admin', 'Daystar Portal Admin']);
+
+const CreateUsersModal = ({ customers, users, callerIsAdmin = false }) => {
   const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("userInfo");
   const [selectedTimezone, setSelectedTimezone] = useState('Africa/Lagos');
@@ -488,26 +493,41 @@ const CreateUsersModal = ({ customers, users }) => {
                   { value: "Customer", label: "Customer User" },
                   { value: "Daystar Customer Admin", label: "Daystar Customer Admin" },
                   { value: "Daystar Portal Admin", label: "Daystar Portal Admin" },
-                ].map((r) => (
-                  <div key={r.value} className="mb-4 align-items-center gap-2 flex">
-                    <input
-                      id={`role_radio_${r.value.replace(/\s+/g, "_").toLowerCase()}`}
-                      name="userRole"
-                      type="radio"
-                      value={r.value}
-                      checked={selectedRole === r.value}
-                      onChange={() => setSelectedRole(r.value)}
-                      className={classes.inputCheckbox}
-                    />
-                    &nbsp;
-                    <label
-                      className={classes.labelText}
-                      htmlFor={`role_radio_${r.value.replace(/\s+/g, "_").toLowerCase()}`}
+                ].map((r) => {
+                  const locked = ELEVATED_ROLES.has(r.value) && !callerIsAdmin;
+                  return (
+                    <div
+                      key={r.value}
+                      className="mb-4 align-items-center gap-2 flex"
+                      style={locked ? { opacity: 0.55 } : undefined}
+                      title={locked ? 'Only an Admin can assign this role.' : undefined}
                     >
-                      {r.label}
-                    </label>
+                      <input
+                        id={`role_radio_${r.value.replace(/\s+/g, "_").toLowerCase()}`}
+                        name="userRole"
+                        type="radio"
+                        value={r.value}
+                        checked={selectedRole === r.value}
+                        disabled={locked}
+                        onChange={() => setSelectedRole(r.value)}
+                        className={classes.inputCheckbox}
+                      />
+                      &nbsp;
+                      <label
+                        className={classes.labelText}
+                        htmlFor={`role_radio_${r.value.replace(/\s+/g, "_").toLowerCase()}`}
+                        style={locked ? { cursor: 'not-allowed' } : undefined}
+                      >
+                        {r.label}
+                      </label>
+                    </div>
+                  );
+                })}
+                {!callerIsAdmin && (
+                  <div style={{ marginTop: 8, fontSize: 12, color: '#7c8796' }}>
+                    Admin and Daystar Portal Admin can only be assigned by an Admin.
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>

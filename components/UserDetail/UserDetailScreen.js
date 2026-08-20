@@ -60,7 +60,7 @@ function Field({ label, value }) {
     );
 }
 
-export default async function UserDetailScreen({ user, customerName, callerIsAdmin, activity, sessions, failedLoginCount, failedLoginWindowDays }) {
+export default async function UserDetailScreen({ user, customerName, callerIsAdmin, callerCanWrite, customers = [], activity, sessions, failedLoginCount, failedLoginWindowDays }) {
     const activeSessionCount = sessions.filter((s) => s.active).length;
     const initials = ((user.name?.[0] || '') + (user.surname?.[0] || '')).toUpperCase()
         || (user.username?.[0] || 'U').toUpperCase();
@@ -109,10 +109,13 @@ export default async function UserDetailScreen({ user, customerName, callerIsAdm
                     </div>
                     <UserDetailActions
                         userId={user.id}
+                        user={user}
                         isLocked={!!user.is_locked_out}
                         userEmail={user.email}
                         canImpersonate={Array.isArray(user.roles) && user.roles.some((r) => r?.name === 'Customer')}
+                        canWrite={!!callerCanWrite}
                         isAdmin={!!callerIsAdmin}
+                        customers={customers}
                     />
                 </section>
 

@@ -22,6 +22,7 @@ import ApiKeyMod from "./ApiKey.js";
 import NotificationMod from "./Notification.js";
 import CronRunMod from "./CronRun.js";
 import CustomerSiteMappingMod from "./CustomerSiteMapping.js";
+import ReportColumnPrefMod from "./ReportColumnPref.js";
 
 const resolve = (m) => (m && m.default ? m.default : m);
 
@@ -42,7 +43,7 @@ const REQUIRED_MODELS = [
   'ReportData', 'SecurityLogs', 'SupportQuery',
   'SupportQueryCategory', 'SupportQueryMessage', 'SupportQueryStatus',
   'TextTemplate', 'UserRole', 'ReportNote', 'UserSession', 'VerificationCode',
-  'ApiKey', 'Notification', 'CronRun', 'CustomerSiteMapping',
+  'ApiKey', 'Notification', 'CronRun', 'CustomerSiteMapping', 'ReportColumnPref',
 ];
 
 if (global._sequelizeModels) {
@@ -77,6 +78,7 @@ if (!global._sequelizeModels) {
   const NotificationClass = resolve(NotificationMod);
   const CronRunClass = resolve(CronRunMod);
   const CustomerSiteMappingClass = resolve(CustomerSiteMappingMod);
+  const ReportColumnPrefClass = resolve(ReportColumnPrefMod);
 
   // map of module classes for reference
   const moduleClasses = {
@@ -100,6 +102,7 @@ if (!global._sequelizeModels) {
     Notification: NotificationClass,
     CronRun: CronRunClass,
     CustomerSiteMapping: CustomerSiteMappingClass,
+    ReportColumnPref: ReportColumnPrefClass,
   };
 
   // Build base models object from sequelize registry (these are the real model classes with static methods)

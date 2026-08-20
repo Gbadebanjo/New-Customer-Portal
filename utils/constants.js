@@ -113,16 +113,37 @@ export function toReadableKWh(amount) {
     return Math.round(amount / 1000);
 }
 
-export function toStringCapacity(wattHours) {
-    const tenKilowattHours = 10000; // 10 kWh in watt-hours
-    const tenMegawattHours = 10000 * 1000; // 10 MWh in watt-hours
+// Formats an installed-panel capacity (watts, peak power). Suffixes are
+// `Wp / kWp / MWp` — "peak" watts. Use this for `asset.total_pv_power`
+// and similar rated-capacity fields, NOT for cumulative energy totals
+// (those go through `toStringEnergy` below).
+export function toStringCapacity(watts) {
+    const tenKilo = 10000;          // 10 kW in W
+    const tenMega = 10 * 1000 * 1000; // 10 MW in W
 
-    if (wattHours >= tenMegawattHours) {
-        return `${Math.round(wattHours / 1e6).toLocaleString()} MWp`;
-    } else if (wattHours >= tenKilowattHours && wattHours < tenMegawattHours) {
-        return `${Math.round(wattHours / 1000).toLocaleString()} kWp`;
+    if (watts >= tenMega) {
+        return `${Math.round(watts / 1e6).toLocaleString()} MWp`;
+    } else if (watts >= tenKilo && watts < tenMega) {
+        return `${Math.round(watts / 1000).toLocaleString()} kWp`;
     } else {
-        return `${Math.round(wattHours).toLocaleString()} Wp`;
+        return `${Math.round(watts).toLocaleString()} Wp`;
+    }
+}
+
+// Formats a cumulative energy value in watt-hours. Suffixes are
+// `Wh / kWh / MWh` — energy over time, distinct from the peak-power
+// `Wp` unit above. Use this for anything that came out of the energy
+// resolver (`totalEnergyProduced`, per-source subtotals, etc.).
+export function toStringEnergy(wattHours) {
+    const tenKiloWh = 10000;              // 10 kWh in Wh
+    const tenMegaWh = 10 * 1000 * 1000;   // 10 MWh in Wh
+
+    if (wattHours >= tenMegaWh) {
+        return `${Math.round(wattHours / 1e6).toLocaleString()} MWh`;
+    } else if (wattHours >= tenKiloWh && wattHours < tenMegaWh) {
+        return `${Math.round(wattHours / 1000).toLocaleString()} kWh`;
+    } else {
+        return `${Math.round(wattHours).toLocaleString()} Wh`;
     }
 }
 

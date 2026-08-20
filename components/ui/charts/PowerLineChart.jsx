@@ -74,8 +74,17 @@ export default function PowerLineChart({ initialData, assetId }) {
     const pvData = chartData?.pv_power?.data || [];
     const consumptionData = chartData?.consumption_power?.data || [];
     const gridData = (chartData?.external_power ?? chartData?.power_from_grid)?.data || [];
+    // Genset (generator) power. AMMP returns this alongside pv/consumption/
+    // grid on the same historic-power endpoint — sites without a generator
+    // simply return an empty series.
+    const gensetData = chartData?.genset_power?.data || [];
 
-    const labels = pvData.map(d => formatTimeLabel(d.date));
+    // Labels: whichever series has data — falling back through the four
+    // sources so a site with no PV but a generator still renders instead
+    // of showing an empty chart.
+    const timeSource = [pvData, consumptionData, gridData, gensetData]
+        .find((s) => s.length > 0) || [];
+    const labels = timeSource.map((d) => formatTimeLabel(d.date));
 
     const data = {
         labels,
@@ -113,6 +122,17 @@ export default function PowerLineChart({ initialData, assetId }) {
                 fill: true,
                 spanGaps: true,
             },
+            {
+                label: 'Generator',
+                data: gensetData.map(d => d.value != null ? +(d.value / 1000).toFixed(3) : null),
+                borderColor: '#f4a742',
+                backgroundColor: 'rgba(244,167,66,0.08)',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.3,
+                fill: true,
+                spanGaps: true,
+            },
         ],
     };
 
@@ -143,7 +163,7 @@ export default function PowerLineChart({ initialData, assetId }) {
         },
     };
 
-    const hasData = pvData.length > 0 || consumptionData.length > 0 || gridData.length > 0;
+    const hasData = pvData.length > 0 || consumptionData.length > 0 || gridData.length > 0 || gensetData.length > 0;
 
     return (
         <div className={classes.chartCard}>

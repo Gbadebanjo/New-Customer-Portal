@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import classes from './dataTable.module.css';
 import modalClasses from '@/components/ui/modals/sharedModal.module.css';
 import { FaSearch, FaEye, FaTimes } from 'react-icons/fa';
+import { formatIpAddress } from '@/utils/formatIp';
 
 const LIMIT = 20;
 
@@ -215,7 +216,7 @@ export default function SecurityLogMainDataTable() {
                                     <td style={{ whiteSpace: 'nowrap' }}>{formatDate(row.created_at)}</td>
                                     <td><ActionBadge action={row.action} /></td>
                                     <td>{row.user_name || row.user_id || '—'}</td>
-                                    <td>{row.client_ip_address || '—'}</td>
+                                    <td>{formatIpAddress(row.client_ip_address)}</td>
                                     <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {row.browser_info || '—'}
                                     </td>
@@ -290,7 +291,7 @@ export default function SecurityLogMainDataTable() {
                                 ['Action', selectedLog.action || '—'],
                                 ['User Name', selectedLog.user_name || '—'],
                                 ['User ID', selectedLog.user_id || '—'],
-                                ['IP Address', selectedLog.client_ip_address || '—'],
+                                ['IP Address', formatIpAddress(selectedLog.client_ip_address)],
                                 ['Browser', selectedLog.browser_info || '—'],
                                 ['Application', selectedLog.application_name || 'Daystar Customer Portal'],
                                 ['Identity', selectedLog.identity || '—'],

@@ -1,8 +1,8 @@
 import AuditLogsScreen from "@/components/AuditLogs/AuditLogsScreen";
-import { requireAdminAuth } from "@/lib/auth/requireAdminAuth";
+import { requireSuperAdminAuth } from "@/lib/auth/requireAdminAuth";
 
 export default async function AuditLogsPage() {
-    await requireAdminAuth();
+    await requireSuperAdminAuth();
     return (
         <div>
             <AuditLogsScreen/>

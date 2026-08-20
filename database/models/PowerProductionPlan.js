@@ -27,14 +27,6 @@ PowerProductionPlan.init({
       len: [1, 255], // Validate length between 1 and 255 characters
     },
   },
-  unique_file_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notNull: true,
-      len: [1, 255], // Validate length between 1 and 255 characters
-    },
-  },
   power_production_plan_items: {
     type: DataTypes.ARRAY(DataTypes.JSON),
     allowNull: true,

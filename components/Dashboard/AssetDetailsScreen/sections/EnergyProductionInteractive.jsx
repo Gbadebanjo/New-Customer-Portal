@@ -3,7 +3,7 @@ import { useState, useTransition } from 'react';
 import classes from '../assetDetails.module.css';
 import CustomDateRangePicker from '@/components/ui/dateRangePicker/CustomDateRangePicker';
 import ProgressBarChartComponent from '@/components/ui/charts/ProgressBarChartComponent';
-import { toStringCapacity } from '@/utils/constants';
+import { toStringEnergy } from '@/utils/constants';
 import { getEnergyForRange } from '@/lib/controllers/energy/getEnergyForRange';
 
 /**
@@ -104,7 +104,7 @@ export default function EnergyProductionInteractive({
                 <div className="js-details-container h-md-80" style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity 0.15s' }}>
                     <div className={classes.totalEnergyBox}>
                         <span className={classes.nameDetail}>Total energy produced</span>
-                        <span className={classes.totalEnergyText}>{toStringCapacity(totals?.totalEnergyProduced ?? 0)}</span>
+                        <span className={classes.totalEnergyText}>{toStringEnergy(totals?.totalEnergyProduced ?? 0)}</span>
                     </div>
                     <div className="p-0 mt-2 mt-md-0 col-md-7 ">
                         <ProgressBarChartComponent progressData={progressData} />

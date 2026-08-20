@@ -10,20 +10,32 @@ import {
 import deleteUserById from '@/lib/controllers/users/deleteUserById';
 import { impersonateUser } from '@/lib/auth/impersonationActions';
 import ConfirmModal from '@/components/ui/modals/customAlertModal/ConfirmModal';
+import EditUserModal from './EditUserModal';
 
 // Panel with the quick-action buttons on the identity card.
 // Each destructive action opens the app-styled ConfirmModal (replacing
 // window.confirm which pops OS-level and looks off-brand).
 //
-// `isAdmin` controls the Delete-user button: only the top-tier Admin
-// role sees it, since user deletion is irreversible. Portal Admin and
-// DCA still see the other admin actions.
-export default function UserDetailActions({ userId, userEmail, isLocked, canImpersonate, isAdmin }) {
+// Prop matrix:
+//   `canWrite`   — Admin + Portal Admin. Shows Edit user.
+//   `isAdmin`    — top-tier `Admin` only. Shows Delete user.
+//   DCA sees neither Edit nor Delete (read + impersonate only).
+export default function UserDetailActions({
+    userId,
+    user,           // full user row for the Edit modal
+    userEmail,
+    isLocked,
+    canImpersonate,
+    canWrite,
+    isAdmin,
+    customers = [],
+}) {
     const router = useRouter();
     const [busy, setBusy] = useState(null);
     const [msg, setMsg] = useState(null);
     // { key, message, confirmLabel, tone, fn } — non-null while awaiting user confirmation.
     const [pending, setPending] = useState(null);
+    const [editOpen, setEditOpen] = useState(false);
 
     const start = (key, fn, confirmDetails) => {
         if (busy) return;
@@ -68,6 +80,14 @@ export default function UserDetailActions({ userId, userEmail, isLocked, canImpe
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end' }}>
+                {canWrite && (
+                    <Btn
+                        onClick={() => setEditOpen(true)}
+                        variant="primary"
+                    >
+                        Edit user
+                    </Btn>
+                )}
                 <Btn
                     onClick={() => start('lock', () => toggleUserLocked(userId, !isLocked), {
                         message: isLocked
@@ -146,6 +166,14 @@ export default function UserDetailActions({ userId, userEmail, isLocked, canImpe
                 tone={pending?.tone}
                 onConfirm={confirmPending}
                 onCancel={() => setPending(null)}
+            />
+
+            <EditUserModal
+                open={editOpen}
+                user={user}
+                customers={customers}
+                callerIsAdmin={!!isAdmin}
+                onClose={() => setEditOpen(false)}
             />
         </div>
     );

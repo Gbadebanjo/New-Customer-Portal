@@ -56,6 +56,9 @@ export default function Navbar({
 
   const roleNames = mounted ? (user?.roles?.map((r) => r.name) || []) : [];
   const hasAdminRole = roleNames.includes('Admin') || roleNames.includes('Daystar Portal Admin');
+  // Top-tier `Admin` role only — used to gate infrastructure surfaces
+  // (Cron Health, Audit Logs) that Portal Admin shouldn't see.
+  const isSuperAdmin = roleNames.includes('Admin');
   const hasDaystarCustomerAdmin = roleNames.includes('Daystar Customer Admin');
   const hasCustomerUser = roleNames.includes('Customer User') || roleNames.includes('Customer');
   const isDaystarRole = hasAdminRole || hasDaystarCustomerAdmin;
@@ -259,26 +262,30 @@ export default function Navbar({
                   <span className={classes.label}>Text Templates</span>
                 </Link>
               </li>
-              <li className={classes.innerMenuItem}>
-                <Link
-                  href="/admin/audit-logs"
-                  onClick={closeAdminOnLeafClick}
-                  className={subItemClass(path.startsWith("/admin/audit-logs"))}
-                >
-                  <span className={classes.icon}><AuditLogsIcon /></span>
-                  <span className={classes.label}>Audit Logs</span>
-                </Link>
-              </li>
-              <li className={classes.innerMenuItem}>
-                <Link
-                  href="/admin/cron-health"
-                  onClick={closeAdminOnLeafClick}
-                  className={subItemClass(path.startsWith("/admin/cron-health"))}
-                >
-                  <span className={classes.icon}><ChartIcon /></span>
-                  <span className={classes.label}>Cron Health</span>
-                </Link>
-              </li>
+              {isSuperAdmin && (
+                <li className={classes.innerMenuItem}>
+                  <Link
+                    href="/admin/audit-logs"
+                    onClick={closeAdminOnLeafClick}
+                    className={subItemClass(path.startsWith("/admin/audit-logs"))}
+                  >
+                    <span className={classes.icon}><AuditLogsIcon /></span>
+                    <span className={classes.label}>Audit Logs</span>
+                  </Link>
+                </li>
+              )}
+              {isSuperAdmin && (
+                <li className={classes.innerMenuItem}>
+                  <Link
+                    href="/admin/cron-health"
+                    onClick={closeAdminOnLeafClick}
+                    className={subItemClass(path.startsWith("/admin/cron-health"))}
+                  >
+                    <span className={classes.icon}><ChartIcon /></span>
+                    <span className={classes.label}>Cron Health</span>
+                  </Link>
+                </li>
+              )}
               <li className={classes.innerMenuItem}>
                 <Link
                   href="/admin/settings"
